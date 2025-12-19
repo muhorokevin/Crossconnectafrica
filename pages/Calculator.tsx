@@ -283,7 +283,7 @@ const Calculator: React.FC<{ initialData?: BookingContextData | null }> = ({ ini
                    </div>
                 </div>
                 <div className="space-y-2">
-                   <span className="text-brand-gold text-[9px] font-bold uppercase tracking-[0.6em] block">Mission Assessment For</span>
+                   <span className="text-brand-gold text-[9px] font-bold uppercase tracking-[0.6em] block mb-2">Mission Assessment For</span>
                    <h3 className="text-3xl font-serif font-bold text-brand-green tracking-tighter italic leading-none">{clientInfo.company || 'Prospective Partner'}</h3>
                    <div className="text-[9px] text-gray-400 font-bold uppercase tracking-widest">{clientInfo.contact} | {clientInfo.email}</div>
                 </div>
@@ -389,20 +389,28 @@ const Calculator: React.FC<{ initialData?: BookingContextData | null }> = ({ ini
       
       <style>{`
         @media print {
-          body * { visibility: hidden; background-color: white !important; }
-          #quote-doc, #quote-doc * { visibility: visible; }
+          /* Force display and static positioning for the document container */
           #quote-doc {
-            position: fixed;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            padding: 40px;
-            margin: 0;
-            box-shadow: none;
-            border: none;
+            display: block !important;
+            position: static !important;
+            width: 100% !important;
+            height: auto !important;
+            margin: 0 !important;
+            padding: 1cm !important;
+            box-shadow: none !important;
+            border: none !important;
+            background-image: none !important; /* Remove paper texture for clean print */
           }
-          .print\\:hidden { display: none !important; }
+          
+          /* Ensure child visibility isn't blocked by generic hidden rules */
+          #quote-doc * {
+            visibility: visible !important;
+          }
+
+          /* Hide other page elements to be safe */
+          header, section, .print-hidden, .bg-brand-cream {
+             background-color: white !important;
+          }
         }
       `}</style>
     </div>

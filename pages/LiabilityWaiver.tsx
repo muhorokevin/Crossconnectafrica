@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { AlertTriangle, FileSignature, Download, MessageCircle, X, CheckCircle } from 'lucide-react';
 
@@ -9,7 +10,6 @@ const LiabilityWaiver: React.FC = () => {
     window.print();
     
     // 2. Show the modal instructing them to send it via WhatsApp after a short delay
-    // The delay ensures the print dialog has likely opened
     setTimeout(() => {
         setShowUploadModal(true);
     }, 2000);
@@ -35,7 +35,7 @@ Client Name: [Please Insert Name]`;
             <h1 className="text-3xl md:text-4xl font-serif text-brand-green font-bold">Liability Waiver & Assumption of Risk</h1>
         </div>
         
-        <div className="bg-brand-green/5 border-l-4 border-brand-gold p-4 mb-8 text-sm text-brand-green">
+        <div className="bg-brand-green/5 border-l-4 border-brand-gold p-4 mb-8 text-sm text-brand-green print-hidden">
             <strong>Legal Notice:</strong> This is a legally binding document. By booking a trip with Cross Connect Africa, you are deemed to have read, understood, and agreed to these terms. It affects your legal rights in the event of injury.
         </div>
 
@@ -95,7 +95,7 @@ Client Name: [Please Insert Name]`;
           </section>
 
           {/* Signature Block for Print */}
-          <section className="border-t-2 border-gray-200 mt-12 pt-8 print:block hidden">
+          <section className="border-t-2 border-gray-200 mt-12 pt-8 print-block">
              <div className="grid grid-cols-2 gap-12">
                  <div>
                     <div className="h-0.5 bg-gray-400 mb-2 w-full"></div>
@@ -167,25 +167,19 @@ Client Name: [Please Insert Name]`;
       )}
 
       <style>{`
+        /* Local Override for Waiver Printing */
         @media print {
-            body * {
-                visibility: hidden;
-            }
-            #waiver-content, #waiver-content * {
-                visibility: visible;
-            }
             #waiver-content {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
-                margin: 0;
-                padding: 40px;
-                box-shadow: none;
-                border: none;
+                display: block !important;
+                position: static !important;
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                border: none !important;
+                box-shadow: none !important;
             }
-            nav, footer, button {
-                display: none !important;
+            .print-block {
+                display: block !important;
             }
         }
       `}</style>

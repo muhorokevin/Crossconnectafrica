@@ -14,7 +14,6 @@
     <script>
       /** 
        * Polyfills for production environments.
-       * Many libraries expect 'process.env' and 'global' to exist.
        */
       window.global = window;
       window.process = window.process || {};
@@ -68,6 +67,27 @@
       .kinetic-btn:hover {
         transform: translateY(-4px);
         box-shadow: 0 20px 40px rgba(2, 44, 34, 0.15);
+      }
+
+      /* Global Print Stability */
+      @media print {
+        @page {
+          margin: 1cm;
+        }
+        body {
+          background-color: white !important;
+        }
+        .noise-overlay::before {
+          display: none !important;
+        }
+        nav, footer, .print-hidden, button, .mission-consultant-trigger {
+          display: none !important;
+        }
+        #root, main {
+          display: block !important;
+          margin: 0 !important;
+          padding: 0 !important;
+        }
       }
     </style>
   <script type="importmap">

@@ -1,0 +1,158 @@
+
+import React from 'react';
+import { ArrowRight, Zap, Award, MoveDown, Shield, Compass, Briefcase, Flame } from 'lucide-react';
+import { ViewState } from '../types';
+
+interface HomeProps {
+  setView: (view: ViewState) => void;
+}
+
+const Home: React.FC<HomeProps> = ({ setView }) => {
+  return (
+    <div className="w-full">
+      {/* 1. CINEMATIC HERO */}
+      <section className="relative h-screen w-full flex items-center justify-center overflow-hidden">
+        <div className="absolute inset-0 z-0">
+          <img 
+            src="https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?q=80&w=2070&auto=format&fit=crop" 
+            alt="Adventure Peak" 
+            className="w-full h-full object-cover brightness-[0.35] animate-slow-zoom" 
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-brand-green/20 via-transparent to-brand-green/80"></div>
+        </div>
+
+        <div className="relative z-10 text-center px-6 max-w-7xl mx-auto pt-20">
+          <div className="inline-flex items-center gap-3 border border-brand-gold/40 rounded-full px-8 py-3 mb-8 backdrop-blur-md animate-fade-in-up">
+            <Award size={14} className="text-brand-gold" />
+            <span className="text-white text-[10px] font-bold uppercase tracking-[0.5em]">Character Forged Since 2023</span>
+          </div>
+          
+          <h1 className="text-5xl md:text-8xl font-serif text-white font-bold mb-8 leading-tight tracking-tighter drop-shadow-2xl animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+            Rugged <br/>
+            <span className="text-brand-gold italic font-light">Refinement.</span>
+          </h1>
+          
+          <p className="text-gray-300 text-lg md:text-xl mb-12 max-w-3xl mx-auto leading-relaxed font-serif italic opacity-90 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+            "Nairobi's elite destination for character mentorship, institutional safety, and high-stakes corporate adventure."
+          </p>
+          
+          <div className="flex flex-col sm:flex-row gap-6 justify-center items-center animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
+            <button 
+              onClick={() => setView(ViewState.ADVENTURE_BUILDER)}
+              className="px-12 py-6 bg-brand-gold text-brand-green font-bold uppercase tracking-[0.5em] text-[10px] kinetic-btn flex items-center gap-4 group"
+            >
+              Architect Mission <Zap size={16} className="group-hover:rotate-12 transition-transform" />
+            </button>
+            <button 
+              onClick={() => setView(ViewState.CALCULATOR)}
+              className="px-12 py-6 bg-transparent border border-white/40 text-white font-bold uppercase tracking-[0.5em] text-[10px] hover:bg-white hover:text-brand-green transition-all backdrop-blur-sm flex items-center gap-4 group"
+            >
+              Get Proposal <ArrowRight size={16} className="group-hover:translate-x-2 transition-transform" />
+            </button>
+          </div>
+        </div>
+
+        <div className="absolute bottom-12 left-1/2 -translate-x-1/2 text-white/30 animate-bounce">
+            <MoveDown size={32} />
+        </div>
+      </section>
+
+      {/* 2. THE EDITORIAL MANIFESTO */}
+      <section className="py-32 px-6 bg-brand-cream relative">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
+             <div className="lg:col-span-5 relative group">
+                <div className="absolute -inset-8 border border-brand-green/5 translate-x-12 translate-y-12 transition-transform group-hover:translate-x-8 group-hover:translate-y-8 duration-700"></div>
+                <img 
+                    src="https://images.unsplash.com/photo-1510733722162-bb811ecbb5c5?q=80&w=1974&auto=format&fit=crop" 
+                    className="relative z-10 w-full aspect-[3/4] object-cover grayscale group-hover:grayscale-0 transition-all duration-1000 shadow-[0_50px_100px_rgba(0,0,0,0.1)]"
+                    alt="Wilderness Mentorship"
+                />
+                <div className="absolute -bottom-8 -right-8 bg-brand-green text-brand-gold p-8 z-20 shadow-2xl">
+                   <div className="text-brand-gold text-[9px] font-bold uppercase tracking-[0.5em] mb-2">Our Creed</div>
+                   <span className="text-3xl font-serif font-bold italic tracking-tighter">Grit & Grace.</span>
+                </div>
+             </div>
+             <div className="lg:col-span-7 space-y-10">
+                <span className="text-brand-gold text-xs font-bold uppercase tracking-[0.7em] block">The Foundation</span>
+                <h2 className="text-5xl md:text-7xl font-serif font-bold text-brand-green leading-tight tracking-tighter">
+                   Forging <br/><span className="italic font-light text-brand-gold">Excellence.</span>
+                </h2>
+                <div className="w-20 h-1.5 bg-brand-gold/30"></div>
+                <p className="text-2xl text-gray-500 leading-relaxed font-serif italic max-w-3xl">
+                   "We don't teach leadership in boardrooms. We forge it at 12,000 feet. Our missions combine elite facilitation with the uncompromising challenge of the African wild."
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-12 pt-4">
+                   <div className="group">
+                      <div className="text-5xl font-serif font-bold text-brand-green tracking-tighter group-hover:text-brand-gold transition-colors">100%</div>
+                      <div className="text-[10px] text-gray-400 font-bold uppercase tracking-[0.4em] mt-2">Safety Protocol</div>
+                   </div>
+                   <div className="group">
+                      <div className="text-5xl font-serif font-bold text-brand-green tracking-tighter group-hover:text-brand-gold transition-colors">2+</div>
+                      <div className="text-[10px] text-gray-400 font-bold uppercase tracking-[0.4em] mt-2">Years Experience</div>
+                   </div>
+                </div>
+             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 3. THE ECOSYSTEM BENTO */}
+      <section className="py-24 bg-brand-sand border-y border-brand-green/5">
+        <div className="container mx-auto px-6">
+          <div className="text-center mb-24">
+             <span className="text-brand-gold text-xs font-bold uppercase tracking-[0.6em] mb-4 block">Service Ecosystem</span>
+             <h2 className="text-4xl md:text-6xl font-serif font-bold text-brand-green tracking-tighter leading-none italic">Four Pillars of <br/><span className="not-italic">Transformation.</span></h2>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-px bg-brand-green/5">
+            {[
+              { icon: <Shield size={28} />, title: 'Safety', desc: 'Certified First Aid & Fire Compliance.', img: 'https://images.unsplash.com/photo-1584285418504-00411639332a?q=80&w=1000' },
+              { icon: <Briefcase size={28} />, title: 'Corporate', desc: 'Strategic Retreats & Executive Labs.', img: 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=1000' },
+              { icon: <Compass size={28} />, title: 'Youth', desc: 'Mentorship & Character Camps.', img: 'https://images.unsplash.com/photo-1502086223501-7ea6ecd79368?q=80&w=1000' },
+              { icon: <Flame size={28} />, title: 'Adventure', desc: 'Alpine Expeditions & Coastal Peaks.', img: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=1000' },
+            ].map((pillar, i) => (
+              <div key={i} className="group relative overflow-hidden aspect-[4/6] bg-brand-green">
+                 <img src={pillar.img} className="absolute inset-0 w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-110 transition-all duration-[2s] opacity-60 group-hover:opacity-100" alt={pillar.title} />
+                 <div className="absolute inset-0 bg-gradient-to-t from-brand-green via-brand-green/20 to-transparent"></div>
+                 <div className="absolute inset-0 flex flex-col justify-end p-10 translate-y-6 group-hover:translate-y-0 transition-transform duration-700">
+                    <div className="text-brand-gold mb-6 opacity-0 group-hover:opacity-100 transition-opacity delay-100">{pillar.icon}</div>
+                    <h3 className="text-3xl font-serif font-bold text-white mb-4 tracking-tighter italic">{pillar.title}</h3>
+                    <p className="text-gray-300 text-base font-serif italic mb-8 opacity-0 group-hover:opacity-100 transition-opacity delay-200">{pillar.desc}</p>
+                    <button 
+                      onClick={() => setView(ViewState.ADVENTURE_BUILDER)} 
+                      className="text-[9px] font-bold uppercase tracking-[0.5em] text-brand-gold flex items-center gap-3 group/btn w-fit"
+                    >
+                      Architect Mission <ArrowRight size={12} className="group-hover/btn:translate-x-2 transition-transform" />
+                    </button>
+                 </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 4. THE CALL TO ACTION */}
+      <section className="py-48 relative flex items-center justify-center text-center overflow-hidden">
+        <div className="absolute inset-0">
+            <img src="https://images.unsplash.com/photo-1493246507139-91e8bef99c02?q=80&w=2070&auto=format&fit=crop" className="w-full h-full object-cover brightness-[0.2]" alt="Summit" />
+            <div className="absolute inset-0 bg-brand-green/60 mix-blend-multiply"></div>
+        </div>
+        <div className="relative z-10 px-6 max-w-6xl">
+            <h2 className="text-5xl md:text-8xl font-serif text-white font-bold mb-12 leading-none tracking-tighter italic">Legacy <br/><span className="not-italic text-brand-gold">Awaits.</span></h2>
+            <p className="text-2xl text-gray-300 mb-16 font-serif italic max-w-4xl mx-auto opacity-80 leading-relaxed">
+              "Exceptional character requires exceptional experiences. Let us architect your next transformational mission."
+            </p>
+            <button 
+              onClick={() => setView(ViewState.CALCULATOR)}
+              className="px-16 py-8 bg-brand-gold text-brand-green font-bold uppercase tracking-[0.6em] text-[10px] kinetic-btn shadow-[0_40px_100px_rgba(217,119,6,0.3)]"
+            >
+              Start Your Investment
+            </button>
+        </div>
+      </section>
+    </div>
+  );
+};
+
+export default Home;

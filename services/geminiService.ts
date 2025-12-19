@@ -1,8 +1,5 @@
-
 import { GoogleGenAI, Type } from "@google/genai";
 import { GeneratedItinerary, ChatMessage } from "../types";
-
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 const RESPONSE_SCHEMA = {
   type: Type.OBJECT,
@@ -38,7 +35,6 @@ export const generateAdventureItinerary = async (
   addons: string[]
 ): Promise<GeneratedItinerary> => {
   const modelId = 'gemini-3-flash-preview';
-
   const prompt = `Create a detailed ${days}-day adventure itinerary for a group of ${groupSize} people in Kenya.
   
   CONTEXT:
@@ -53,15 +49,16 @@ export const generateAdventureItinerary = async (
   1. Title reflecting "Rugged Refinement".
   2. Balanced spiritual reflection, physical challenge, and social bonding.
   3. Professional, structured daily field log.
-  4. Cost estimate in KES per person (Standard Kenyan high-end rates).
-  `;
+  4. Cost estimate in KES per person.`;
 
   try {
+    // Initializing GoogleGenAI using a fresh instance per call as per guidelines
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
     const response = await ai.models.generateContent({
       model: modelId,
       contents: prompt,
       config: {
-        systemInstruction: "You are 'Kevin Muhoro', the Founder and Lead Facilitator for Cross Connect Africa in Nairobi. You are rugged, wise, and committed to character building. You use Kenyan references (Ngong Hills, Mt. Kenya, Aberdares). Your tone is professional yet inspiring. You are an expert in Safety, Team Building, and Mentorship. If asked about prices, direct them to the 'Get Quote' calculator or the Shop. Keep responses concise and high-end.",
+        systemInstruction: "You are 'Kevin Muhoro', the Founder and Lead Facilitator for Cross Connect Africa in Nairobi. You are rugged, wise, and committed to character building. You use Kenyan references. If asked about prices, direct them to the 'Get Quote' calculator or the Shop. Keep responses concise and high-end.",
         responseMimeType: "application/json",
         responseSchema: RESPONSE_SCHEMA
       }
@@ -70,19 +67,18 @@ export const generateAdventureItinerary = async (
     if (response.text) {
       return JSON.parse(response.text) as GeneratedItinerary;
     }
-    throw new Error("No content generated");
-
-  } catch (error) {
-    console.error("Gemini API Error:", error);
+    throw new Error("Empty response from AI");
+  } catch (error: any) {
+    console.error("Itinerary Generation Error:", error);
+    // Return a graceful fallback if the API fails
     return {
       title: `${programName} Mission`,
       theme: "Resilience & Connection",
       estimatedCost: 8500,
       items: [
-        { id: "1", time: "08:00", activity: "Strategy Briefing", category: "social", description: "Initial mission overview and gear inspection." },
-        { id: "2", time: "10:30", activity: "Ridge Challenge", category: "physical", description: "Terrain navigation and team dynamic testing." },
-        { id: "3", time: "13:00", activity: "Bush Nutrition", category: "leisure", description: "High-protein field lunch." },
-        { id: "4", time: "15:00", activity: "Reflective De-brief", category: "spiritual", description: "Spiritual application of physical challenges." },
+        { id: "1", time: "08:00", activity: "Strategic Briefing", category: "social", description: "Standard field deployment and gear inspection." },
+        { id: "2", time: "11:00", activity: "Ridge Challenge", category: "physical", description: "Testing group dynamics and terrain navigation." },
+        { id: "3", time: "15:00", activity: "Field Reflection", category: "spiritual", description: "Spiritual application of the morning's physical hurdles." }
       ]
     };
   }
@@ -91,18 +87,23 @@ export const generateAdventureItinerary = async (
 export const chatWithConsultant = async (history: ChatMessage[], message: string): Promise<string> => {
   const modelId = 'gemini-3-flash-preview';
   
-  const chat = ai.chats.create({
-    model: modelId,
-    config: {
-      systemInstruction: "You are 'Kevin Muhoro', the Founder and Lead Facilitator for Cross Connect Africa in Nairobi. You are rugged, wise, and committed to character building. You use Kenyan references (Ngong Hills, Mt. Kenya, Aberdares). Your tone is professional yet inspiring. You are an expert in Safety, Team Building, and Mentorship. If asked about prices, direct them to the 'Get Quote' calculator or the Shop. Keep responses concise and high-end.",
-    }
-  });
-
   try {
+    // Create a new instance right before the call to ensure up-to-date configuration
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
+    const chat = ai.chats.create({
+      model: modelId,
+      config: {
+        systemInstruction: "You are 'Kevin Muhoro', Founder of Cross Connect Africa. You are rugged, professional, and use Kenyan references. You mentor users on adventure, character, and mission strategy. If asked about technical things like 'Failed to Fetch', explain that you are on a mountain ridge and they should check their 'API Key Environment Variables' in Vercel settings.",
+      }
+    });
+
     const response = await chat.sendMessage({ message });
-    return response.text || "Apologies, the signal on the ridge is weak. Say again?";
-  } catch (error) {
-    console.error("Chat Error:", error);
-    return "The mountains are calling, but my connection is fading. Try once more?";
+    return response.text || "The signal is dropping on the ridge. Say again?";
+  } catch (error: any) {
+    console.error("Consultant Chat Error:", error);
+    if (error.message?.includes("API_KEY")) {
+      return "Critical Alert: My radio (API Key) is not configured in your deployment settings. Please add the API_KEY to your Vercel project environment variables.";
+    }
+    return "The mountains are calling, but my connection is fading. Check your network or API settings.";
   }
 };

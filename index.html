@@ -5,6 +5,16 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Cross Connect Africa | Forged in the Wild</title>
+    <script>
+      /** 
+       * Polyfills for production environments.
+       * Many libraries expect 'process.env' and 'global' to exist.
+       */
+      window.global = window;
+      window.process = window.process || {};
+      window.process.env = window.process.env || {};
+      window.process.browser = true;
+    </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,10 +25,10 @@
           extend: {
             colors: {
               brand: {
-                green: '#022c22', // CCA Green
-                gold: '#d97706',  // Amber Gold
-                cream: '#FDFBF7', // Paper Bone
-                stone: '#e7e5e4', // CCA Stone
+                green: '#022c22',
+                gold: '#d97706',
+                cream: '#FDFBF7',
+                stone: '#e7e5e4',
                 sand: '#f4f4f0',
                 clay: '#78350f',
               }
@@ -26,25 +36,6 @@
             fontFamily: {
               serif: ['"Playfair Display"', 'serif'],
               sans: ['"Inter"', 'sans-serif'],
-            },
-            animation: {
-              'fade-in-up': 'fadeInUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards',
-              'slow-zoom': 'slowZoom 30s infinite alternate ease-in-out',
-              'reveal': 'reveal 1.2s cubic-bezier(0.77, 0, 0.175, 1) forwards',
-            },
-            keyframes: {
-              fadeInUp: {
-                '0%': { opacity: '0', transform: 'translateY(40px)' },
-                '100%': { opacity: '1', transform: 'translateY(0)' },
-              },
-              slowZoom: {
-                '0%': { transform: 'scale(1)' },
-                '100%': { transform: 'scale(1.2)' },
-              },
-              reveal: {
-                '0%': { transform: 'translateY(100%)', opacity: '0' },
-                '100%': { transform: 'translateY(0)', opacity: '1' },
-              }
             }
           }
         }
@@ -65,29 +56,6 @@
         pointer-events: none;
         z-index: 9999;
       }
-      .glass {
-        background: rgba(255, 255, 255, 0.7);
-        backdrop-filter: blur(14px);
-        -webkit-backdrop-filter: blur(14px);
-        border: 1px solid rgba(255, 255, 255, 0.3);
-      }
-      .paper-texture {
-        background-image: url('https://www.transparenttextures.com/patterns/paper-fibers.png');
-        background-color: #fff;
-      }
-      .bento-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 1.5rem;
-      }
-      ::selection {
-        background: #d97706;
-        color: #FDFBF7;
-      }
-      ::-webkit-scrollbar { width: 4px; }
-      ::-webkit-scrollbar-track { background: #FDFBF7; }
-      ::-webkit-scrollbar-thumb { background: #022c22; }
-      
       .kinetic-btn {
         transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
       }
@@ -95,26 +63,28 @@
         transform: translateY(-4px);
         box-shadow: 0 20px 40px rgba(2, 44, 34, 0.15);
       }
-      .kinetic-btn:active {
-        transform: translateY(0);
-      }
     </style>
   <script type="importmap">
 {
   "imports": {
-    "react/": "https://esm.sh/react@^19.2.3/",
     "react": "https://esm.sh/react@^19.2.3",
     "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "react/": "https://esm.sh/react@^19.2.3/",
     "@google/genai": "https://esm.sh/@google/genai@^1.34.0",
     "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
     "recharts": "https://esm.sh/recharts@^3.6.0",
-    "@vitejs/plugin-react": "https://esm.sh/@vitejs/plugin-react@^5.1.2",
-    "vite": "https://esm.sh/vite@^7.3.0"
+    "vite": "https://esm.sh/vite@^7.3.0",
+    "@vitejs/plugin-react": "https://esm.sh/@vitejs/plugin-react@^5.1.2"
   }
 }
 </script>
 </head>
   <body class="noise-overlay">
     <div id="root"></div>
+    <!-- 
+      Relative path is safer for Vite's build process.
+      Vite will transform this into the optimized JS bundle.
+    -->
+    <script type="module" src="./index.tsx"></script>
   </body>
 </html>

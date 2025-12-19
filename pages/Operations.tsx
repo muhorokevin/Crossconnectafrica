@@ -84,12 +84,14 @@ const Operations: React.FC = () => {
             {inventoryGroups.map((group, idx) => (
                 <div key={idx} className="bg-white p-8 border border-brand-green/5 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
                     <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
-                        {React.cloneElement(group.icon as React.ReactElement, { size: 120 })}
+                        {/* Fix: cast icon to React.ReactElement<any> to allow 'size' prop in cloneElement */}
+                        {React.cloneElement(group.icon as React.ReactElement<any>, { size: 120 })}
                     </div>
                     
                     <div className="relative z-10">
                         <div className="flex items-center gap-3 mb-4">
-                            {React.cloneElement(group.icon as React.ReactElement, { size: 24 })}
+                            {/* Fix: cast icon to React.ReactElement<any> to allow 'size' prop in cloneElement */}
+                            {React.cloneElement(group.icon as React.ReactElement<any>, { size: 24 })}
                             <h2 className="text-2xl font-serif font-bold text-brand-green">{group.title}</h2>
                         </div>
                         <p className="text-gray-400 text-sm mb-8 font-medium italic">{group.description}</p>

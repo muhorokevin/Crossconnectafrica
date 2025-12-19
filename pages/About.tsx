@@ -16,7 +16,7 @@ const About: React.FC = () => {
         </div>
       </section>
 
-      {/* 2. Founder Profile */}
+      {/* 2. Founder Profile (Mentioned but without personal photo) */}
       <section className="bg-white py-24 px-6 relative overflow-hidden">
         {/* Decorative Leaf/Nature accent */}
         <div className="absolute -right-20 top-20 opacity-[0.02] rotate-45">
@@ -25,17 +25,17 @@ const About: React.FC = () => {
 
         <div className="max-w-6xl mx-auto relative z-10">
             <div className="flex flex-col md:flex-row items-center gap-12 lg:gap-24">
-                {/* Image Side */}
+                {/* Image Side - Landscape representing the mission environment */}
                 <div className="w-full md:w-1/2 relative group">
                     <div className="absolute top-6 -left-6 w-full h-full border-2 border-brand-gold rounded-lg z-0 transition-all duration-500 group-hover:top-4 group-hover:-left-4"></div>
                     <div className="relative z-10 rounded-lg overflow-hidden shadow-2xl aspect-[4/5] bg-brand-green">
                         <img 
-                            src="https://images.unsplash.com/photo-1544168190-79c17527004f?q=80&w=1976&auto=format&fit=crop" 
-                            alt="Kevin Muhoro - Founder" 
+                            src="https://images.unsplash.com/photo-1527605156685-f12b75f3c763?q=80&w=1970&auto=format&fit=crop" 
+                            alt="The Rugged Peaks of Kenya" 
                             className="w-full h-full object-cover grayscale transition-all duration-700 group-hover:grayscale-0" 
                         /> 
                         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-brand-green p-8">
-                          <p className="text-brand-gold font-bold uppercase tracking-widest text-[10px]">Lead Facilitator</p>
+                          <p className="text-brand-gold font-bold uppercase tracking-widest text-[10px]">Founder & Lead Facilitator</p>
                           <h3 className="text-white text-3xl font-serif font-bold">Kevin Muhoro</h3>
                         </div>
                     </div>
@@ -51,7 +51,7 @@ const About: React.FC = () => {
                           "I believe that true leadership isn't learned in a classroom—it's forged in the fire of challenge and the quiet of nature."
                       </p>
                       <p>
-                          As the Lead Facilitator of Cross Connect Africa, Kevin has dedicated his life to mentoring youth and coaching corporate teams. His approach combines rigorous outdoor training with deep spiritual mentorship.
+                          As the Lead Facilitator of Cross Connect Africa, Kevin Muhoro has dedicated his life to mentoring youth and coaching corporate teams. His approach combines rigorous outdoor training with deep spiritual mentorship, rooted in the uncompromising landscape of the Kenyan wild.
                       </p>
                     </div>
 

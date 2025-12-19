@@ -14,8 +14,8 @@ const Home: React.FC<HomeProps> = ({ setView }) => {
       <section className="relative h-screen w-full flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
           <img 
-            src="https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?q=80&w=2070&auto=format&fit=crop" 
-            alt="Adventure Peak" 
+            src="https://images.unsplash.com/photo-1454496522488-7a8e488e8606?q=80&w=2076&auto=format&fit=crop" 
+            alt="Majestic Mountain Peak" 
             className="w-full h-full object-cover brightness-[0.35] animate-slow-zoom" 
           />
           <div className="absolute inset-0 bg-gradient-to-b from-brand-green/20 via-transparent to-brand-green/80"></div>
@@ -64,9 +64,9 @@ const Home: React.FC<HomeProps> = ({ setView }) => {
              <div className="lg:col-span-5 relative group">
                 <div className="absolute -inset-8 border border-brand-green/5 translate-x-12 translate-y-12 transition-transform group-hover:translate-x-8 group-hover:translate-y-8 duration-700"></div>
                 <img 
-                    src="https://images.unsplash.com/photo-1510733722162-bb811ecbb5c5?q=80&w=1974&auto=format&fit=crop" 
+                    src="https://images.unsplash.com/photo-1501555088652-021faa106b9b?q=80&w=1973&auto=format&fit=crop" 
                     className="relative z-10 w-full aspect-[3/4] object-cover grayscale group-hover:grayscale-0 transition-all duration-1000 shadow-[0_50px_100px_rgba(0,0,0,0.1)]"
-                    alt="Wilderness Mentorship"
+                    alt="Wilderness Mentorship Silhouette"
                 />
                 <div className="absolute -bottom-8 -right-8 bg-brand-green text-brand-gold p-8 z-20 shadow-2xl">
                    <div className="text-brand-gold text-[9px] font-bold uppercase tracking-[0.5em] mb-2">Our Creed</div>
@@ -107,9 +107,9 @@ const Home: React.FC<HomeProps> = ({ setView }) => {
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-px bg-brand-green/5">
             {[
-              { icon: <Shield size={28} />, title: 'Safety', desc: 'Certified First Aid & Fire Compliance.', img: 'https://images.unsplash.com/photo-1584285418504-00411639332a?q=80&w=1000' },
-              { icon: <Briefcase size={28} />, title: 'Corporate', desc: 'Strategic Retreats & Executive Labs.', img: 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=1000' },
-              { icon: <Compass size={28} />, title: 'Youth', desc: 'Mentorship & Character Camps.', img: 'https://images.unsplash.com/photo-1502086223501-7ea6ecd79368?q=80&w=1000' },
+              { icon: <Shield size={28} />, title: 'Safety', desc: 'Certified First Aid & Fire Compliance.', img: 'https://images.unsplash.com/photo-1603398938378-e54eab446ddd?q=80&w=1000' },
+              { icon: <Briefcase size={28} />, title: 'Corporate', desc: 'Strategic Retreats & Executive Labs.', img: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=1000' },
+              { icon: <Compass size={28} />, title: 'Youth', desc: 'Mentorship & Character Camps.', img: 'https://images.unsplash.com/photo-1475483768296-6163e08872a1?q=80&w=1000' },
               { icon: <Flame size={28} />, title: 'Adventure', desc: 'Alpine Expeditions & Coastal Peaks.', img: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=1000' },
             ].map((pillar, i) => (
               <div key={i} className="group relative overflow-hidden aspect-[4/6] bg-brand-green">
@@ -135,7 +135,7 @@ const Home: React.FC<HomeProps> = ({ setView }) => {
       {/* 4. THE CALL TO ACTION */}
       <section className="py-48 relative flex items-center justify-center text-center overflow-hidden">
         <div className="absolute inset-0">
-            <img src="https://images.unsplash.com/photo-1493246507139-91e8bef99c02?q=80&w=2070&auto=format&fit=crop" className="w-full h-full object-cover brightness-[0.2]" alt="Summit" />
+            <img src="https://images.unsplash.com/photo-1491438590914-bc09fcaaf77a?q=80&w=2070&auto=format&fit=crop" className="w-full h-full object-cover brightness-[0.2]" alt="Summit Landscape" />
             <div className="absolute inset-0 bg-brand-green/60 mix-blend-multiply"></div>
         </div>
         <div className="relative z-10 px-6 max-w-6xl">

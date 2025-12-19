@@ -12,7 +12,7 @@ const products: Product[] = [
     price: '2500',
     description: 'Premium heavy cotton with high-density print. Engineered for events, hikes, and CSR days.',
     valueProp: 'Wear the mission. Built for community and service.',
-    image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=1000'
+    image: 'https://images.unsplash.com/photo-1576566588028-4147f3842f27?q=80&w=1000&auto=format&fit=crop'
   },
   {
     id: 'app-2',
@@ -21,7 +21,7 @@ const products: Product[] = [
     price: '4800',
     description: 'Premium brushed fleece for early morning pickups and evening fellowship sessions.',
     valueProp: 'Rugged warmth for high-altitude de-briefs.',
-    image: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=1000'
+    image: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=1000&auto=format&fit=crop'
   },
   // 2. ADVENTURE ESSENTIALS
   {
@@ -31,7 +31,7 @@ const products: Product[] = [
     price: '4500',
     description: 'Branded multi-compartment pack with dedicated water bottle loops and mission tag loop.',
     valueProp: 'Tactical efficiency for every mission terrain.',
-    image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?q=80&w=1000'
+    image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?q=80&w=1000&auto=format&fit=crop'
   },
   {
     id: 'ess-2',
@@ -40,7 +40,7 @@ const products: Product[] = [
     price: '1800',
     description: 'Double-walled medical-grade stainless steel. Keeps hydration cool for 24 hours.',
     valueProp: 'Environmentally responsible hydration.',
-    image: 'https://images.unsplash.com/photo-1602143407151-0111d1916d4c?q=80&w=1000'
+    image: 'https://images.unsplash.com/photo-1519739039704-733f43d59642?q=80&w=1000&auto=format&fit=crop'
   },
   {
     id: 'ess-3',
@@ -49,7 +49,7 @@ const products: Product[] = [
     price: '1500',
     description: 'Sun protection with identity. Durable twill with adjustable cord.',
     valueProp: 'Identity and protection for the open ridge.',
-    image: 'https://images.unsplash.com/photo-1582791694770-cad1d8aff3a5?q=80&w=1000'
+    image: 'https://images.unsplash.com/photo-1533055640609-24b498dfd74c?q=80&w=1000&auto=format&fit=crop'
   },
   // 3. SAFETY & FIRST AID
   {
@@ -59,7 +59,7 @@ const products: Product[] = [
     price: '2800',
     description: 'Contains trauma bandages, antiseptic, and emergency instructions. Essential hiker gear.',
     valueProp: 'Stewardship starts with preparedness.',
-    image: 'https://images.unsplash.com/photo-1603398938378-e54eab446ddd?q=80&w=1000'
+    image: 'https://images.unsplash.com/photo-1603398938378-e54eab446ddd?q=80&w=1000&auto=format&fit=crop'
   },
   {
     id: 'saf-2',
@@ -68,7 +68,7 @@ const products: Product[] = [
     price: '1200',
     description: 'High-visibility safety gear for street clean-ups and urban restoration projects.',
     valueProp: 'Visibility is credibility.',
-    image: 'https://images.unsplash.com/photo-1628102422201-987820610f44?q=80&w=1000'
+    image: 'https://images.unsplash.com/photo-1628102422201-987820610f44?q=80&w=1000&auto=format&fit=crop'
   },
   // 4. FAITH & LIFESTYLE
   {
@@ -78,7 +78,7 @@ const products: Product[] = [
     price: '2200',
     description: 'Premium leather-bound journal with mission reflection prompts and scripture inserts.',
     valueProp: 'Capture the forge moments in physical ink.',
-    image: 'https://images.unsplash.com/photo-1586281380349-632531db7ed4?q=80&w=1000'
+    image: 'https://images.unsplash.com/photo-1517842645767-c639042777db?q=80&w=1000&auto=format&fit=crop'
   },
   {
     id: 'fai-2',
@@ -87,7 +87,7 @@ const products: Product[] = [
     price: '500',
     description: 'Embossed silicone wristband. A constant reminder of the call to service.',
     valueProp: 'Identity that stays with you.',
-    image: 'https://images.unsplash.com/photo-1573855619003-97b4799dcd8b?q=80&w=1000'
+    image: 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?q=80&w=1000&auto=format&fit=crop'
   },
   // 5. CSR & IMPACT
   {
@@ -98,7 +98,7 @@ const products: Product[] = [
     description: 'Directly funds our monthly charity outreach missions with food and hygiene supplies.',
     valueProp: '100% of proceeds fund CSR logistics.',
     impactLabel: 'A portion of this purchase supports our community outreach work.',
-    image: 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=1000'
+    image: 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=1000&auto=format&fit=crop'
   },
   {
     id: 'csr-2',
@@ -108,7 +108,7 @@ const products: Product[] = [
     description: 'Gloves, bags, and sanitizers for our urban restoration missions.',
     valueProp: 'Restoring beauty to our city.',
     impactLabel: 'Directly supports Urban Restoration days.',
-    image: 'https://images.unsplash.com/photo-1550616149-a316c1410427?q=80&w=1000'
+    image: 'https://images.unsplash.com/photo-1618477461853-cf6ed80fafa5?q=80&w=1000&auto=format&fit=crop'
   },
   // 6. EXPERIENCE
   {
@@ -119,7 +119,7 @@ const products: Product[] = [
     description: 'Commit to the season. Access to any three 2026 missions with a 10% discount.',
     valueProp: 'Commitment to consistency.',
     isBundle: true,
-    image: 'https://images.unsplash.com/photo-1491438590914-bc09fcaaf77a?q=80&w=1000'
+    image: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=1000&auto=format&fit=crop'
   },
   {
     id: 'exp-2',
@@ -128,7 +128,7 @@ const products: Product[] = [
     price: '6000',
     description: 'Voucher for any Professional First Aid & Preparedness Day session.',
     valueProp: 'Give the gift of life-saving skills.',
-    image: 'https://images.unsplash.com/photo-1516574187841-69301976e499?q=80&w=1000'
+    image: 'https://images.unsplash.com/photo-1516574187841-69301976e499?q=80&w=1000&auto=format&fit=crop'
   },
   // 7. CORPORATE & GROUP
   {
@@ -138,7 +138,7 @@ const products: Product[] = [
     price: '150000',
     description: 'Includes event facilitation, merchandise, and a structured CSR activity for up to 30 pax.',
     valueProp: 'High-ticket impact aligned with your mission.',
-    image: 'https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=1000'
+    image: 'https://images.unsplash.com/photo-1522071823991-b1ae5e6a3048?q=80&w=1000&auto=format&fit=crop'
   },
   // 8. ADD-ONS
   {
@@ -148,7 +148,7 @@ const products: Product[] = [
     price: '1000',
     description: 'High-resolution professional photography pack from your mission day.',
     valueProp: 'Capture the peak moments forever.',
-    image: 'https://images.unsplash.com/photo-1452723312111-3a7d0db0e024?q=80&w=1000'
+    image: 'https://images.unsplash.com/photo-1452723312111-3a7d0db0e024?q=80&w=1000&auto=format&fit=crop'
   },
   {
     id: 'add-2',
@@ -157,11 +157,13 @@ const products: Product[] = [
     price: '1500',
     description: 'Mission transfer for those who have their own gear but need reliable fleet access.',
     valueProp: 'Reliable logistics for every trail.',
-    image: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?q=80&w=1000'
+    image: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?q=80&w=1000&auto=format&fit=crop'
   }
 ];
 
 const categories = ['All', 'Apparel', 'Adventure Essentials', 'Safety & First Aid', 'Faith & Lifestyle', 'CSR & Impact', 'Experience Passes', 'Corporate & Group', 'Small Add-ons'];
+
+const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=1000&auto=format&fit=crop';
 
 interface CartItem extends Product {
   quantity: number;
@@ -173,6 +175,10 @@ const Shop: React.FC = () => {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+    e.currentTarget.src = FALLBACK_IMAGE;
+  };
 
   const filteredProducts = products.filter(p => {
     const matchesCategory = selectedCategory === 'All' || p.category === selectedCategory;
@@ -309,12 +315,15 @@ const Shop: React.FC = () => {
                   className="group bg-white rounded-none border border-gray-100 hover:shadow-[0_40px_80px_rgba(0,0,0,0.04)] transition-all duration-700 flex flex-col cursor-pointer overflow-hidden"
                 >
                    <div className="aspect-[4/5] bg-brand-sand overflow-hidden relative">
+                      <div className="absolute inset-0 bg-gray-200 animate-pulse"></div>
                       <img 
                         src={product.image} 
                         alt={product.name} 
-                        className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-[3s]" 
+                        loading="lazy"
+                        onError={handleImageError}
+                        className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-[3s] relative z-10" 
                       />
-                      <div className="absolute top-4 left-4 flex flex-col gap-2">
+                      <div className="absolute top-4 left-4 flex flex-col gap-2 z-20">
                         {product.impactLabel && (
                             <div className="bg-brand-gold text-white px-2 py-1 text-[8px] font-bold uppercase tracking-widest flex items-center gap-1 shadow-lg">
                                 <Heart size={10} /> Impact Choice
@@ -326,7 +335,7 @@ const Shop: React.FC = () => {
                             </div>
                         )}
                       </div>
-                      <div className="absolute bottom-4 right-4">
+                      <div className="absolute bottom-4 right-4 z-20">
                          <div className="bg-white/95 backdrop-blur-md px-4 py-2 text-[10px] font-bold text-brand-green uppercase tracking-[0.2em] shadow-lg">
                             {formatPrice(product.price)}
                          </div>
@@ -366,7 +375,7 @@ const Shop: React.FC = () => {
               </button>
               
               <div className="bg-brand-sand relative min-h-[400px]">
-                 <img src={selectedProduct.image} alt={selectedProduct.name} className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-1000" />
+                 <img src={selectedProduct.image} alt={selectedProduct.name} onError={handleImageError} className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-1000" />
               </div>
               
               <div className="p-10 md:p-16 flex flex-col justify-center">
@@ -423,7 +432,7 @@ const Shop: React.FC = () => {
                 cart.map(item => (
                     <div key={item.id} className="flex gap-6 group animate-reveal border-b border-gray-50 pb-8 last:border-0">
                         <div className="w-20 h-20 bg-brand-sand overflow-hidden flex-shrink-0 shadow-sm">
-                            <img src={item.image} alt={item.name} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" />
+                            <img src={item.image} alt={item.name} onError={handleImageError} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" />
                         </div>
                         <div className="flex-grow space-y-2">
                             <div className="flex justify-between items-start">

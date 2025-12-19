@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Home from './pages/Home';
@@ -29,10 +29,14 @@ const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<ViewState>(ViewState.HOME);
   const [bookingContext, setBookingContext] = useState<BookingContextData | null>(null);
 
+  // Ensure page loads from top when view changes
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }, [currentView]);
+
   const handleNavigateToBooking = (data: BookingContextData) => {
     setBookingContext(data);
     setCurrentView(ViewState.CALCULATOR);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const renderView = () => {

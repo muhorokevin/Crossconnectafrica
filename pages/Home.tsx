@@ -107,7 +107,7 @@ const Home: React.FC<HomeProps> = ({ setView }) => {
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px bg-brand-green/5">
             {[
-              { icon: <Shield size={28} />, title: 'Safety', desc: 'Certified First Aid & Fire Compliance.', img: 'https://images.unsplash.com/photo-1603398938378-e54eab446ddd?q=80&w=1000' },
+              { icon: <Shield size={28} />, title: 'Safety', desc: 'Certified First Aid & Fire Compliance.', img: 'https://images.unsplash.com/photo-1516574187841-69301976e499?q=80&w=1000' },
               { icon: <Briefcase size={28} />, title: 'Corporate', desc: 'Strategic Retreats & Executive Labs.', img: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=1000' },
               { icon: <Compass size={28} />, title: 'Youth', desc: 'Mentorship & Character Camps.', img: 'https://images.unsplash.com/photo-1475483768296-6163e08872a1?q=80&w=1000' },
               { icon: <Flame size={28} />, title: 'Adventure', desc: 'Alpine Expeditions & Coastal Peaks.', img: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=1000' },

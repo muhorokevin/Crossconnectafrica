@@ -124,7 +124,33 @@ const Calculator: React.FC<{ initialData?: BookingContextData | null }> = ({ ini
 
   const handleWhatsApp = () => {
     const formattedDate = new Date(missionDate).toLocaleDateString('en-KE', { dateStyle: 'long' });
-    const message = `*CCA QUOTE [${quoteId}]*\n--------------------------------\nOrganization: ${clientInfo.company || 'N/A'}\nMission: ${selectedProgram.title}\nDate: ${formattedDate}\nInvestment: ${formatKES(results.subtotal)}\n--------------------------------\nFinalizing assessment...`;
+    const message = `*CROSS CONNECT AFRICA*
+*OFFICIAL MISSION QUOTE*
+--------------------------------
+QUOTE ID: ${quoteId}
+DATE: ${new Date().toLocaleDateString('en-KE', { dateStyle: 'medium' })}
+--------------------------------
+*CLIENT INFORMATION*
+ORGANIZATION: ${clientInfo.company || 'N/A'}
+CONTACT: ${clientInfo.contact || 'N/A'}
+EMAIL: ${clientInfo.email || 'N/A'}
+--------------------------------
+*MISSION PARAMETERS*
+MISSION: ${selectedProgram.title}
+PARTICIPANTS: ${pax}
+DATE: ${formattedDate}
+DURATION: ${results.days} Day(s)
+--------------------------------
+*INVESTMENT BREAKDOWN*
+Base Cost: ${formatKES(results.baseTotal)}
+Logistics & Ops: ${formatKES(results.venueCost + results.transportCost + results.accommodationCost + results.opsFee)}
+Add-ons: ${formatKES(results.addonsTotal)}
+--------------------------------
+*TOTAL INVESTMENT: ${formatKES(results.subtotal)}*
+*DEPOSIT (50%): ${formatKES(results.deposit)}*
+--------------------------------
+_Forging Character Since 2023_`;
+
     window.open(`https://wa.me/254710974670?text=${encodeURIComponent(message)}`, '_blank');
   };
 

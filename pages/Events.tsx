@@ -294,7 +294,17 @@ const Events: React.FC = () => {
   const formatPrice = (price: number) => `KES ${price.toLocaleString()}`;
 
   const handleBooking = (event: Event) => {
-    const message = `*MISSION BOOKING*\nExpedition: ${event.title}\nDate: ${event.date}\nInvestment: ${formatPrice(event.price)}`;
+    const message = `*CROSS CONNECT AFRICA*
+*COMMUNITY MISSION BOOKING*
+--------------------------------
+MISSION: ${event.title}
+DATE: ${event.date}
+LOCATION: ${event.location}
+INVESTMENT: ${formatPrice(event.price)}
+--------------------------------
+I would like to secure a spot for this mission. Please advise on the next steps for commitment.
+
+_Faith. Fellowship. Service. Adventure._`;
     window.open(`https://wa.me/254710974670?text=${encodeURIComponent(message)}`, '_blank');
   };
 

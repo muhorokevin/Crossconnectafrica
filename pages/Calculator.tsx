@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { Printer, MessageCircle, Target, ShieldCheck, CheckSquare, Square, User, Mail, Building2, Map, Truck, Home, Clock, Info, CheckCircle2, Calendar as CalendarIcon } from 'lucide-react';
+import { Printer, MessageCircle, Target, ShieldCheck, CheckSquare, Square, User, Mail, Building2, Map, Truck, Home, Clock, Info, CheckCircle2, Calendar as CalendarIcon, AlertCircle, AlertTriangle } from 'lucide-react';
 import { CATEGORIES, Program } from './AdventureBuilder';
 import { BookingContextData } from '../App';
 import Logo from '../components/Logo';
@@ -14,11 +14,11 @@ const VENUE_GROUNDS = {
 };
 
 const FLEET_SOLUTIONS = {
-  none: { id: 'none', label: 'Self Drive', price: 0 },
-  van: { id: 'van', label: '14-seater van', price: 18000 },
-  bus25: { id: 'bus25', label: '25-seater bus', price: 28000 },
-  bus33: { id: 'bus33', label: '33-seater bus', price: 35000 },
-  cruiser: { id: 'cruiser', label: '4×4 Land Cruiser', price: 38000 }
+  none: { id: 'none', label: 'Self Drive', price: 0, capacity: 0 },
+  van: { id: 'van', label: '14-seater van', price: 18000, capacity: 14 },
+  bus25: { id: 'bus25', label: '25-seater bus', price: 28000, capacity: 25 },
+  bus33: { id: 'bus33', label: '33-seater bus', price: 35000, capacity: 33 },
+  cruiser: { id: 'cruiser', label: '4×4 Land Cruiser', price: 38000, capacity: 7 }
 };
 
 const ACCOMMODATION_LEVELS = {
@@ -55,53 +55,94 @@ const Calculator: React.FC<{ initialData?: BookingContextData | null }> = ({ ini
     if (initialData) {
       if (initialData.program) {
         setSelectedProgram(initialData.program);
-        if (initialData.program.priceType === 'flat_rate') {
-          setPricingMode('group');
-        }
+        if (initialData.program.priceType === 'flat_rate') setPricingMode('group');
       }
       if (initialData.pax !== undefined) setPax(initialData.pax);
       if (initialData.durationIndex !== undefined) {
         setDurationIdx(initialData.durationIndex);
-        if (initialData.program?.durations?.[initialData.durationIndex].isGroup) {
-          setPricingMode('group');
-        }
+        const variant = initialData.program?.durations?.[initialData.durationIndex];
+        if (variant?.isGroup) setPricingMode('group');
       }
     }
   }, [initialData]);
+
+  // Pricing mode sync
+  useEffect(() => {
+    const variant = selectedProgram.durations?.[durationIdx];
+    if (variant?.isGroup) {
+      setPricingMode('group');
+    } else if (pricingMode === 'group' && pax < 50 && selectedProgram.priceType !== 'flat_rate') {
+      setPricingMode('pp');
+    }
+  }, [pax, durationIdx, selectedProgram]);
 
   const toggleAddon = (id: string) => {
     setSelectedAddons(prev => prev.includes(id) ? prev.filter(a => a !== id) : [...prev, id]);
   };
 
   const results = useMemo(() => {
-    const variant = selectedProgram.durations ? selectedProgram.durations[durationIdx] : { price: selectedProgram.basePrice, days: 1, isGroup: false };
+    const variant = selectedProgram.durations ? selectedProgram.durations[durationIdx] : { price: selectedProgram.basePrice, days: 1, isGroup: false, label: '' };
     const days = Math.ceil(variant.days || 1);
     
-    const isActuallyGroup = selectedProgram.priceType === 'flat_rate' || variant.isGroup || pricingMode === 'group';
-    const unitRate = variant.price;
-    const baseTotal = isActuallyGroup ? unitRate : unitRate * pax;
-    
+    if (pax <= 0) {
+      return { 
+        subtotal: 0, deposit: 0, opsFee: 0, days, baseTotal: 0, 
+        unitRate: variant.price, venueCost: 0, transportCost: 0, 
+        accommodationCost: 0, addonsTotal: 0, isGroup: false, vehicleCount: 0,
+        marginError: null, selectedAddonsList: []
+      };
+    }
+
+    // Margin Validation
+    let marginError: string | null = null;
+    if (variant.isGroup && variant.label.includes('(')) {
+      const match = variant.label.match(/(\d+)[–|-](\d+)/);
+      if (match) {
+        const min = parseInt(match[1]);
+        const max = parseInt(match[2]);
+        if (pax < min || pax > max) {
+          marginError = `Group variant requires ${min}–${max} participants. Currently: ${pax}.`;
+        }
+      }
+    }
+
+    const isActuallyGroup = (
+      selectedProgram.priceType === 'flat_rate' || 
+      variant.isGroup || 
+      (pricingMode === 'group' && pax >= 50)
+    );
+
+    const baseTotal = isActuallyGroup ? variant.price : variant.price * pax;
     const venueCost = VENUE_GROUNDS[venue].price * days;
-    const transportCost = FLEET_SOLUTIONS[transport].price * days;
-    const accommodationCost = ACCOMMODATION_LEVELS[accommodation].price * pax * Math.max(0, days - 0.5); // Acc is per night
     
-    // Reasonable Ground operations tiers
+    // Transport Scaling
+    const fleet = FLEET_SOLUTIONS[transport];
+    let transportCost = 0;
+    let vehicleCount = 0;
+    if (fleet.capacity > 0) {
+      vehicleCount = Math.ceil(pax / fleet.capacity);
+      transportCost = vehicleCount * fleet.price * days;
+    }
+    
+    const accommodationCost = ACCOMMODATION_LEVELS[accommodation].price * pax * Math.max(0, days - 0.5); 
+    
+    // Operational Tiers
     let groundHandling = 0;
-    if (pax <= 15) groundHandling = 6000;
+    if (pax > 0 && pax <= 15) groundHandling = 6000;
     else if (pax <= 30) groundHandling = 10000;
     else if (pax <= 60) groundHandling = 18000;
     else groundHandling = 25000;
 
     const adminFees = 5000;
 
-    const addonsTotal = ADDONS.reduce((sum, a) => {
-      if (!selectedAddons.includes(a.id)) return sum;
+    const addonsData = ADDONS.filter(a => selectedAddons.includes(a.id));
+    const addonsTotal = addonsData.reduce((sum, a) => {
       return sum + (a.type === 'pp' ? a.price * pax : a.price);
     }, 0);
 
-    const subtotal = baseTotal + venueCost + transportCost + accommodationCost + groundHandling + adminFees + addonsTotal;
-    const contingency = subtotal * 0.04; // 4% Institutional Buffer
-    const finalTotal = subtotal + contingency;
+    const subtotalNoBuffer = baseTotal + venueCost + transportCost + accommodationCost + groundHandling + adminFees + addonsTotal;
+    const contingency = subtotalNoBuffer * 0.04; 
+    const finalTotal = subtotalNoBuffer + contingency;
 
     return { 
       subtotal: finalTotal, 
@@ -109,58 +150,72 @@ const Calculator: React.FC<{ initialData?: BookingContextData | null }> = ({ ini
       opsFee: groundHandling + adminFees + contingency, 
       days, 
       baseTotal, 
-      unitRate, 
+      unitRate: variant.price, 
       venueCost, 
       transportCost, 
       accommodationCost, 
       addonsTotal,
-      isGroup: isActuallyGroup
+      isGroup: isActuallyGroup,
+      vehicleCount,
+      marginError,
+      selectedAddonsList: addonsData
     };
   }, [selectedProgram, durationIdx, pax, venue, accommodation, transport, selectedAddons, pricingMode]);
 
   const formatKES = (n: number) => `KES ${n.toLocaleString()}`;
 
-  const handleExport = () => { window.print(); };
-
   const handleWhatsApp = () => {
+    if (results.marginError) {
+      alert(results.marginError);
+      return;
+    }
     const formattedDate = new Date(missionDate).toLocaleDateString('en-KE', { dateStyle: 'long' });
+    const addonText = results.selectedAddonsList.map(a => `- ${a.label}`).join('\n');
+    const fleetText = transport !== 'none' ? `${results.vehicleCount}x ${FLEET_SOLUTIONS[transport].label}` : 'Self Drive';
+
     const message = `*CROSS CONNECT AFRICA*
 *OFFICIAL MISSION QUOTE*
 --------------------------------
 QUOTE ID: ${quoteId}
 DATE: ${new Date().toLocaleDateString('en-KE', { dateStyle: 'medium' })}
 --------------------------------
-*CLIENT INFORMATION*
-ORGANIZATION: ${clientInfo.company || 'N/A'}
-CONTACT: ${clientInfo.contact || 'N/A'}
-EMAIL: ${clientInfo.email || 'N/A'}
+*CLIENT INFO*
+ORG: ${clientInfo.company || 'N/A'}
+LEAD: ${clientInfo.contact || 'N/A'}
 --------------------------------
 *MISSION PARAMETERS*
 MISSION: ${selectedProgram.title}
-PARTICIPANTS: ${pax}
-DATE: ${formattedDate}
-DURATION: ${results.days} Day(s)
+PAX: ${pax}
+DEPLOYMENT: ${formattedDate}
 --------------------------------
-*INVESTMENT BREAKDOWN*
-Base Cost: ${formatKES(results.baseTotal)}
-Logistics & Ops: ${formatKES(results.venueCost + results.transportCost + results.accommodationCost + results.opsFee)}
+*LOGISTICS & FLEET*
+FLEET: ${fleetText}
+STAY: ${ACCOMMODATION_LEVELS[accommodation].label}
+GROUNDS: ${VENUE_GROUNDS[venue].label}
+--------------------------------
+*ADD-ONS SELECTED*
+${addonText || 'None'}
+--------------------------------
+*INVESTMENT*
+Base: ${formatKES(results.baseTotal)}
 Add-ons: ${formatKES(results.addonsTotal)}
+Ops & Fleet: ${formatKES(results.venueCost + results.transportCost + results.accommodationCost + results.opsFee)}
 --------------------------------
-*TOTAL INVESTMENT: ${formatKES(results.subtotal)}*
-*DEPOSIT (50%): ${formatKES(results.deposit)}*
+*TOTAL: ${formatKES(results.subtotal)}*
+*DEPOSIT: ${formatKES(results.deposit)}*
 --------------------------------
-_Forging Character Since 2023_`;
+_Character Forged in the Wild_`;
 
     window.open(`https://wa.me/254710974670?text=${encodeURIComponent(message)}`, '_blank');
   };
 
   return (
     <div className="min-h-screen bg-brand-cream pt-40 pb-32 px-6 md:px-12">
-      <div className="max-w-[1800px] mx-auto flex flex-col lg:flex-row gap-12">
+      <div className="max-w-[1800px] mx-auto flex flex-col lg:grid lg:grid-cols-10 gap-12 items-stretch">
         
-        <div className="lg:w-[65%] space-y-10 print:hidden">
+        {/* Left Column: Calculator Inputs */}
+        <div className="lg:col-span-6 space-y-10 print:hidden">
           <div className="bg-white p-12 shadow-[0_40px_100px_rgba(0,0,0,0.04)] space-y-16 border border-brand-green/5">
-            
             <section className="space-y-10">
                <div className="flex items-center gap-4 border-b border-gray-100 pb-6">
                   <div className="w-10 h-10 bg-brand-green text-brand-gold flex items-center justify-center font-bold font-serif">01</div>
@@ -177,7 +232,7 @@ _Forging Character Since 2023_`;
                   </div>
                   <div className="space-y-3">
                      <label className="text-[10px] font-bold text-brand-gold uppercase tracking-[0.4em] flex items-center gap-2"><Mail size={12}/> Email</label>
-                     <input type="email" value={clientInfo.email} onChange={(e) => setClientInfo({...clientInfo, email: e.target.value})} placeholder="crossconnectmisiions@protonmail.com" className="w-full p-4 bg-gray-50 border-none text-sm font-bold focus:ring-1 focus:ring-brand-green" />
+                     <input type="email" value={clientInfo.email} onChange={(e) => setClientInfo({...clientInfo, email: e.target.value})} placeholder="missions@cca.africa" className="w-full p-4 bg-gray-50 border-none text-sm font-bold focus:ring-1 focus:ring-brand-green" />
                   </div>
                </div>
             </section>
@@ -187,7 +242,6 @@ _Forging Character Since 2023_`;
                   <div className="w-10 h-10 bg-brand-green text-brand-gold flex items-center justify-center font-bold font-serif">02</div>
                   <h3 className="text-xl font-serif font-bold text-brand-green tracking-tight uppercase">Mission Parameters</h3>
                </div>
-               
                <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
                   <div className="space-y-8">
                      <div className="space-y-4">
@@ -211,16 +265,14 @@ _Forging Character Since 2023_`;
                            ))}
                         </select>
                      </div>
-
                      <div className="space-y-4">
                         <label className="text-[10px] font-bold text-brand-gold uppercase tracking-[0.4em]">Pricing Mode</label>
                         <div className="flex bg-gray-100 p-1">
-                           <button onClick={() => setPricingMode('pp')} disabled={selectedProgram.priceType === 'flat_rate'} className={`flex-1 py-4 text-[10px] font-bold uppercase tracking-widest transition-all ${pricingMode === 'pp' ? 'bg-brand-green text-brand-gold shadow-sm' : 'text-gray-400 opacity-50'}`}>Participant</button>
-                           <button onClick={() => setPricingMode('group')} className={`flex-1 py-4 text-[10px] font-bold uppercase tracking-widest transition-all ${pricingMode === 'group' ? 'bg-brand-green text-brand-gold shadow-sm' : 'text-gray-400'}`}>Flat Rate</button>
+                           <button onClick={() => setPricingMode('pp')} disabled={selectedProgram.priceType === 'flat_rate' || selectedProgram.durations?.[durationIdx]?.isGroup} className={`flex-1 py-4 text-[10px] font-bold uppercase tracking-widest transition-all ${pricingMode === 'pp' ? 'bg-brand-green text-brand-gold shadow-sm' : 'text-gray-400 opacity-50'}`}>Participant</button>
+                           <button onClick={() => setPricingMode('group')} disabled={pax < 50 && selectedProgram.priceType !== 'flat_rate' && !selectedProgram.durations?.[durationIdx]?.isGroup} className={`flex-1 py-4 text-[10px] font-bold uppercase tracking-widest transition-all ${pricingMode === 'group' ? 'bg-brand-green text-brand-gold shadow-sm' : 'text-gray-400 opacity-50'}`}>Flat Rate</button>
                         </div>
                      </div>
                   </div>
-
                   <div className="space-y-8">
                      <div className="space-y-4">
                         <label className="text-[10px] font-bold text-brand-gold uppercase tracking-[0.4em] flex items-center gap-2"><Clock size={12}/> Mission Variant</label>
@@ -232,12 +284,12 @@ _Forging Character Since 2023_`;
                      </div>
                      <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-4">
-                            <label className="text-[10px] font-bold text-brand-gold uppercase tracking-[0.4em] flex items-center gap-2"><CalendarIcon size={12}/> Proposed Date</label>
+                            <label className="text-[10px] font-bold text-brand-gold uppercase tracking-[0.4em] flex items-center gap-2"><CalendarIcon size={12}/> Deployment Date</label>
                             <CustomCalendar value={missionDate} onChange={setMissionDate} />
                         </div>
                         <div className="space-y-4">
                             <label className="text-[10px] font-bold text-brand-gold uppercase tracking-[0.4em]">Participants</label>
-                            <input type="number" value={pax} onChange={(e) => setPax(parseInt(e.target.value) || 0)} className="w-full p-3.5 bg-gray-50 border-none font-serif font-bold text-2xl text-brand-green" />
+                            <input type="number" value={pax} onChange={(e) => setPax(Math.max(0, parseInt(e.target.value) || 0))} className="w-full p-3.5 bg-gray-50 border-none font-serif font-bold text-2xl text-brand-green" />
                         </div>
                      </div>
                   </div>
@@ -249,30 +301,24 @@ _Forging Character Since 2023_`;
                   <div className="w-10 h-10 bg-brand-green text-brand-gold flex items-center justify-center font-bold font-serif">03</div>
                   <h3 className="text-xl font-serif font-bold text-brand-green tracking-tight uppercase">Fleet & Logistics</h3>
                </div>
-               
                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                   <div className="space-y-4">
                      <label className="text-[10px] font-bold text-brand-gold uppercase tracking-[0.4em] flex items-center gap-2"><Map size={12}/> Site Basis</label>
                      <select value={venue} onChange={(e) => setVenue(e.target.value as any)} className="w-full p-4 bg-gray-50 border-none text-[10px] font-bold uppercase">
-                        {Object.values(VENUE_GROUNDS).map(v => (
-                           <option key={v.id} value={v.id}>{v.label} ({v.price === 0 ? 'Free' : formatKES(v.price)})</option>
-                        ))}
+                        {Object.values(VENUE_GROUNDS).map(v => <option key={v.id} value={v.id}>{v.label}</option>)}
                      </select>
                   </div>
                   <div className="space-y-4">
                      <label className="text-[10px] font-bold text-brand-gold uppercase tracking-[0.4em] flex items-center gap-2"><Truck size={12}/> Mobility Solution</label>
                      <select value={transport} onChange={(e) => setTransport(e.target.value as any)} className="w-full p-4 bg-gray-50 border-none text-[10px] font-bold uppercase">
-                        {Object.values(FLEET_SOLUTIONS).map(f => (
-                           <option key={f.id} value={f.id}>{f.label} ({f.price === 0 ? 'Self' : formatKES(f.price) + '/day'})</option>
-                        ))}
+                        {Object.values(FLEET_SOLUTIONS).map(f => <option key={f.id} value={f.id}>{f.label}</option>)}
                      </select>
+                     {results.vehicleCount > 0 && <p className="text-[9px] font-bold text-brand-gold uppercase tracking-widest mt-1">Scale: {results.vehicleCount} Units Required.</p>}
                   </div>
                   <div className="space-y-4">
                      <label className="text-[10px] font-bold text-brand-gold uppercase tracking-[0.4em] flex items-center gap-2"><Home size={12}/> Stay Tiers</label>
                      <select value={accommodation} onChange={(e) => setAccommodation(e.target.value as any)} className="w-full p-4 bg-gray-50 border-none text-[10px] font-bold uppercase">
-                        {Object.values(ACCOMMODATION_LEVELS).map(acc => (
-                           <option key={acc.id} value={acc.id}>{acc.label} ({acc.price === 0 ? 'None' : formatKES(acc.price) + ' pp'})</option>
-                        ))}
+                        {Object.values(ACCOMMODATION_LEVELS).map(acc => <option key={acc.id} value={acc.id}>{acc.label}</option>)}
                      </select>
                   </div>
                </div>
@@ -283,22 +329,17 @@ _Forging Character Since 2023_`;
                   <div className="w-10 h-10 bg-brand-green text-brand-gold flex items-center justify-center font-bold font-serif">04</div>
                   <h3 className="text-xl font-serif font-bold text-brand-green tracking-tight uppercase">Operational Add-ons</h3>
                </div>
-               
                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                   {ADDONS.map(addon => (
-                     <button 
-                        key={addon.id}
-                        onClick={() => toggleAddon(addon.id)}
-                        className={`p-6 text-left border-2 transition-all flex flex-col justify-between h-44 ${selectedAddons.includes(addon.id) ? 'bg-brand-sand border-brand-green' : 'bg-gray-50 border-transparent hover:border-brand-gold/20'}`}
-                     >
+                     <button key={addon.id} onClick={() => toggleAddon(addon.id)} className={`p-6 text-left border-2 transition-all flex flex-col justify-between h-44 ${selectedAddons.includes(addon.id) ? 'bg-brand-sand border-brand-green' : 'bg-gray-50 border-transparent hover:border-brand-gold/20'}`}>
                         <div className="space-y-2">
                            <div className="flex justify-between items-center">
                               <span className="text-[10px] font-bold uppercase tracking-widest text-brand-green">{addon.label}</span>
                               {selectedAddons.includes(addon.id) ? <CheckSquare size={16} className="text-brand-gold" /> : <Square size={16} className="text-gray-200" />}
                            </div>
-                           <p className="text-[9px] text-gray-400 italic">"{addon.desc}"</p>
+                           <p className="text-[9px] text-gray-400 italic leading-snug">"{addon.desc}"</p>
                         </div>
-                        <div className="text-sm font-bold text-brand-green">{formatKES(addon.price)} {addon.type === 'pp' ? 'pp' : 'Flat'}</div>
+                        <div className="text-xs font-bold text-brand-green">{formatKES(addon.price)} {addon.type === 'pp' ? 'pp' : 'Flat'}</div>
                      </button>
                   ))}
                </div>
@@ -306,151 +347,138 @@ _Forging Character Since 2023_`;
           </div>
         </div>
 
-        <div className="lg:w-[35%] w-full">
-          <div id="quote-doc" className="bg-white p-12 md:p-14 shadow-2xl paper-texture space-y-12 relative border border-gray-100 lg:sticky lg:top-40 max-h-[92vh] overflow-y-auto print:max-h-none print:shadow-none print:p-16 print:border-none">
+        {/* Right Column: Quote Document - TALL VERSION */}
+        <div className="lg:col-span-4 w-full">
+          <div id="quote-doc" className="bg-white p-12 md:p-14 shadow-2xl paper-texture flex flex-col border border-gray-100 lg:sticky lg:top-40 min-h-[90vh] print:shadow-none print:p-16 print:border-none">
              
-             <header className="border-b-[6px] border-brand-green pb-8 relative z-10">
-                <div className="flex justify-between items-start mb-6">
-                   <Logo className="w-14 h-14" />
-                   <div className="text-right">
-                      <div className="text-[8px] font-bold uppercase text-gray-400 tracking-widest">{quoteId}</div>
-                      <div className="text-[9px] font-bold uppercase text-brand-gold tracking-[0.3em]">Operational Assessment</div>
-                   </div>
-                </div>
-                <div className="space-y-2">
-                   <div className="flex justify-between items-end">
-                      <span className="text-brand-gold text-[9px] font-bold uppercase tracking-[0.6em] block">Mission Assessment For</span>
-                      <span className="text-[9px] font-bold text-brand-green uppercase tracking-widest">Scheduled Deployment: {new Date(missionDate).toLocaleDateString('en-KE', { dateStyle: 'medium' })}</span>
-                   </div>
-                   <h3 className="text-3xl font-serif font-bold text-brand-green tracking-tighter italic leading-none">{clientInfo.company || 'Prospective Partner'}</h3>
-                   <div className="text-[9px] text-gray-400 font-bold uppercase tracking-widest">{clientInfo.contact} | {clientInfo.email}</div>
-                </div>
-             </header>
+             {/* Dynamic Top Content */}
+             <div className="flex-grow space-y-10">
+                <header className="border-b-[6px] border-brand-green pb-8 relative z-10">
+                    <div className="flex justify-between items-start mb-6">
+                       <Logo className="w-14 h-14" />
+                       <div className="text-right">
+                          <div className="text-[8px] font-bold uppercase text-gray-400 tracking-widest">{quoteId}</div>
+                          <div className="text-[9px] font-bold uppercase text-brand-gold tracking-[0.3em]">Institutional Record</div>
+                       </div>
+                    </div>
+                    <div className="space-y-2">
+                       <div className="flex justify-between items-end">
+                          <span className="text-brand-gold text-[9px] font-bold uppercase tracking-[0.6em] block">Mission Assessment For</span>
+                          <span className="text-[9px] font-bold text-brand-green uppercase tracking-widest">{new Date(missionDate).toLocaleDateString('en-KE', { dateStyle: 'medium' })}</span>
+                       </div>
+                       <h3 className="text-3xl font-serif font-bold text-brand-green tracking-tighter italic leading-none truncate">{clientInfo.company || 'Prospective Partner'}</h3>
+                       <div className="text-[9px] text-gray-400 font-bold uppercase tracking-widest">{clientInfo.contact || 'N/A'}</div>
+                    </div>
+                </header>
 
-             <section className="bg-brand-sand/30 p-4 border border-brand-green/5 space-y-3 relative z-10">
-                <span className="text-[9px] font-bold uppercase text-brand-gold tracking-widest flex items-center gap-2"><Info size={12}/> Core Mission Package</span>
-                <div className="grid grid-cols-2 gap-x-4 gap-y-2">
-                   {selectedProgram.inclusions.map((inc, i) => (
-                      <div key={i} className="flex items-center gap-2 text-[9px] text-brand-green font-bold uppercase tracking-tighter">
-                         <CheckCircle2 size={10} className="text-brand-gold shrink-0"/> {inc}
-                      </div>
-                   ))}
-                </div>
-             </section>
+                {results.marginError && (
+                    <div className="bg-red-50 border border-red-100 p-4 flex gap-3 animate-pulse">
+                        <AlertTriangle className="text-red-500 shrink-0" size={16} />
+                        <p className="text-[10px] font-bold text-red-700 uppercase tracking-tight leading-normal">{results.marginError}</p>
+                    </div>
+                )}
 
-             <section className="relative z-10">
-                <table className="w-full text-left text-[11px] font-serif border-collapse">
-                   <thead>
-                      <tr className="border-b border-gray-100 text-[8px] uppercase tracking-widest text-gray-400 font-bold">
-                         <th className="py-2 pr-4">Description</th>
-                         <th className="py-2 pr-4">Rate</th>
-                         <th className="py-2 text-right">Subtotal</th>
-                      </tr>
-                   </thead>
-                   <tbody className="divide-y divide-gray-50 text-brand-green italic">
-                      <tr>
-                         <td className="py-4 pr-4">{selectedProgram.title}</td>
-                         <td className="py-4 pr-4">{results.isGroup ? 'FLAT' : 'PER PAX'}</td>
-                         <td className="py-4 text-right font-bold">{formatKES(results.baseTotal)}</td>
-                      </tr>
-                      {results.venueCost > 0 && (
-                         <tr>
-                            <td className="py-4 pr-4">Site: {VENUE_GROUNDS[venue].label}</td>
-                            <td className="py-4 pr-4">DAILY</td>
-                            <td className="py-4 text-right font-bold">{formatKES(results.venueCost)}</td>
-                         </tr>
-                      )}
-                      {results.transportCost > 0 && (
-                         <tr>
-                            <td className="py-4 pr-4">Fleet: {FLEET_SOLUTIONS[transport].label}</td>
-                            <td className="py-4 pr-4">DAILY</td>
-                            <td className="py-4 text-right font-bold">{formatKES(results.transportCost)}</td>
-                         </tr>
-                      )}
-                      {results.accommodationCost > 0 && (
-                         <tr>
-                            <td className="py-4 pr-4">Stay: {ACCOMMODATION_LEVELS[accommodation].label}</td>
-                            <td className="py-4 pr-4">PP</td>
-                            <td className="py-4 text-right font-bold">{formatKES(results.accommodationCost)}</td>
-                         </tr>
-                      )}
-                      {results.addonsTotal > 0 && (
-                         <tr>
-                            <td className="py-4 pr-4">Add-ons</td>
-                            <td className="py-4 pr-4">VARIOUS</td>
-                            <td className="py-4 text-right font-bold">{formatKES(results.addonsTotal)}</td>
-                         </tr>
-                      )}
-                   </tbody>
-                </table>
-             </section>
+                {/* Table Data - Enhanced Addon Visibility */}
+                <section className="relative z-10">
+                    <table className="w-full text-left text-[11px] font-serif border-collapse">
+                    <thead>
+                        <tr className="border-b border-gray-100 text-[8px] uppercase tracking-widest text-gray-400 font-bold">
+                            <th className="py-2 pr-4">Description</th>
+                            <th className="py-2 pr-4 text-center">Basis</th>
+                            <th className="py-2 text-right">Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-50 text-brand-green italic">
+                        <tr>
+                            <td className="py-4 pr-4">{selectedProgram.title}</td>
+                            <td className="py-4 pr-4 text-center text-[8px] uppercase tracking-widest">{results.isGroup ? 'FLAT' : `PP (${pax})`}</td>
+                            <td className="py-4 text-right font-bold">{formatKES(results.baseTotal)}</td>
+                        </tr>
+                        {results.venueCost > 0 && (
+                            <tr>
+                                <td className="py-4 pr-4">Site: {VENUE_GROUNDS[venue].label}</td>
+                                <td className="py-4 pr-4 text-center text-[8px] uppercase tracking-widest">STAY</td>
+                                <td className="py-4 text-right font-bold">{formatKES(results.venueCost)}</td>
+                            </tr>
+                        )}
+                        {results.transportCost > 0 && (
+                            <tr>
+                                <td className="py-4 pr-4">Fleet: {results.vehicleCount}x Units</td>
+                                <td className="py-4 pr-4 text-center text-[8px] uppercase tracking-widest">DEPLOY</td>
+                                <td className="py-4 text-right font-bold">{formatKES(results.transportCost)}</td>
+                            </tr>
+                        )}
+                        {results.accommodationCost > 0 && (
+                            <tr>
+                                <td className="py-4 pr-4">Stay: {ACCOMMODATION_LEVELS[accommodation].label}</td>
+                                <td className="py-4 pr-4 text-center text-[8px] uppercase tracking-widest">PP</td>
+                                <td className="py-4 text-right font-bold">{formatKES(results.accommodationCost)}</td>
+                            </tr>
+                        )}
+                        {/* RESTORED ADD-ON VISIBILITY */}
+                        {results.selectedAddonsList.map(addon => (
+                            <tr key={addon.id} className="bg-brand-sand/20">
+                                <td className="py-4 pr-4 text-brand-gold font-bold">Add-on: {addon.label}</td>
+                                <td className="py-4 pr-4 text-center text-[8px] uppercase tracking-widest">{addon.type}</td>
+                                <td className="py-4 text-right font-bold text-brand-gold">
+                                    {formatKES(addon.type === 'pp' ? addon.price * pax : addon.price)}
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                    </table>
+                </section>
 
-             <section className="bg-brand-green/5 p-6 border-l-4 border-brand-green relative z-10">
-                <div className="flex justify-between items-center mb-2">
-                   <span className="text-[10px] font-bold uppercase text-brand-green tracking-widest">Ground Handling & Ops Buffer</span>
-                   <span className="text-[10px] font-bold text-brand-green">{formatKES(results.opsFee)}</span>
-                </div>
-                <p className="text-[8px] text-gray-400 uppercase tracking-widest font-bold">
-                   Covers site reconnaissance, medical standby, and 4% institutional contingency.
-                </p>
-             </section>
+                <section className="bg-brand-green/5 p-6 border-l-4 border-brand-green relative z-10">
+                    <div className="flex justify-between items-center mb-2">
+                        <span className="text-[10px] font-bold uppercase text-brand-green tracking-widest">Institutional Buffer</span>
+                        <span className="text-[10px] font-bold text-brand-green">{formatKES(results.opsFee)}</span>
+                    </div>
+                    <p className="text-[8px] text-gray-400 uppercase tracking-widest font-bold leading-normal">
+                        Includes Recon, medical standby, and 4% institutional buffer.
+                    </p>
+                </section>
+             </div>
 
-             <section className="bg-brand-green text-white p-8 space-y-4 relative z-10">
-                <div className="flex justify-between items-end">
-                   <div>
-                      <span className="text-brand-gold text-[10px] font-bold uppercase tracking-[0.6em] block mb-2">Total Mission Investment</span>
-                      <div className="text-5xl font-serif font-bold text-brand-gold tracking-tighter leading-none">{formatKES(results.subtotal)}</div>
-                   </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4 border-t border-white/10 pt-4">
-                   <div>
-                      <span className="text-[8px] opacity-60 uppercase font-bold tracking-widest block mb-1">50% Commitment</span>
-                      <span className="text-xl font-serif font-bold text-brand-gold">{formatKES(results.deposit)}</span>
-                   </div>
-                   <div className="text-right">
-                      <span className="text-[8px] opacity-60 uppercase font-bold tracking-widest block mb-1">Final Balance</span>
-                      <span className="text-xl font-serif font-bold">{formatKES(results.deposit)}</span>
-                   </div>
-                </div>
-             </section>
+             {/* Sticky Bottom Actions */}
+             <div className="space-y-8 mt-10">
+                <section className="bg-brand-green text-white p-8 space-y-4 relative z-10">
+                    <div>
+                        <span className="text-brand-gold text-[10px] font-bold uppercase tracking-[0.6em] block mb-2">Total Mission Investment</span>
+                        <div className="text-5xl font-serif font-bold text-brand-gold tracking-tighter leading-none">{formatKES(results.subtotal)}</div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4 border-t border-white/10 pt-4">
+                        <div>
+                            <span className="text-[8px] opacity-60 uppercase font-bold tracking-widest block mb-1">50% Deposit</span>
+                            <span className="text-xl font-serif font-bold text-brand-gold">{formatKES(results.deposit)}</span>
+                        </div>
+                        <div className="text-right">
+                            <span className="text-[8px] opacity-60 uppercase font-bold tracking-widest block mb-1">Final Balance</span>
+                            <span className="text-xl font-serif font-bold">{formatKES(results.deposit)}</span>
+                        </div>
+                    </div>
+                </section>
 
-             <footer className="pt-8 border-t border-gray-100 flex flex-col gap-6 relative z-10 print:hidden">
-                <div className="flex items-center gap-3 text-brand-gold opacity-60"><ShieldCheck size={14}/> <span className="text-[9px] font-bold uppercase tracking-widest leading-loose">Verified Operational Log V6.3</span></div>
-                <div className="grid grid-cols-2 gap-4">
-                   <button onClick={handleExport} className="w-full py-4 border-2 border-brand-green text-brand-green font-bold text-[9px] uppercase tracking-widest hover:bg-brand-green hover:text-white transition-all"><Printer size={16} className="inline mr-2" /> Export PDF</button>
-                   <button onClick={handleWhatsApp} className="w-full py-4 bg-[#25D366] text-white font-bold text-[9px] uppercase tracking-widest shadow-lg flex items-center justify-center gap-2"><MessageCircle size={16} /> Finalize</button>
-                </div>
-             </footer>
+                <footer className="pt-8 border-t border-gray-100 flex flex-col gap-6 relative z-10 print:hidden">
+                    <div className="flex items-center justify-between text-brand-gold opacity-60">
+                        <div className="flex items-center gap-2"><ShieldCheck size={14}/> <span className="text-[8px] font-bold uppercase tracking-widest">Verified Log V6.3</span></div>
+                        <span className="text-[8px] font-bold uppercase tracking-widest">CCA/2026/FIN</span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                        <button onClick={() => window.print()} className="w-full py-4 border-2 border-brand-green text-brand-green font-bold text-[9px] uppercase tracking-widest hover:bg-brand-green hover:text-white transition-all"><Printer size={16} className="inline mr-2" /> PDF</button>
+                        <button 
+                            onClick={handleWhatsApp} 
+                            disabled={!!results.marginError}
+                            className={`w-full py-4 bg-[#25D366] text-white font-bold text-[9px] uppercase tracking-widest shadow-lg flex items-center justify-center gap-2 ${!!results.marginError ? 'opacity-50 cursor-not-allowed grayscale' : ''}`}
+                        >
+                            <MessageCircle size={16} /> Finalize
+                        </button>
+                    </div>
+                </footer>
+             </div>
           </div>
         </div>
       </div>
-      
-      <style>{`
-        @media print {
-          /* Force display and static positioning for the document container */
-          #quote-doc {
-            display: block !important;
-            position: static !important;
-            width: 100% !important;
-            height: auto !important;
-            margin: 0 !important;
-            padding: 1cm !important;
-            box-shadow: none !important;
-            border: none !important;
-            background-image: none !important; /* Remove paper texture for clean print */
-          }
-          
-          /* Ensure child visibility isn't blocked by generic hidden rules */
-          #quote-doc * {
-            visibility: visible !important;
-          }
-
-          /* Hide other page elements to be safe */
-          header, section, .print-hidden, .bg-brand-cream {
-             background-color: white !important;
-          }
-        }
-      `}</style>
     </div>
   );
 };

@@ -402,7 +402,6 @@ const AdventureBuilder: React.FC<{ onNavigateToBooking: (data: BookingContextDat
   useEffect(() => { 
     setDurationIdx(0); 
     setItinerary(null); 
-    // Manual scroll removal to allow user to keep context while browsing programs
   }, [selectedProgram]);
 
   const currentRate = useMemo(() => {
@@ -412,6 +411,12 @@ const AdventureBuilder: React.FC<{ onNavigateToBooking: (data: BookingContextDat
   const isGroupRate = useMemo(() => {
     return selectedProgram.priceType === 'flat_rate' || selectedProgram.durations?.[durationIdx]?.isGroup || false;
   }, [selectedProgram, durationIdx]);
+
+  // If participants are 0, Investment is always 0 KES regardless of program type
+  const estimatedInvestment = useMemo(() => {
+    if (formData.groupSize <= 0) return 0;
+    return isGroupRate ? currentRate : currentRate * formData.groupSize;
+  }, [formData.groupSize, isGroupRate, currentRate]);
 
   const handleGenerate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -541,7 +546,7 @@ const AdventureBuilder: React.FC<{ onNavigateToBooking: (data: BookingContextDat
                         <input 
                            type="number" 
                            value={formData.groupSize} 
-                           onChange={(e) => setFormData({...formData, groupSize: parseInt(e.target.value) || 0})}
+                           onChange={(e) => setFormData({...formData, groupSize: Math.max(0, parseInt(e.target.value) || 0)})}
                            className="w-full p-3.5 bg-gray-50 border-none rounded-none text-xl font-serif font-bold text-brand-green focus:ring-1 focus:ring-brand-green" 
                         />
                       </div>
@@ -624,7 +629,7 @@ const AdventureBuilder: React.FC<{ onNavigateToBooking: (data: BookingContextDat
                       <div className="bg-brand-sand/50 p-4 border border-brand-green/10 w-full flex justify-between items-center">
                          <div className="text-[8px] text-gray-400 font-bold uppercase tracking-widest">Est. Investment</div>
                          <div className="text-xl font-serif font-bold text-brand-green">
-                           {formatKES(isGroupRate ? currentRate : currentRate * formData.groupSize)}
+                           {formatKES(estimatedInvestment)}
                          </div>
                       </div>
                    </header>

@@ -1,9 +1,10 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { Printer, MessageCircle, Target, ShieldCheck, CheckSquare, Square, User, Mail, Building2, Map, Truck, Home, Clock, Info, CheckCircle2, Gift } from 'lucide-react';
+import { Printer, MessageCircle, Target, ShieldCheck, CheckSquare, Square, User, Mail, Building2, Map, Truck, Home, Clock, Info, CheckCircle2, Calendar as CalendarIcon } from 'lucide-react';
 import { CATEGORIES, Program } from './AdventureBuilder';
 import { BookingContextData } from '../App';
 import Logo from '../components/Logo';
+import CustomCalendar from '../components/CustomCalendar';
 
 const VENUE_GROUNDS = {
   client: { id: 'client', label: 'Client Provided Site', price: 0 },
@@ -43,6 +44,7 @@ const Calculator: React.FC<{ initialData?: BookingContextData | null }> = ({ ini
   const [selectedProgram, setSelectedProgram] = useState<Program>(CATEGORIES[1].programs[0]); 
   const [durationIdx, setDurationIdx] = useState(0);
   const [pax, setPax] = useState(25);
+  const [missionDate, setMissionDate] = useState(new Date().toISOString().split('T')[0]);
   const [venue, setVenue] = useState<keyof typeof VENUE_GROUNDS>('client');
   const [accommodation, setAccommodation] = useState<keyof typeof ACCOMMODATION_LEVELS>('none');
   const [transport, setTransport] = useState<keyof typeof FLEET_SOLUTIONS>('none');
@@ -121,7 +123,8 @@ const Calculator: React.FC<{ initialData?: BookingContextData | null }> = ({ ini
   const handleExport = () => { window.print(); };
 
   const handleWhatsApp = () => {
-    const message = `*CCA QUOTE [${quoteId}]*\n--------------------------------\nOrganization: ${clientInfo.company || 'N/A'}\nMission: ${selectedProgram.title}\nVariant: ${selectedProgram.durations?.[durationIdx]?.label || 'Standard'}\nInvestment: ${formatKES(results.subtotal)}\n--------------------------------\nFinalizing assessment...`;
+    const formattedDate = new Date(missionDate).toLocaleDateString('en-KE', { dateStyle: 'long' });
+    const message = `*CCA QUOTE [${quoteId}]*\n--------------------------------\nOrganization: ${clientInfo.company || 'N/A'}\nMission: ${selectedProgram.title}\nDate: ${formattedDate}\nInvestment: ${formatKES(results.subtotal)}\n--------------------------------\nFinalizing assessment...`;
     window.open(`https://wa.me/254710974670?text=${encodeURIComponent(message)}`, '_blank');
   };
 
@@ -201,9 +204,15 @@ const Calculator: React.FC<{ initialData?: BookingContextData | null }> = ({ ini
                            ))}
                         </select>
                      </div>
-                     <div className="space-y-4">
-                        <label className="text-[10px] font-bold text-brand-gold uppercase tracking-[0.4em]">Participant Count</label>
-                        <input type="number" value={pax} onChange={(e) => setPax(parseInt(e.target.value) || 1)} className="w-full p-4 bg-gray-50 border-none font-serif font-bold text-3xl text-brand-green" />
+                     <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-4">
+                            <label className="text-[10px] font-bold text-brand-gold uppercase tracking-[0.4em] flex items-center gap-2"><CalendarIcon size={12}/> Proposed Date</label>
+                            <CustomCalendar value={missionDate} onChange={setMissionDate} />
+                        </div>
+                        <div className="space-y-4">
+                            <label className="text-[10px] font-bold text-brand-gold uppercase tracking-[0.4em]">Participants</label>
+                            <input type="number" value={pax} onChange={(e) => setPax(parseInt(e.target.value) || 1)} className="w-full p-3.5 bg-gray-50 border-none font-serif font-bold text-2xl text-brand-green" />
+                        </div>
                      </div>
                   </div>
                </div>
@@ -283,7 +292,10 @@ const Calculator: React.FC<{ initialData?: BookingContextData | null }> = ({ ini
                    </div>
                 </div>
                 <div className="space-y-2">
-                   <span className="text-brand-gold text-[9px] font-bold uppercase tracking-[0.6em] block mb-2">Mission Assessment For</span>
+                   <div className="flex justify-between items-end">
+                      <span className="text-brand-gold text-[9px] font-bold uppercase tracking-[0.6em] block">Mission Assessment For</span>
+                      <span className="text-[9px] font-bold text-brand-green uppercase tracking-widest">Scheduled Deployment: {new Date(missionDate).toLocaleDateString('en-KE', { dateStyle: 'medium' })}</span>
+                   </div>
                    <h3 className="text-3xl font-serif font-bold text-brand-green tracking-tighter italic leading-none">{clientInfo.company || 'Prospective Partner'}</h3>
                    <div className="text-[9px] text-gray-400 font-bold uppercase tracking-widest">{clientInfo.contact} | {clientInfo.email}</div>
                 </div>

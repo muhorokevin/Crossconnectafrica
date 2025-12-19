@@ -402,7 +402,7 @@ const AdventureBuilder: React.FC<{ onNavigateToBooking: (data: BookingContextDat
   useEffect(() => { 
     setDurationIdx(0); 
     setItinerary(null); 
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Manual scroll removal to allow user to keep context while browsing programs
   }, [selectedProgram]);
 
   const currentRate = useMemo(() => {

@@ -3,14 +3,14 @@ import React, { useState } from 'react';
 import { Calendar, MapPin, Users, ArrowRight, CheckCircle2, Heart, ShieldPlus, Trees, Star, X, Clock, Info, Zap, Backpack, Utensils, Award, ShieldCheck, HeartHandshake, Footprints } from 'lucide-react';
 import { Event } from '../types';
 
-interface ExtendedEvent extends Event {
+export interface ExtendedEvent extends Event {
   itinerary: { time: string; task: string }[];
   gearList: string[];
   meetingPoint: string;
   categoryType: 'hike' | 'csr' | 'safety' | 'teambuilding' | 'social' | 'gala';
 }
 
-const mockEvents: ExtendedEvent[] = [
+export const mockEvents: ExtendedEvent[] = [
   {
     id: '2026-01',
     title: 'New Year Fellowship Meet & Greet',
@@ -282,7 +282,7 @@ const mockEvents: ExtendedEvent[] = [
     gearList: ['Formal Attire', 'Appreciative Spirit'],
     itinerary: [
       { time: '17:00', task: 'Assembly at CBD for Transfer' },
-      { time: '18:00', task: 'Red Carpet & Welcome' },
+      { time: '18:00', task: 'Red carpet & Welcome' },
       { time: '19:30', task: 'Gala Dinner' },
       { time: '21:00', task: 'Mission Awards' }
     ]

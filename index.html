@@ -1,9 +1,9 @@
 
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en" class="scroll-smooth w-full overflow-x-hidden">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
     <title>Cross Connect Africa | Forged in the Wild</title>
     
     <!-- Favicon: The CCA Shield -->
@@ -47,11 +47,15 @@
       }
     </script>
     <style>
+      html, body {
+        width: 100%;
+        overflow-x: hidden;
+        position: relative;
+      }
       body {
         background-color: #FDFBF7;
         color: #022c22;
         -webkit-font-smoothing: antialiased;
-        overflow-x: hidden;
       }
       .noise-overlay::before {
         content: "";
@@ -105,8 +109,8 @@
 }
 </script>
 </head>
-  <body class="noise-overlay">
-    <div id="root"></div>
+  <body class="noise-overlay w-full overflow-x-hidden">
+    <div id="root" class="w-full overflow-x-hidden"></div>
     <!-- Vite entry point -->
     <script type="module" src="./index.tsx"></script>
   </body>

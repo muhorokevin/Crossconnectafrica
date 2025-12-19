@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Menu, X, ShoppingBag, ArrowRight } from 'lucide-react';
 import { ViewState } from '../types';
@@ -37,19 +38,19 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, setView }) => {
 
   return (
     <nav className={`${navBaseClass} ${navBgClass}`}>
-      <div className="container mx-auto px-6 flex justify-between items-center">
+      <div className="max-w-7xl mx-auto px-4 md:px-6 flex justify-between items-center">
         
         {/* Brand */}
         <div 
-          className="flex items-center gap-3 cursor-pointer group"
+          className="flex items-center gap-2 md:gap-3 cursor-pointer group"
           onClick={() => setView(ViewState.HOME)}
         >
           <div className="transition-transform duration-300 group-hover:scale-105">
-            <Logo className="w-10 h-10 md:w-12 md:h-12" light={true} />
+            <Logo className="w-8 h-8 md:w-12 md:h-12" light={true} />
           </div>
           <div className="flex flex-col">
-            <span className={`font-serif font-bold text-xl leading-none tracking-tight ${(!isHome || scrolled) ? 'text-brand-cream' : 'text-white'}`}>CROSS CONNECT</span>
-            <span className="text-brand-gold text-[0.6rem] tracking-[0.3em] uppercase">Africa</span>
+            <span className={`font-serif font-bold text-lg md:text-xl leading-none tracking-tight ${(!isHome || scrolled) ? 'text-brand-cream' : 'text-white'}`}>CROSS CONNECT</span>
+            <span className="text-brand-gold text-[0.5rem] md:text-[0.6rem] tracking-[0.3em] uppercase">Africa</span>
           </div>
         </div>
 
@@ -93,13 +94,13 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, setView }) => {
         </div>
 
         {/* Mobile Toggle */}
-        <div className={`md:hidden cursor-pointer transition-colors ${(!isHome || scrolled) ? 'text-brand-cream' : 'text-white'}`} onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
-          {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
+        <div className={`md:hidden cursor-pointer transition-colors p-2 ${(!isHome || scrolled) ? 'text-brand-cream' : 'text-white'}`} onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+          {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
         </div>
       </div>
 
       {/* Mobile Menu */}
-      <div className={`absolute top-full left-0 right-0 bg-brand-green border-t border-brand-green/50 overflow-hidden transition-all duration-500 ease-in-out ${isMobileMenuOpen ? 'max-h-[500px] opacity-100 shadow-xl' : 'max-h-0 opacity-0'}`}>
+      <div className={`absolute top-full left-0 right-0 bg-brand-green border-t border-brand-green/50 overflow-hidden transition-all duration-500 ease-in-out ${isMobileMenuOpen ? 'max-h-screen opacity-100 shadow-xl' : 'max-h-0 opacity-0'}`}>
         <div className="p-8 flex flex-col gap-6 items-center">
           <button onClick={() => { setView(ViewState.HOME); setIsMobileMenuOpen(false); }} className="text-brand-cream text-lg font-serif">Home</button>
           <button onClick={() => { setView(ViewState.ABOUT); setIsMobileMenuOpen(false); }} className="text-brand-cream text-lg font-serif">About Us</button>

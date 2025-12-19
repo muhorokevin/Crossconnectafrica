@@ -102,12 +102,12 @@ const Home: React.FC<HomeProps> = ({ setView }) => {
         <div className="container mx-auto px-6">
           <div className="text-center mb-16 md:mb-24">
              <span className="text-brand-gold text-xs font-bold uppercase tracking-[0.6em] mb-4 block">Service Ecosystem</span>
-             <h2 className="text-3xl md:text-6xl font-serif font-bold text-brand-green tracking-tighter leading-none italic">Four Pillars of <br/><span className="not-italic">Transformation.</span></h2>
+             <h2 className="text-3xl md:text-6xl font-serif font-bold text-brand-green tracking-tighter leading-none italic">Four Pillars of <br/><span className="not-italic text-brand-gold">Transformation.</span></h2>
           </div>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px bg-brand-green/5">
             {[
-              { icon: <Shield size={28} />, title: 'Safety', desc: 'Certified First Aid & Fire Compliance.', img: 'https://images.unsplash.com/photo-1516574187841-69301976e499?q=80&w=1000' },
+              { icon: <Shield size={28} />, title: 'Safety', desc: 'Certified First Aid & Fire Compliance.', img: 'https://i.imgur.com/dXyQVwQ.jpeg' },
               { icon: <Briefcase size={28} />, title: 'Corporate', desc: 'Strategic Retreats & Executive Labs.', img: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=1000' },
               { icon: <Compass size={28} />, title: 'Youth', desc: 'Mentorship & Character Camps.', img: 'https://images.unsplash.com/photo-1475483768296-6163e08872a1?q=80&w=1000' },
               { icon: <Flame size={28} />, title: 'Adventure', desc: 'Alpine Expeditions & Coastal Peaks.', img: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=1000' },

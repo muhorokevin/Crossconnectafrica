@@ -52,8 +52,12 @@ const MissionConsultant: React.FC = () => {
         <div className="bg-brand-green p-4 flex justify-between items-center text-white">
           <div className="flex items-center gap-3">
             <div className="relative">
-              <div className="w-10 h-10 rounded-full bg-brand-gold/20 flex items-center justify-center border border-brand-gold/40">
-                <User size={20} className="text-brand-gold" />
+              <div className="w-10 h-10 rounded-full bg-brand-gold/20 overflow-hidden border border-brand-gold/40 flex items-center justify-center">
+                <img 
+                  src="https://i.imgur.com/pADVOmg.jpeg" 
+                  alt="Kevin Muhoro" 
+                  className="w-full h-full object-cover"
+                />
               </div>
               <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-brand-green rounded-full"></div>
             </div>

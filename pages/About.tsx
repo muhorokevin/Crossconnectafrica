@@ -16,7 +16,7 @@ const About: React.FC = () => {
         </div>
       </section>
 
-      {/* 2. Founder Profile (Mentioned but without personal photo) */}
+      {/* 2. Founder Profile */}
       <section className="bg-white py-24 px-6 relative overflow-hidden">
         {/* Decorative Leaf/Nature accent */}
         <div className="absolute -right-20 top-20 opacity-[0.02] rotate-45">
@@ -25,13 +25,13 @@ const About: React.FC = () => {
 
         <div className="max-w-6xl mx-auto relative z-10">
             <div className="flex flex-col md:flex-row items-center gap-12 lg:gap-24">
-                {/* Image Side - Landscape representing the mission environment */}
+                {/* Image Side - Facilitator Photo */}
                 <div className="w-full md:w-1/2 relative group">
                     <div className="absolute top-6 -left-6 w-full h-full border-2 border-brand-gold rounded-lg z-0 transition-all duration-500 group-hover:top-4 group-hover:-left-4"></div>
                     <div className="relative z-10 rounded-lg overflow-hidden shadow-2xl aspect-[4/5] bg-brand-green">
                         <img 
-                            src="https://images.unsplash.com/photo-1527605156685-f12b75f3c763?q=80&w=1970&auto=format&fit=crop" 
-                            alt="The Rugged Peaks of Kenya" 
+                            src="https://i.imgur.com/pADVOmg.jpeg" 
+                            alt="Kevin Muhoro - Lead Facilitator" 
                             className="w-full h-full object-cover grayscale transition-all duration-700 group-hover:grayscale-0" 
                         /> 
                         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-brand-green p-8">

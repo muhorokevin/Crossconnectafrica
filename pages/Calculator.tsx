@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { Printer, MessageCircle, Target, ShieldCheck, CheckSquare, Square, User, Mail, Building2, Map, Truck, Home, Clock, Info, CheckCircle2, Calendar as CalendarIcon, AlertCircle, AlertTriangle } from 'lucide-react';
+import { Printer, MessageCircle, ShieldCheck, CheckSquare, Square, User, Mail, Building2, Map, Truck, Home, Clock, Info, CheckCircle2, Calendar as CalendarIcon, AlertTriangle } from 'lucide-react';
 import { CATEGORIES, Program } from './AdventureBuilder';
 import { BookingContextData } from '../App';
 import Logo from '../components/Logo';
@@ -68,11 +68,9 @@ const Calculator: React.FC<{ initialData?: BookingContextData | null }> = ({ ini
 
   useEffect(() => {
     const variant = selectedProgram.durations?.[durationIdx];
-    // If variant is explicitly a group bracket, force group mode
     if (variant?.isGroup) {
       setPricingMode('group');
     } else if (pricingMode === 'group' && pax < 50 && selectedProgram.priceType !== 'flat_rate') {
-      // Manual "Group Rate" only works for 50+ participants
       setPricingMode('pp');
     }
   }, [pax, durationIdx, selectedProgram]);
@@ -94,50 +92,41 @@ const Calculator: React.FC<{ initialData?: BookingContextData | null }> = ({ ini
       };
     }
 
-    // Logic: If group mode is selected but no specific variant bracket exists, 
-    // find the minimum unit cost for the activity from available variants to use as the base.
     const minUnitCost = selectedProgram.durations?.reduce((min, d) => 
       !d.isGroup && d.price < min ? d.price : min, selectedProgram.basePrice) || selectedProgram.basePrice;
 
-    // Margin Validation for specific Group Brackets (e.g., "Group 10-15")
     let marginError: string | null = null;
+    let satisfiesMargin = false;
+
     if (variant.isGroup && variant.label.includes('(')) {
       const match = variant.label.match(/(\d+)[–|-](\d+)/);
       if (match) {
         const min = parseInt(match[1]);
         const max = parseInt(match[2]);
-        if (pax < min || pax > max) {
-          marginError = `Selected group bracket requires ${min}–${max} participants. Current: ${pax}.`;
+        satisfiesMargin = pax >= min && pax <= max;
+        if (!satisfiesMargin) {
+          marginError = `Current bracket: ${min}–${max} participants. Current count: ${pax}.`;
         }
       }
     }
 
-    // Flat Rate Eligibility:
-    // 1. Program is inherently flat (e.g., MC)
-    // 2. Variant is explicitly marked as a group bracket
-    // 3. Manual "Group Rate" is selected (Strictly for 50+ participants)
-    const isActuallyGroup = (
+    // A "Flat" rate only applies if the variant is explicitly marked as a group bracket and the margin is satisfied.
+    const isActuallyGroupFlat = (
       selectedProgram.priceType === 'flat_rate' || 
-      variant.isGroup || 
-      (pricingMode === 'group' && pax >= 50)
+      (variant.isGroup && satisfiesMargin)
     );
 
-    // Calculation:
-    // - If it's a defined flat rate (variant.isGroup or flat_rate), use variant price as a fixed sum.
-    // - If it's a forced "Group Rate" without a bracket, use pax * minUnitCost.
-    // - Otherwise, standard pax * variant.price.
     let baseTotal = 0;
-    if (selectedProgram.priceType === 'flat_rate' || variant.isGroup) {
+    if (isActuallyGroupFlat) {
       baseTotal = variant.price;
-    } else if (pricingMode === 'group' && pax >= 50) {
+    } else if (pricingMode === 'group') {
+      // User Logic: If no bracket is specified but "Group Rate" is active, use (Participants * Minimum Activity Rate)
       baseTotal = pax * minUnitCost;
     } else {
       baseTotal = pax * variant.price;
     }
 
     const venueCost = VENUE_GROUNDS[venue].price * days;
-    
-    // Transport Scaling: Logic for multiple vehicles based on capacity
     const fleet = FLEET_SOLUTIONS[transport];
     let transportCost = 0;
     let vehicleCount = 0;
@@ -171,13 +160,13 @@ const Calculator: React.FC<{ initialData?: BookingContextData | null }> = ({ ini
       opsFee: groundHandling + adminFees + contingency, 
       days, 
       baseTotal, 
-      unitRate: variant.price, 
-      minUnitCost,
+      unitRate: isActuallyGroupFlat ? variant.price : (pricingMode === 'group' ? minUnitCost : variant.price),
       venueCost, 
       transportCost, 
       accommodationCost, 
       addonsTotal,
-      isGroup: isActuallyGroup,
+      isGroup: isActuallyGroupFlat || pricingMode === 'group',
+      isFlat: isActuallyGroupFlat,
       vehicleCount,
       marginError,
       selectedAddonsList: addonsData
@@ -187,49 +176,24 @@ const Calculator: React.FC<{ initialData?: BookingContextData | null }> = ({ ini
   const formatKES = (n: number) => `KES ${n.toLocaleString()}`;
 
   const handleWhatsApp = () => {
-    if (results.marginError) {
+    if (results.marginError && results.isFlat) {
       alert(results.marginError);
       return;
     }
     const formattedDate = new Date(missionDate).toLocaleDateString('en-KE', { dateStyle: 'long' });
-    const addonText = results.selectedAddonsList.map(a => `- ${a.label} (${a.type === 'pp' ? formatKES(a.price) + ' pp' : formatKES(a.price) + ' flat'})`).join('\n');
-    const fleetText = transport !== 'none' ? `${results.vehicleCount}x ${FLEET_SOLUTIONS[transport].label} (KES ${FLEET_SOLUTIONS[transport].price}/unit per day)` : 'Self Drive';
+    const addonText = results.selectedAddonsList.map(a => `- ${a.label}`).join('\n');
+    const fleetText = transport !== 'none' ? `${results.vehicleCount}x ${FLEET_SOLUTIONS[transport].label}` : 'Self Drive';
 
     const message = `*CROSS CONNECT AFRICA*
-*OFFICIAL MISSION QUOTE*
---------------------------------
-QUOTE ID: ${quoteId}
-DATE: ${new Date().toLocaleDateString('en-KE', { dateStyle: 'medium' })}
---------------------------------
-*CLIENT INFO*
-ORG: ${clientInfo.company || 'N/A'}
-LEAD: ${clientInfo.contact || 'N/A'}
---------------------------------
-*MISSION PARAMETERS*
+*MISSION QUOTE REQUEST*
+ID: ${quoteId}
 MISSION: ${selectedProgram.title}
 PAX: ${pax}
 DEPLOYMENT: ${formattedDate}
---------------------------------
-*FLEET LOGISTICS*
-MODE: ${fleetText}
-UNITS: ${results.vehicleCount}
---------------------------------
-*STAY & GROUNDS*
-VENUE: ${VENUE_GROUNDS[venue].label} (${formatKES(VENUE_GROUNDS[venue].price)})
-STAY: ${ACCOMMODATION_LEVELS[accommodation].label} (${formatKES(ACCOMMODATION_LEVELS[accommodation].price)} pp)
---------------------------------
-*ADD-ONS SELECTED*
-${addonText || 'None'}
---------------------------------
-*INVESTMENT BREAKDOWN*
-Base: ${formatKES(results.baseTotal)}
-Add-ons: ${formatKES(results.addonsTotal)}
-Logistics & Ops: ${formatKES(results.venueCost + results.transportCost + results.accommodationCost + results.opsFee)}
---------------------------------
-*TOTAL: ${formatKES(results.subtotal)}*
-*DEPOSIT: ${formatKES(results.deposit)}*
---------------------------------
-_Character Forged in the Wild_`;
+LOGISTICS: ${fleetText}, ${VENUE_GROUNDS[venue].label}
+ADD-ONS: ${addonText || 'None'}
+INVESTMENT: ${formatKES(results.subtotal)}
+COMMITMENT: ${formatKES(results.deposit)}`;
 
     window.open(`https://wa.me/254710974670?text=${encodeURIComponent(message)}`, '_blank');
   };
@@ -238,7 +202,7 @@ _Character Forged in the Wild_`;
     <div className="min-h-screen bg-brand-cream pt-40 pb-32 px-6 md:px-12">
       <div className="max-w-[1800px] mx-auto flex flex-col lg:grid lg:grid-cols-10 gap-12 items-stretch">
         
-        {/* Left Column: Inputs */}
+        {/* Left Column: Calculator Inputs */}
         <div className="lg:col-span-6 space-y-10 print:hidden">
           <div className="bg-white p-12 shadow-[0_40px_100px_rgba(0,0,0,0.04)] space-y-16 border border-brand-green/5">
             <section className="space-y-10">
@@ -265,12 +229,12 @@ _Character Forged in the Wild_`;
             <section className="space-y-10">
                <div className="flex items-center gap-4 border-b border-gray-100 pb-6">
                   <div className="w-10 h-10 bg-brand-green text-brand-gold flex items-center justify-center font-bold font-serif">02</div>
-                  <h3 className="text-xl font-serif font-bold text-brand-green tracking-tight uppercase">Mission Parameters</h3>
+                  <h3 className="text-xl font-serif font-bold text-brand-green tracking-tight uppercase">Mission Configuration</h3>
                </div>
                <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
                   <div className="space-y-8">
                      <div className="space-y-4">
-                        <label className="text-[10px] font-bold text-brand-gold uppercase tracking-[0.4em]">Service Choice</label>
+                        <label className="text-[10px] font-bold text-brand-gold uppercase tracking-[0.4em]">Service Selection</label>
                         <select 
                            value={selectedProgram.id} 
                            onChange={(e) => {
@@ -293,14 +257,14 @@ _Character Forged in the Wild_`;
                      <div className="space-y-4">
                         <label className="text-[10px] font-bold text-brand-gold uppercase tracking-[0.4em]">Pricing Mode</label>
                         <div className="flex bg-gray-100 p-1">
-                           <button onClick={() => setPricingMode('pp')} disabled={selectedProgram.priceType === 'flat_rate' || selectedProgram.durations?.[durationIdx]?.isGroup} className={`flex-1 py-4 text-[10px] font-bold uppercase tracking-widest transition-all ${pricingMode === 'pp' ? 'bg-brand-green text-brand-gold shadow-sm' : 'text-gray-400 opacity-50'}`}>Participant</button>
+                           <button onClick={() => setPricingMode('pp')} disabled={selectedProgram.priceType === 'flat_rate' || selectedProgram.durations?.[durationIdx]?.isGroup} className={`flex-1 py-4 text-[10px] font-bold uppercase tracking-widest transition-all ${pricingMode === 'pp' ? 'bg-brand-green text-brand-gold shadow-sm' : 'text-gray-400 opacity-50'}`}>Per Participant</button>
                            <button onClick={() => setPricingMode('group')} disabled={pax < 50 && selectedProgram.priceType !== 'flat_rate' && !selectedProgram.durations?.[durationIdx]?.isGroup} className={`flex-1 py-4 text-[10px] font-bold uppercase tracking-widest transition-all ${pricingMode === 'group' ? 'bg-brand-green text-brand-gold shadow-sm' : 'text-gray-400 opacity-50'}`}>Group Rate (50+)</button>
                         </div>
                      </div>
                   </div>
                   <div className="space-y-8">
                      <div className="space-y-4">
-                        <label className="text-[10px] font-bold text-brand-gold uppercase tracking-[0.4em] flex items-center gap-2"><Clock size={12}/> Mission Variant</label>
+                        <label className="text-[10px] font-bold text-brand-gold uppercase tracking-[0.4em] flex items-center gap-2"><Clock size={12}/> Activity Variant</label>
                         <select value={durationIdx} onChange={(e) => setDurationIdx(parseInt(e.target.value))} className="w-full p-5 bg-gray-50 border-none text-[11px] font-bold uppercase">
                            {selectedProgram.durations?.map((d, i) => (
                               <option key={i} value={i}>{d.label} — {formatKES(d.price)} {selectedProgram.priceType === 'flat_rate' || d.isGroup ? 'Flat' : 'pp'}</option>
@@ -309,7 +273,7 @@ _Character Forged in the Wild_`;
                      </div>
                      <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-4">
-                            <label className="text-[10px] font-bold text-brand-gold uppercase tracking-[0.4em] flex items-center gap-2"><CalendarIcon size={12}/> Deployment Date</label>
+                            <label className="text-[10px] font-bold text-brand-gold uppercase tracking-[0.4em] flex items-center gap-2"><CalendarIcon size={12}/> Deployment</label>
                             <CustomCalendar value={missionDate} onChange={setMissionDate} />
                         </div>
                         <div className="space-y-4">
@@ -324,14 +288,14 @@ _Character Forged in the Wild_`;
             <section className="space-y-10">
                <div className="flex items-center gap-4 border-b border-gray-100 pb-6">
                   <div className="w-10 h-10 bg-brand-green text-brand-gold flex items-center justify-center font-bold font-serif">03</div>
-                  <h3 className="text-xl font-serif font-bold text-brand-green tracking-tight uppercase">Fleet & Logistics</h3>
+                  <h3 className="text-xl font-serif font-bold text-brand-green tracking-tight uppercase">Logistics & Fleet</h3>
                </div>
                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                   <div className="space-y-4">
-                     <label className="text-[10px] font-bold text-brand-gold uppercase tracking-[0.4em] flex items-center gap-2"><Map size={12}/> Site Basis</label>
+                     <label className="text-[10px] font-bold text-brand-gold uppercase tracking-[0.4em] flex items-center gap-2"><Map size={12}/> Venue Choice</label>
                      <select value={venue} onChange={(e) => setVenue(e.target.value as any)} className="w-full p-4 bg-gray-50 border-none text-[10px] font-bold uppercase">
                         {Object.values(VENUE_GROUNDS).map(v => (
-                           <option key={v.id} value={v.id}>{v.label} {v.price > 0 ? `(${formatKES(v.price)})` : '(Free)'}</option>
+                           <option key={v.id} value={v.id}>{v.label} {v.price > 0 ? `(${formatKES(v.price)}/day)` : '(Included)'}</option>
                         ))}
                      </select>
                   </div>
@@ -339,13 +303,13 @@ _Character Forged in the Wild_`;
                      <label className="text-[10px] font-bold text-brand-gold uppercase tracking-[0.4em] flex items-center gap-2"><Truck size={12}/> Mobility Solution</label>
                      <select value={transport} onChange={(e) => setTransport(e.target.value as any)} className="w-full p-4 bg-gray-50 border-none text-[10px] font-bold uppercase">
                         {Object.values(FLEET_SOLUTIONS).map(f => (
-                           <option key={f.id} value={f.id}>{f.label} {f.price > 0 ? `(${formatKES(f.price)}/unit)` : '(Self)'}</option>
+                           <option key={f.id} value={f.id}>{f.label} {f.price > 0 ? `(${formatKES(f.price)}/unit)` : '(None)'}</option>
                         ))}
                      </select>
-                     {results.vehicleCount > 0 && <p className="text-[9px] font-bold text-brand-gold uppercase tracking-widest mt-1">Scale: {results.vehicleCount} Units Required.</p>}
+                     {results.vehicleCount > 0 && <p className="text-[9px] font-bold text-brand-gold uppercase tracking-widest mt-1">Allocation: {results.vehicleCount} Units.</p>}
                   </div>
                   <div className="space-y-4">
-                     <label className="text-[10px] font-bold text-brand-gold uppercase tracking-[0.4em] flex items-center gap-2"><Home size={12}/> Stay Tiers</label>
+                     <label className="text-[10px] font-bold text-brand-gold uppercase tracking-[0.4em] flex items-center gap-2"><Home size={12}/> Accommodations</label>
                      <select value={accommodation} onChange={(e) => setAccommodation(e.target.value as any)} className="w-full p-4 bg-gray-50 border-none text-[10px] font-bold uppercase">
                         {Object.values(ACCOMMODATION_LEVELS).map(acc => (
                            <option key={acc.id} value={acc.id}>{acc.label} {acc.price > 0 ? `(${formatKES(acc.price)} pp)` : '(None)'}</option>
@@ -358,7 +322,7 @@ _Character Forged in the Wild_`;
             <section className="space-y-10">
                <div className="flex items-center gap-4 border-b border-gray-100 pb-6">
                   <div className="w-10 h-10 bg-brand-green text-brand-gold flex items-center justify-center font-bold font-serif">04</div>
-                  <h3 className="text-xl font-serif font-bold text-brand-green tracking-tight uppercase">Operational Add-ons</h3>
+                  <h3 className="text-xl font-serif font-bold text-brand-green tracking-tight uppercase">Tactical Add-ons</h3>
                </div>
                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                   {ADDONS.map(addon => (
@@ -380,7 +344,7 @@ _Character Forged in the Wild_`;
 
         {/* Right Column: Tall Quote Doc */}
         <div className="lg:col-span-4 w-full flex flex-col">
-          <div id="quote-doc" className="bg-white p-12 md:p-14 shadow-2xl paper-texture flex flex-col border border-gray-100 lg:sticky lg:top-40 min-h-[100vh] lg:min-h-[1200px] print:shadow-none print:p-16 print:border-none">
+          <div id="quote-doc" className="bg-white p-12 md:p-14 shadow-2xl paper-texture flex flex-col border border-gray-100 lg:sticky lg:top-40 min-h-[100vh] lg:min-h-full print:shadow-none print:p-16 print:border-none">
              
              <div className="flex-grow space-y-10">
                 <header className="border-b-[6px] border-brand-green pb-8 relative z-10">
@@ -388,20 +352,20 @@ _Character Forged in the Wild_`;
                        <Logo className="w-14 h-14" />
                        <div className="text-right">
                           <div className="text-[8px] font-bold uppercase text-gray-400 tracking-widest">{quoteId}</div>
-                          <div className="text-[9px] font-bold uppercase text-brand-gold tracking-[0.3em]">Institutional Record</div>
+                          <div className="text-[9px] font-bold uppercase text-brand-gold tracking-[0.3em]">Operational Record</div>
                        </div>
                     </div>
                     <div className="space-y-2">
                        <div className="flex justify-between items-end">
-                          <span className="text-brand-gold text-[9px] font-bold uppercase tracking-[0.6em] block">Mission Assessment For</span>
+                          <span className="text-brand-gold text-[9px] font-bold uppercase tracking-[0.6em] block">Mission Proposal For</span>
                           <span className="text-[9px] font-bold text-brand-green uppercase tracking-widest">{new Date(missionDate).toLocaleDateString('en-KE', { dateStyle: 'medium' })}</span>
                        </div>
-                       <h3 className="text-3xl font-serif font-bold text-brand-green tracking-tighter italic leading-none truncate">{clientInfo.company || 'Prospective Partner'}</h3>
+                       <h3 className="text-3xl font-serif font-bold text-brand-green tracking-tighter italic leading-none truncate">{clientInfo.company || 'Mission Partner'}</h3>
                        <div className="text-[9px] text-gray-400 font-bold uppercase tracking-widest">{clientInfo.contact || 'N/A'}</div>
                     </div>
                 </header>
 
-                {results.marginError && (
+                {results.marginError && results.isFlat && (
                     <div className="bg-red-50 border border-red-100 p-4 flex gap-3 animate-pulse">
                         <AlertTriangle className="text-red-500 shrink-0" size={16} />
                         <p className="text-[10px] font-bold text-red-700 uppercase tracking-tight leading-normal">{results.marginError}</p>
@@ -413,7 +377,7 @@ _Character Forged in the Wild_`;
                     <thead>
                         <tr className="border-b border-gray-100 text-[8px] uppercase tracking-widest text-gray-400 font-bold">
                             <th className="py-2 pr-4">Description</th>
-                            <th className="py-2 pr-4 text-center">Unit Basis</th>
+                            <th className="py-2 pr-4 text-center">Unit Rate</th>
                             <th className="py-2 text-right">Subtotal</th>
                         </tr>
                     </thead>
@@ -421,7 +385,7 @@ _Character Forged in the Wild_`;
                         <tr>
                             <td className="py-4 pr-4">{selectedProgram.title}</td>
                             <td className="py-4 pr-4 text-center text-[8px] uppercase tracking-widest">
-                                {results.isGroup ? 'GROUP' : `${formatKES(results.unitRate)} PP`}
+                                {results.isFlat ? 'FLAT RATE' : `${formatKES(results.unitRate)} PP`}
                             </td>
                             <td className="py-4 text-right font-bold">{formatKES(results.baseTotal)}</td>
                         </tr>
@@ -446,8 +410,7 @@ _Character Forged in the Wild_`;
                                 <td className="py-4 text-right font-bold">{formatKES(results.accommodationCost)}</td>
                             </tr>
                         )}
-                        
-                        {/* RESTORED AND ENHANCED ADD-ONS VISIBILITY */}
+                        {/* RESTORED ADD-ONS VISIBILITY */}
                         {results.selectedAddonsList.map(addon => (
                             <tr key={addon.id} className="bg-brand-sand/30 border-l-4 border-brand-gold">
                                 <td className="py-4 px-4 text-brand-gold font-bold italic">ADD-ON: {addon.label}</td>
@@ -465,7 +428,7 @@ _Character Forged in the Wild_`;
 
                 <section className="bg-brand-green/5 p-6 border-l-4 border-brand-green relative z-10">
                     <div className="flex justify-between items-center mb-2">
-                        <span className="text-[10px] font-bold uppercase text-brand-green tracking-widest">Ground Handling & Institutional Buffer</span>
+                        <span className="text-[10px] font-bold uppercase text-brand-green tracking-widest">Operating Buffer & Fees</span>
                         <span className="text-[10px] font-bold text-brand-green">{formatKES(results.opsFee)}</span>
                     </div>
                     <p className="text-[8px] text-gray-400 uppercase tracking-widest font-bold leading-normal">
@@ -498,13 +461,13 @@ _Character Forged in the Wild_`;
                         <span className="text-[8px] font-bold uppercase tracking-widest">CCA/2026/PROPOSAL</span>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
-                        <button onClick={() => window.print()} className="w-full py-4 border-2 border-brand-green text-brand-green font-bold text-[9px] uppercase tracking-widest hover:bg-brand-green hover:text-white transition-all"><Printer size={16} className="inline mr-2" /> EXPORT PDF</button>
+                        <button onClick={() => window.print()} className="w-full py-4 border-2 border-brand-green text-brand-green font-bold text-[9px] uppercase tracking-widest hover:bg-brand-green hover:text-white transition-all">PDF EXPORT</button>
                         <button 
                             onClick={handleWhatsApp} 
-                            disabled={!!results.marginError}
-                            className={`w-full py-4 bg-[#25D366] text-white font-bold text-[9px] uppercase tracking-widest shadow-lg flex items-center justify-center gap-2 ${!!results.marginError ? 'opacity-50 cursor-not-allowed grayscale' : ''}`}
+                            disabled={!!results.marginError && results.isFlat}
+                            className={`w-full py-4 bg-[#25D366] text-white font-bold text-[9px] uppercase tracking-widest shadow-lg flex items-center justify-center gap-2 ${!!results.marginError && results.isFlat ? 'opacity-50 cursor-not-allowed grayscale' : ''}`}
                         >
-                            <MessageCircle size={16} /> FINALIZE MISSION
+                            <MessageCircle size={16} /> FINALIZE QUOTE
                         </button>
                     </div>
                 </footer>

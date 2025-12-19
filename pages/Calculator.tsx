@@ -43,7 +43,7 @@ const Calculator: React.FC<{ initialData?: BookingContextData | null }> = ({ ini
   const [pricingMode, setPricingMode] = useState<'pp' | 'group'>('pp');
   const [selectedProgram, setSelectedProgram] = useState<Program>(CATEGORIES[1].programs[0]); 
   const [durationIdx, setDurationIdx] = useState(0);
-  const [pax, setPax] = useState(25);
+  const [pax, setPax] = useState(0);
   const [missionDate, setMissionDate] = useState(new Date().toISOString().split('T')[0]);
   const [venue, setVenue] = useState<keyof typeof VENUE_GROUNDS>('client');
   const [accommodation, setAccommodation] = useState<keyof typeof ACCOMMODATION_LEVELS>('none');
@@ -59,7 +59,7 @@ const Calculator: React.FC<{ initialData?: BookingContextData | null }> = ({ ini
           setPricingMode('group');
         }
       }
-      if (initialData.pax) setPax(initialData.pax);
+      if (initialData.pax !== undefined) setPax(initialData.pax);
       if (initialData.durationIndex !== undefined) {
         setDurationIdx(initialData.durationIndex);
         if (initialData.program?.durations?.[initialData.durationIndex].isGroup) {
@@ -237,7 +237,7 @@ _Forging Character Since 2023_`;
                         </div>
                         <div className="space-y-4">
                             <label className="text-[10px] font-bold text-brand-gold uppercase tracking-[0.4em]">Participants</label>
-                            <input type="number" value={pax} onChange={(e) => setPax(parseInt(e.target.value) || 1)} className="w-full p-3.5 bg-gray-50 border-none font-serif font-bold text-2xl text-brand-green" />
+                            <input type="number" value={pax} onChange={(e) => setPax(parseInt(e.target.value) || 0)} className="w-full p-3.5 bg-gray-50 border-none font-serif font-bold text-2xl text-brand-green" />
                         </div>
                      </div>
                   </div>

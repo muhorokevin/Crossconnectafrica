@@ -394,7 +394,7 @@ const AdventureBuilder: React.FC<{ onNavigateToBooking: (data: BookingContextDat
   const [activeCategory, setActiveCategory] = useState<Category>(CATEGORIES[1]);
   const [selectedProgram, setSelectedProgram] = useState<Program>(CATEGORIES[1].programs[0]);
   const [durationIdx, setDurationIdx] = useState(0);
-  const [formData, setFormData] = useState({ groupSize: 25, focus: 'Character & Synergy' });
+  const [formData, setFormData] = useState({ groupSize: 0, focus: 'Character & Synergy' });
   const [clientInfo, setClientInfo] = useState({ company: '', contact: '', email: '' });
   const [itinerary, setItinerary] = useState<GeneratedItinerary | null>(null);
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
@@ -541,7 +541,7 @@ const AdventureBuilder: React.FC<{ onNavigateToBooking: (data: BookingContextDat
                         <input 
                            type="number" 
                            value={formData.groupSize} 
-                           onChange={(e) => setFormData({...formData, groupSize: parseInt(e.target.value) || 1})}
+                           onChange={(e) => setFormData({...formData, groupSize: parseInt(e.target.value) || 0})}
                            className="w-full p-3.5 bg-gray-50 border-none rounded-none text-xl font-serif font-bold text-brand-green focus:ring-1 focus:ring-brand-green" 
                         />
                       </div>
@@ -602,7 +602,7 @@ const AdventureBuilder: React.FC<{ onNavigateToBooking: (data: BookingContextDat
                          <label className="text-[9px] font-bold text-brand-gold uppercase tracking-[0.7em] block">Mission Covers</label>
                          <ul className="grid grid-cols-1 gap-2">
                             {selectedProgram.inclusions.map((inc, i) => (
-                               <li key={i} className="flex items-center gap-2 text-[9px] font-bold uppercase tracking-widest text-gray-400">
+                               <li key={i} className="flex items-center gap-2 text-[9px] font-bold uppercase tracking-widest text-brand-green font-bold">
                                   <CheckCircle2 size={12} className="text-brand-gold shrink-0" /> {inc}
                                </li>
                             ))}

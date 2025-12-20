@@ -12,7 +12,7 @@ const products: Product[] = [
     price: '2500',
     description: 'Premium heavy cotton with high-density print. Engineered for events, hikes, and CSR days.',
     valueProp: 'Wear the mission. Built for community and service.',
-    image: 'https://images.unsplash.com/photo-1576566588028-4147f3842f27?q=80&w=1000&auto=format&fit=crop'
+    image: 'https://i.imgur.com/Kiw1wbc.jpeg'
   },
   {
     id: 'app-2',
@@ -21,7 +21,7 @@ const products: Product[] = [
     price: '4800',
     description: 'Premium brushed fleece for early morning pickups and evening fellowship sessions.',
     valueProp: 'Rugged warmth for high-altitude de-briefs.',
-    image: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=1000&auto=format&fit=crop'
+    image: 'https://i.imgur.com/4z6QSwY.jpeg'
   },
   // 2. ADVENTURE ESSENTIALS
   {
@@ -31,7 +31,7 @@ const products: Product[] = [
     price: '4500',
     description: 'Branded multi-compartment pack with dedicated water bottle loops and mission tag loop.',
     valueProp: 'Tactical efficiency for every mission terrain.',
-    image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?q=80&w=1000&auto=format&fit=crop'
+    image: 'https://i.imgur.com/JTJ1k1w.jpeg'
   },
   {
     id: 'ess-2',
@@ -40,7 +40,7 @@ const products: Product[] = [
     price: '1800',
     description: 'Double-walled medical-grade stainless steel. Keeps hydration cool for 24 hours.',
     valueProp: 'Environmentally responsible hydration.',
-    image: 'https://images.unsplash.com/photo-1519739039704-733f43d59642?q=80&w=1000&auto=format&fit=crop'
+    image: 'https://i.imgur.com/rnxR5gh.jpeg'
   },
   {
     id: 'ess-3',
@@ -49,7 +49,7 @@ const products: Product[] = [
     price: '1500',
     description: 'Sun protection with identity. Durable twill with adjustable cord.',
     valueProp: 'Identity and protection for the open ridge.',
-    image: 'https://images.unsplash.com/photo-1533055640609-24b498dfd74c?q=80&w=1000&auto=format&fit=crop'
+    image: 'https://i.imgur.com/YLr6AHT.jpeg'
   },
   // 3. SAFETY & FIRST AID
   {
@@ -59,7 +59,7 @@ const products: Product[] = [
     price: '2800',
     description: 'Contains trauma bandages, antiseptic, and emergency instructions. Essential hiker gear.',
     valueProp: 'Stewardship starts with preparedness.',
-    image: 'https://images.unsplash.com/photo-1603398938378-e54eab446ddd?q=80&w=1000&auto=format&fit=crop'
+    image: 'https://i.imgur.com/qAqwGkv.jpeg'
   },
   {
     id: 'saf-2',
@@ -68,7 +68,7 @@ const products: Product[] = [
     price: '1200',
     description: 'High-visibility safety gear for street clean-ups and urban restoration projects.',
     valueProp: 'Visibility is credibility.',
-    image: 'https://images.unsplash.com/photo-1628102422201-987820610f44?q=80&w=1000&auto=format&fit=crop'
+    image: 'https://i.imgur.com/MXik4LC.jpeg'
   },
   // 4. FAITH & LIFESTYLE
   {
@@ -78,7 +78,7 @@ const products: Product[] = [
     price: '2200',
     description: 'Premium leather-bound journal with mission reflection prompts and scripture inserts.',
     valueProp: 'Capture the forge moments in physical ink.',
-    image: 'https://images.unsplash.com/photo-1517842645767-c639042777db?q=80&w=1000&auto=format&fit=crop'
+    image: 'https://i.imgur.com/1H2TZBa.jpeg'
   },
   {
     id: 'fai-2',
@@ -87,7 +87,7 @@ const products: Product[] = [
     price: '500',
     description: 'Embossed silicone wristband. A constant reminder of the call to service.',
     valueProp: 'Identity that stays with you.',
-    image: 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?q=80&w=1000&auto=format&fit=crop'
+    image: 'https://i.imgur.com/8gT01yT.jpeg'
   },
   // 5. CSR & IMPACT
   {
@@ -98,7 +98,7 @@ const products: Product[] = [
     description: 'Directly funds our monthly charity outreach missions with food and hygiene supplies.',
     valueProp: '100% of proceeds fund CSR logistics.',
     impactLabel: 'A portion of this purchase supports our community outreach work.',
-    image: 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=1000&auto=format&fit=crop'
+    image: 'https://i.imgur.com/JqP8igR.jpeg'
   },
   {
     id: 'csr-2',
@@ -108,7 +108,7 @@ const products: Product[] = [
     description: 'Gloves, bags, and sanitizers for our urban restoration missions.',
     valueProp: 'Restoring beauty to our city.',
     impactLabel: 'Directly supports Urban Restoration days.',
-    image: 'https://images.unsplash.com/photo-1618477461853-cf6ed80fafa5?q=80&w=1000&auto=format&fit=crop'
+    image: 'https://i.imgur.com/sjLj5CK.jpeg'
   },
   // 6. EXPERIENCE
   {
@@ -119,7 +119,7 @@ const products: Product[] = [
     description: 'Commit to the season. Access to any three 2026 missions with a 10% discount.',
     valueProp: 'Commitment to consistency.',
     isBundle: true,
-    image: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=1000&auto=format&fit=crop'
+    image: 'https://i.imgur.com/Q3qLaBj.jpeg'
   },
   {
     id: 'exp-2',
@@ -128,7 +128,7 @@ const products: Product[] = [
     price: '6000',
     description: 'Voucher for any Professional First Aid & Preparedness Day session.',
     valueProp: 'Give the gift of life-saving skills.',
-    image: 'https://images.unsplash.com/photo-1516574187841-69301976e499?q=80&w=1000&auto=format&fit=crop'
+    image: 'https://i.imgur.com/GPln6Is.jpeg'
   },
   // 7. CORPORATE & GROUP
   {
@@ -138,7 +138,7 @@ const products: Product[] = [
     price: '150000',
     description: 'Includes event facilitation, merchandise, and a structured CSR activity for up to 30 pax.',
     valueProp: 'High-ticket impact aligned with your mission.',
-    image: 'https://images.unsplash.com/photo-1522071823991-b1ae5e6a3048?q=80&w=1000&auto=format&fit=crop'
+    image: 'https://i.imgur.com/WBVuUUz.jpeg'
   },
   // 8. ADD-ONS
   {
@@ -148,7 +148,7 @@ const products: Product[] = [
     price: '1000',
     description: 'High-resolution professional photography pack from your mission day.',
     valueProp: 'Capture the peak moments forever.',
-    image: 'https://images.unsplash.com/photo-1452723312111-3a7d0db0e024?q=80&w=1000&auto=format&fit=crop'
+    image: 'https://i.imgur.com/xSTsIFg.jpeg'
   },
   {
     id: 'add-2',

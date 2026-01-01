@@ -17,14 +17,14 @@ export const mockEvents: ExtendedEvent[] = [
     date: '2026-01-10', // Saturday
     month: 'Jan',
     location: 'Karura Gardens',
-    price: 3500,
+    price: 1800,
     seatsAvailable: 60,
     categoryType: 'social',
     image: 'https://images.unsplash.com/photo-1528605248644-14dd04022da1?q=80&w=1000',
     description: 'A relaxed Christian meet-up to start the year. Icebreakers, games, prayer moments, and intentional introductions for young adults and community seekers.',
     gift: 'Vision Card Set',
     includes: ['Transport', 'Mineral Water', 'Professional Facilitators', 'Social Games'],
-    addons: [{ name: 'Picnic Basket', price: 1500 }],
+    addons: [{ name: 'Picnic Basket', price: 1200 }],
     meetingPoint: 'Outside City Market, CBD',
     gearList: ['Casual Wear', 'Sunscreen', 'Outdoor Blanket'],
     itinerary: [
@@ -40,14 +40,14 @@ export const mockEvents: ExtendedEvent[] = [
     date: '2026-02-14', // Saturday
     month: 'Feb',
     location: 'Kijabe Grounds',
-    price: 4000,
+    price: 2500,
     seatsAvailable: 45,
     categoryType: 'teambuilding',
     image: 'https://images.unsplash.com/photo-1543269865-cbf427effbad?q=80&w=1000',
     description: 'Faith-based team building with fun challenges, communication games, and fellowship. Ideal for churches, ministries, and professionals.',
     gift: 'Unity Keychain',
     includes: ['Transport', 'Mineral Water', 'Facilitators', 'Team Equipment'],
-    addons: [{ name: 'Team T-Shirt', price: 1800 }],
+    addons: [{ name: 'Team T-Shirt', price: 1500 }],
     meetingPoint: 'Outside City Market, CBD',
     gearList: ['Sporty Attire', 'Sneakers', 'Water Bottle'],
     itinerary: [
@@ -63,14 +63,14 @@ export const mockEvents: ExtendedEvent[] = [
     date: '2026-03-14', // Saturday
     month: 'Mar',
     location: 'Kijani Forest',
-    price: 4500,
+    price: 2200,
     seatsAvailable: 35,
     categoryType: 'hike',
     image: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=1000',
     description: 'A gentle, well-paced hike focused on vision, purpose, and fellowship. Designed for community, not fitness competition.',
     gift: 'Mission Map',
     includes: ['Transport', 'Mineral Water', 'Guides', 'Facilitation'],
-    addons: [{ name: 'Hiker\'s Log', price: 1200 }],
+    addons: [{ name: 'Hiker\'s Log', price: 800 }],
     meetingPoint: 'Outside City Market, CBD',
     gearList: ['Hiking Boots', 'Backpack', 'Sun Hat'],
     itinerary: [
@@ -86,14 +86,14 @@ export const mockEvents: ExtendedEvent[] = [
     date: '2026-04-18', // Saturday
     month: 'Apr',
     location: 'Children’s Home',
-    price: 3800,
+    price: 2000,
     seatsAvailable: 30,
     categoryType: 'csr',
     image: 'https://i.imgur.com/WBVuUUz.jpeg',
     description: 'A full day of service: games with children, cleaning, mentorship, and prayer. Deeply joyful and impactful Christian service.',
     gift: 'CSR Impact Pin',
     includes: ['Transport', 'Mineral Water', 'Coordination', 'Facilitation'],
-    addons: [{ name: 'Donation Pack', price: 2000 }],
+    addons: [{ name: 'Donation Pack', price: 1500 }],
     meetingPoint: 'Outside City Market, CBD',
     gearList: ['Service Clothes', 'Comfortable Shoes', 'Open Heart'],
     itinerary: [
@@ -109,7 +109,7 @@ export const mockEvents: ExtendedEvent[] = [
     date: '2026-05-16', // Saturday
     month: 'May',
     location: 'Kiboko Safety Grounds',
-    price: 4800,
+    price: 2800,
     seatsAvailable: 25,
     categoryType: 'safety',
     image: 'https://i.imgur.com/BRDK6Sj.jpeg',
@@ -127,157 +127,19 @@ export const mockEvents: ExtendedEvent[] = [
     ]
   },
   {
-    id: '2026-06',
-    title: 'Beyond Comfort Trail',
-    date: '2026-06-13', // Saturday
-    month: 'Jun',
-    location: 'Kinale Bamboo Grove',
-    price: 4500,
-    seatsAvailable: 35,
-    categoryType: 'hike',
-    image: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?q=80&w=1000',
-    description: 'A scenic hike focused on growth, encouragement, and shared experiences with lots of laughter and bonding.',
-    gift: 'Growth Token',
-    includes: ['Transport', 'Mineral Water', 'Guides', 'Facilitation'],
-    addons: [{ name: 'Merch Bundle', price: 3000 }],
-    meetingPoint: 'Outside City Market, CBD',
-    gearList: ['Hiking Shoes', 'Warm Jacket', 'Camera'],
-    itinerary: [
-      { time: '06:30', task: 'Assembly at City Market' },
-      { time: '09:00', task: 'Trail Entry' },
-      { time: '11:00', task: 'Bamboo Grove Reflection' },
-      { time: '14:00', task: 'Synergy Games' }
-    ]
-  },
-  {
-    id: '2026-07',
-    title: 'Serve the City Clean-Up',
-    date: '2026-07-11', // Saturday
-    month: 'Jul',
-    location: 'Market Zones',
-    price: 3500,
-    seatsAvailable: 40,
-    categoryType: 'csr',
-    image: 'https://i.imgur.com/sjLj5CK.jpeg',
-    description: 'Christian community service combining clean-up, prayer walks, and fellowship. Ends with a group meal.',
-    gift: 'Stewardship Badge',
-    includes: ['Transport', 'Mineral Water', 'Safety Gear', 'Community Meal'],
-    addons: [{ name: 'Reflective Vest', price: 800 }],
-    meetingPoint: 'Outside City Market, CBD',
-    gearList: ['Sturdy Boots', 'Gloves (Provided)', 'Old Wear'],
-    itinerary: [
-      { time: '08:30', task: 'Assembly at CBD' },
-      { time: '09:30', task: 'Zone Briefing & Prayer' },
-      { time: '11:00', task: 'Restoration Block' },
-      { time: '13:00', task: 'Fellowship Lunch' }
-    ]
-  },
-  {
-    id: '2026-08',
-    title: 'Christian Picnic Day',
-    date: '2026-08-15', // Saturday
-    month: 'Aug',
-    location: 'Arboretum Lawns',
-    price: 3800,
-    seatsAvailable: 70,
-    categoryType: 'social',
-    image: 'https://i.imgur.com/DKZKSaJ.jpeg',
-    description: 'Games, conversations, music, and prayer moments in a relaxed park setting. Perfect for all ages.',
-    gift: 'Friendship Bracelet',
-    includes: ['Transport', 'Mineral Water', 'Facilitators', 'Games'],
-    addons: [{ name: 'Family Pack', price: 2000 }],
-    meetingPoint: 'Outside City Market, CBD',
-    gearList: ['Casual Gear', 'Shades', 'Picnic Blanket'],
-    itinerary: [
-      { time: '09:30', task: 'Assembly at CBD' },
-      { time: '10:30', task: 'Morning Icebreakers' },
-      { time: '12:00', task: 'Interactive Storytelling' },
-      { time: '14:00', task: 'Group Prayer & Music' }
-    ]
-  },
-  {
-    id: '2026-09',
-    title: 'Forge the Mind Hike',
-    date: '2026-09-12', // Saturday
-    month: 'Sep',
-    location: 'Lukenya Ridge',
-    price: 4800,
-    seatsAvailable: 30,
-    categoryType: 'hike',
-    image: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=1000',
-    description: 'Moderate hike focused on resilience, encouragement, and mental strength. Done as a community, not individuals.',
-    gift: 'Mental Grit Coin',
-    includes: ['Transport', 'Mineral Water', 'Guides', 'Facilitation'],
-    addons: [{ name: 'Recovery Gel', price: 500 }],
-    meetingPoint: 'Outside City Market, CBD',
-    gearList: ['Trail Shoes', '2L Water', 'Light Jacket'],
-    itinerary: [
-      { time: '06:00', task: 'Assembly at CBD' },
-      { time: '07:30', task: 'Ridge Ascent' },
-      { time: '10:00', task: 'Mindset Workshop' },
-      { time: '13:00', task: 'Valley View Meditation' }
-    ]
-  },
-  {
-    id: '2026-10',
-    title: 'Hope Restored Outreach',
-    date: '2026-10-10', // Saturday
-    month: 'Oct',
-    location: 'Correctional Facility',
-    price: 3800,
-    seatsAvailable: 25,
-    categoryType: 'csr',
-    image: 'https://i.imgur.com/UnHoxKO.jpeg',
-    description: 'A structured outreach involving encouragement talks, worship, prayer, and support activities. Deeply meaningful.',
-    gift: 'Hope Embossed Band',
-    includes: ['Transport', 'Mineral Water', 'Coordination', 'Facilitators'],
-    addons: [{ name: 'Care Kit for Inmates', price: 1500 }],
-    meetingPoint: 'Outside City Market, CBD',
-    gearList: ['Modest Attire', 'ID (Mandatory)'],
-    itinerary: [
-      { time: '08:30', task: 'Assembly at CBD' },
-      { time: '10:00', task: 'Security Briefing' },
-      { time: '11:00', task: 'Outreach & Fellowship' },
-      { time: '14:00', task: 'Staff Support Reflection' }
-    ]
-  },
-  {
-    id: '2026-11',
-    title: 'Gratitude Walk',
-    date: '2026-11-14', // Saturday
-    month: 'Nov',
-    location: 'Aberdare Foothills',
-    price: 4500,
-    seatsAvailable: 40,
-    categoryType: 'hike',
-    image: 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?q=80&w=1000',
-    description: 'A slow, reflective walk with gratitude conversations, prayer, and reflection—suitable for all ages.',
-    gift: 'Gratitude Jar',
-    includes: ['Transport', 'Mineral Water', 'Guides', 'Facilitation'],
-    addons: [{ name: 'Reflection Journal', price: 1500 }],
-    meetingPoint: 'Outside City Market, CBD',
-    gearList: ['Walking Shoes', 'Sweater', 'Notebook'],
-    itinerary: [
-      { time: '06:30', task: 'Assembly at CBD' },
-      { time: '08:30', task: 'Quiet Entry & Prayer' },
-      { time: '11:00', task: 'Grateful Sharing Circle' },
-      { time: '14:00', task: 'Panoramic Prayer' }
-    ]
-  },
-  {
     id: '2026-12',
     title: 'End-Year Gala Dinner',
     date: '2026-12-19', // Saturday
     month: 'Dec',
     location: 'Elite Lodge Space',
-    price: 6500,
+    price: 3500,
     seatsAvailable: 100,
     categoryType: 'gala',
     image: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=1000',
     description: 'A classy, alcohol-free Christian celebration with dinner, music, testimonies, awards, and community bonding.',
     gift: 'CCA Heritage Keepsake',
     includes: ['Transport', 'Full Dinner', 'Venue', 'Facilitation', 'Music'],
-    addons: [{ name: 'VIP Seating Upgrade', price: 2500 }],
+    addons: [{ name: 'VIP Seating Upgrade', price: 1500 }],
     meetingPoint: 'Outside City Market, CBD',
     gearList: ['Formal Attire', 'Appreciative Spirit'],
     itinerary: [
@@ -403,71 +265,6 @@ _Faith. Fellowship. Service. Adventure._`;
             </div>
         </section>
 
-        {/* PRICING & LOGIC */}
-        <section className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start mb-32">
-            <div className="bg-white p-12 shadow-2xl border border-gray-100 space-y-10">
-                <header>
-                    <span className="text-brand-gold text-[10px] font-bold uppercase tracking-[0.4em] mb-2 block">Investment Tiers</span>
-                    <h3 className="text-3xl font-serif font-bold text-brand-green italic">Group Efficiency Rates.</h3>
-                </header>
-                <div className="space-y-6">
-                    <p className="text-gray-500 font-serif italic text-sm">Applies to churches, ministries, schools, and chamas seeking dedicated facilitators.</p>
-                    <div className="space-y-4">
-                        {[
-                            { range: '10–15 pax', discount: '5% Deduction' },
-                            { range: '16–25 pax', discount: '8% Deduction' },
-                            { range: '26–40 pax', discount: '12% Deduction' },
-                            { range: '40+ pax', discount: 'Custom Strategic Quote' }
-                        ].map((row, i) => (
-                            <div key={i} className="flex justify-between items-center border-b border-gray-50 pb-4">
-                                <span className="text-[10px] font-bold uppercase tracking-widest text-brand-green">{row.range}</span>
-                                <span className="bg-brand-sand px-3 py-1 text-[9px] font-bold text-brand-gold uppercase tracking-widest">{row.discount}</span>
-                            </div>
-                        ))}
-                    </div>
-                    <div className="pt-6 bg-brand-sand/30 p-6 space-y-3">
-                        <h4 className="text-[10px] font-bold uppercase tracking-[0.4em] text-brand-green">Corporate / Institutional Benefits</h4>
-                        <ul className="space-y-2">
-                            {['Single Consolidated Invoice', 'Dedicated Lead Strategist', 'Custom Mission Theme Alignment', 'Professional Behavioral Debrief'].map((item, i) => (
-                                <li key={i} className="flex items-center gap-3 text-[9px] font-bold uppercase tracking-widest text-gray-400">
-                                    <CheckCircle2 size={12} className="text-brand-gold shrink-0"/> {item}
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-            <div className="space-y-12">
-                <header>
-                    <span className="text-brand-gold text-[10px] font-bold uppercase tracking-[0.4em] mb-2 block">Our Distinction</span>
-                    <h3 className="text-3xl font-serif font-bold text-brand-green italic">What We Do <span className="not-italic text-brand-gold">Differently.</span></h3>
-                </header>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    {[
-                        { label: 'Alcohol-Free', desc: 'Ensuring safe, high-integrity environments for clear-minded connection.' },
-                        { label: 'Faith-Rooted', desc: 'Christ-centered facilitation that connects wilderness to the Word.' },
-                        { label: 'No Intimidation', desc: 'Hikes are well-paced; we focus on the slowest walker to build community.' },
-                        { label: 'Multi-Age Design', desc: 'From energetic youth to wise seniors, our year plan includes everyone.' }
-                    ].map((item, i) => (
-                        <div key={i} className="space-y-2 border-l-2 border-brand-gold/20 pl-6 py-2">
-                           <h4 className="text-[10px] font-bold uppercase tracking-[0.4em] text-brand-green">{item.label}</h4>
-                           <p className="text-gray-400 text-xs font-serif italic leading-relaxed">{item.desc}</p>
-                        </div>
-                    ))}
-                </div>
-                <div className="p-10 bg-brand-green text-brand-gold relative overflow-hidden group">
-                    <div className="absolute -right-8 -bottom-8 opacity-10 rotate-12 transition-transform group-hover:rotate-0 duration-[3s]">
-                        <Zap size={200} />
-                    </div>
-                    <div className="relative z-10 space-y-6">
-                        <p className="text-xl font-serif italic leading-relaxed text-brand-cream">"Cross Connect Africa is not a hiking club. We are a platform where faith is lived, resilience is forged, and community is permanent."</p>
-                        <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="text-[10px] font-bold uppercase tracking-[0.5em] border-b border-brand-gold/30 pb-1">Begin Your Mission Journey</button>
-                    </div>
-                </div>
-            </div>
-        </section>
-
         {/* MODAL */}
         {selectedEvent && (
             <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-brand-green/95 backdrop-blur-md animate-fade-in-up">
@@ -517,18 +314,6 @@ _Faith. Fellowship. Service. Adventure._`;
                                             <div key={i} className="flex items-center gap-3 text-[9px] font-bold uppercase tracking-widest text-brand-green">
                                                 <CheckCircle2 size={12} className="text-brand-gold shrink-0"/> {inc}
                                             </div>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                <div className="space-y-4">
-                                    <h3 className="text-brand-gold font-bold uppercase tracking-[0.4em] text-[10px] border-b border-brand-green/10 pb-3 flex items-center gap-2"><MapPin size={14}/> Logistics</h3>
-                                    <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500 leading-loose">
-                                        <strong>Point:</strong> {selectedEvent.meetingPoint}
-                                    </p>
-                                    <div className="flex flex-wrap gap-2">
-                                        {selectedEvent.gearList.map((gear, i) => (
-                                            <span key={i} className="bg-gray-100 px-2 py-1 text-[8px] font-bold uppercase tracking-widest text-gray-500">{gear}</span>
                                         ))}
                                     </div>
                                 </div>

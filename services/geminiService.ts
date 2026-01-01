@@ -1,3 +1,4 @@
+
 import { GoogleGenAI, Type } from "@google/genai";
 import { GeneratedItinerary, ChatMessage } from "../types";
 
@@ -34,6 +35,7 @@ export const generateAdventureItinerary = async (
   focus: string,
   addons: string[]
 ): Promise<GeneratedItinerary> => {
+  // Using gemini-3-flash-preview for fast, iterative generation
   const modelId = 'gemini-3-flash-preview';
   const prompt = `Create a detailed ${days}-day adventure itinerary for a group of ${groupSize} people in Kenya.
   
@@ -52,7 +54,6 @@ export const generateAdventureItinerary = async (
   4. Cost estimate in KES per person.`;
 
   try {
-    // Initializing GoogleGenAI using a fresh instance per call as per guidelines
     const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
     const response = await ai.models.generateContent({
       model: modelId,
@@ -70,7 +71,6 @@ export const generateAdventureItinerary = async (
     throw new Error("Empty response from AI");
   } catch (error: any) {
     console.error("Itinerary Generation Error:", error);
-    // Return a graceful fallback if the API fails
     return {
       title: `${programName} Mission`,
       theme: "Resilience & Connection",
@@ -88,7 +88,6 @@ export const chatWithConsultant = async (history: ChatMessage[], message: string
   const modelId = 'gemini-3-flash-preview';
   
   try {
-    // Create a new instance right before the call to ensure up-to-date configuration
     const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
     const chat = ai.chats.create({
       model: modelId,

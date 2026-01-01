@@ -1,5 +1,5 @@
 
-import { MessageSquare, Send, Minimize2, User, ShieldCheck } from 'lucide-react';
+import { MessageSquare, Send, Minimize2, User, ShieldCheck, RotateCcw } from 'lucide-react';
 import React, { useState, useRef, useEffect } from 'react';
 import { chatWithConsultant } from '../services/geminiService';
 import { ChatMessage } from '../types';
@@ -36,6 +36,10 @@ const MissionConsultant: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const restoreMessageToInput = (text: string) => {
+    setInput(text);
   };
 
   return (
@@ -79,9 +83,16 @@ const MissionConsultant: React.FC = () => {
           style={{ backgroundImage: "url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noise%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noise)%22 opacity=%220.03%22/%3E%3C/svg%3E')" }}
         >
           {messages.map((msg, i) => (
-            <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-              <div className={`max-w-[85%] p-3 rounded-2xl text-sm leading-relaxed ${msg.role === 'user' ? 'bg-brand-green text-white rounded-tr-none shadow-md' : 'bg-white border border-brand-green/5 text-gray-700 shadow-sm rounded-tl-none'}`}>
+            <div key={i} className={`flex group relative ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+              <div className={`max-w-[85%] p-3 rounded-2xl text-sm leading-relaxed relative ${msg.role === 'user' ? 'bg-brand-green text-white rounded-tr-none shadow-md' : 'bg-white border border-brand-green/5 text-gray-700 shadow-sm rounded-tl-none'}`}>
                 {msg.text}
+                <button 
+                  onClick={() => restoreMessageToInput(msg.text)}
+                  title="Restore to input"
+                  className={`absolute -top-2 ${msg.role === 'user' ? '-left-6' : '-right-6'} p-1 bg-white rounded-full shadow-sm text-brand-gold opacity-0 group-hover:opacity-100 transition-opacity border border-gray-100`}
+                >
+                  <RotateCcw size={10} />
+                </button>
               </div>
             </div>
           ))}

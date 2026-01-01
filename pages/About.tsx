@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Award, Heart, Shield, Users, Target, BookOpen, Quote } from 'lucide-react';
+import { Award, Heart, Shield, Users, Target, BookOpen, Quote, ExternalLink } from 'lucide-react';
 
 const About: React.FC = () => {
   return (
@@ -34,9 +34,21 @@ const About: React.FC = () => {
                             alt="Kevin Muhoro - Lead Facilitator" 
                             className="w-full h-full object-cover grayscale transition-all duration-700 group-hover:grayscale-0" 
                         /> 
-                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-brand-green p-8">
-                          <p className="text-brand-gold font-bold uppercase tracking-widest text-[10px]">Founder & Lead Facilitator</p>
-                          <h3 className="text-white text-3xl font-serif font-bold">Kevin Muhoro</h3>
+                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-brand-green p-8 flex justify-between items-end">
+                          <div>
+                            <p className="text-brand-gold font-bold uppercase tracking-widest text-[10px]">Founder & Lead Facilitator</p>
+                            <h3 className="text-white text-3xl font-serif font-bold">Kevin Muhoro</h3>
+                          </div>
+                          <a 
+                            href="https://kevin-muhoro-portfolio.vercel.app/" 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="bg-brand-gold text-brand-green px-5 py-3 rounded-none shadow-xl hover:scale-105 transition-all duration-300 group/link flex items-center gap-2"
+                            title="View Strategic Portfolio"
+                          >
+                            <span className="text-[10px] font-bold uppercase tracking-[0.2em]">View Portfolio</span>
+                            <ExternalLink size={16} className="group-hover/link:rotate-12 transition-transform" />
+                          </a>
                         </div>
                     </div>
                 </div>

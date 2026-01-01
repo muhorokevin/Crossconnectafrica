@@ -3,15 +3,15 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { GeneratedItinerary, ItineraryItem } from '../types';
 import { generateAdventureItinerary } from '../services/geminiService';
 import { 
-  Loader2, CheckCircle2, ShieldAlert, Users, Mountain, Compass, ArrowRight, Flame, School, 
-  Zap, Briefcase, ChevronRight, ShieldCheck, Anchor, Mic2, Edit3, Save, User, Mail, Building2, 
-  Trash2, Home, Truck, Heart, Coffee, Star, Info, Calendar as CalendarIcon, Target, Camera, Music, 
-  ShieldX, Backpack, BriefcaseBusiness, Award, Sparkles, Radio, Church, Video
+  Loader2, CheckCircle2, Users, Mountain, Compass, ArrowRight, Flame, School, 
+  Zap, Briefcase, ChevronRight, ShieldCheck, Heart, ShieldX, Backpack, 
+  Mic2, Edit3, Save, User, Mail, Building2, RotateCcw, Target, Award, Users2, Star, ShieldPlus
 } from 'lucide-react';
 import { BookingContextData } from '../App';
 
 export interface Program {
   id: string;
+  category: string;
   title: string;
   quoteTitle: string; 
   audience: string;
@@ -19,12 +19,19 @@ export interface Program {
   outcomes: string;
   image: string;
   basePrice: number; 
-  priceType: 'per_person' | 'flat_rate'; 
+  priceType: 'per_person' | 'flat_rate' | 'tier_based'; 
   inclusions: string[]; 
   participantsBring: string[];
   ccaProvides: string[];
   icon?: React.ReactNode;
-  durations?: { label: string; price: number; days: number; isGroup?: boolean }[];
+  durations?: { 
+    label: string; 
+    price: number; 
+    days: number; 
+    isGroup?: boolean; 
+    thresholdMin?: number; 
+    thresholdMax?: number; 
+  }[];
 }
 
 export interface Category {
@@ -36,352 +43,286 @@ export interface Category {
 
 export const CATEGORIES: Category[] = [
   {
-    id: 'safety',
-    title: 'Training & Safety',
+    id: 'team_building',
+    title: 'Team Building',
+    icon: <Users2 size={20} />,
+    programs: [
+      {
+        id: 'tb_corporate',
+        category: 'team_building',
+        title: 'Corporates & NGOs',
+        icon: <Briefcase size={16} />,
+        quoteTitle: 'Corporate Strategy Mission',
+        audience: 'Executive Teams, NGO Staff, Departments',
+        description: 'Elite engagement. Professional behavioral debrief included.',
+        outcomes: 'Strategy Alignment, Trust, High Performance.',
+        image: 'https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=1000',
+        basePrice: 3500,
+        priceType: 'tier_based',
+        durations: [
+          { label: 'Full Day (< 40 pax)', price: 3500, days: 1, thresholdMin: 0, thresholdMax: 39 },
+          { label: 'Half Day (< 40 pax)', price: 2200, days: 0.5, thresholdMin: 0, thresholdMax: 39 },
+          { label: 'Full Day Group (40–100 pax)', price: 120000, days: 1, isGroup: true, thresholdMin: 40, thresholdMax: 100 },
+          { label: 'Half Day Group (40–100 pax)', price: 75000, days: 0.5, isGroup: true, thresholdMin: 40, thresholdMax: 100 }
+        ],
+        inclusions: ['Facilitation', 'Strategic debrief', 'Prop logistics'],
+        participantsBring: ['Active wear', 'Notebook'],
+        ccaProvides: ['Lead strategist', 'Field gear']
+      },
+      {
+        id: 'tb_chama',
+        category: 'team_building',
+        title: 'Chamas & Community',
+        icon: <Users size={16} />,
+        quoteTitle: 'Community Fellowship Day',
+        audience: 'Investment Groups, Ministries, Chamas',
+        description: 'Relationship focused. Breaking walls through shared experience.',
+        outcomes: 'Cohesion, Fellowship, Shared Values.',
+        image: 'https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?q=80&w=1000',
+        basePrice: 2500,
+        priceType: 'tier_based',
+        durations: [
+          { label: 'Full Day (< 40 pax)', price: 2500, days: 1, thresholdMin: 0, thresholdMax: 39 },
+          { label: 'Half Day (< 40 pax)', price: 1500, days: 0.5, thresholdMin: 0, thresholdMax: 39 },
+          { label: 'Full Day Group (40–100 pax)', price: 90000, days: 1, isGroup: true, thresholdMin: 40, thresholdMax: 100 },
+          { label: 'Half Day Group (40–100 pax)', price: 55000, days: 0.5, isGroup: true, thresholdMin: 40, thresholdMax: 100 }
+        ],
+        inclusions: ['Facilitation', 'Game gear'],
+        participantsBring: ['Casual wear'],
+        ccaProvides: ['Facilitators', 'Refreshments coordination']
+      },
+      {
+        id: 'tb_youth',
+        category: 'team_building',
+        title: 'Youth & Teens',
+        icon: <Zap size={16} />,
+        quoteTitle: 'Youth Empowerment Day',
+        audience: 'Universities, Schools, Youth Groups',
+        description: 'Character-focused modules for young leaders.',
+        outcomes: 'Resilience, Peer Leadership, Character Forge.',
+        image: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=1000',
+        basePrice: 1800,
+        priceType: 'tier_based',
+        durations: [
+          { label: 'Full Day (< 40 pax)', price: 1800, days: 1, thresholdMin: 0, thresholdMax: 39 },
+          { label: 'Half Day (< 40 pax)', price: 1200, days: 0.5, thresholdMin: 0, thresholdMax: 39 },
+          { label: 'Full Day Group (40–100 pax)', price: 65000, days: 1, isGroup: true, thresholdMin: 40, thresholdMax: 100 },
+          { label: 'Half Day Group (40–100 pax)', price: 40000, days: 0.5, isGroup: true, thresholdMin: 40, thresholdMax: 100 }
+        ],
+        inclusions: ['Mentorship', 'Group activities'],
+        participantsBring: ['Sporty shoes'],
+        ccaProvides: ['Mentors', 'Safety team']
+      },
+      {
+        id: 'tb_children',
+        category: 'team_building',
+        title: 'Children (Schools)',
+        icon: <Target size={16} />,
+        quoteTitle: 'Junior Adventure Day',
+        audience: 'Primary Schools, Clubs',
+        description: 'Safety-first fun and foundational character building.',
+        outcomes: 'Early Teamwork, Nature Appreciation.',
+        image: 'https://images.unsplash.com/photo-1484069560501-87d72b0c3669?q=80&w=1000',
+        basePrice: 1500,
+        priceType: 'tier_based',
+        durations: [
+          { label: 'Full Day (< 40 pax)', price: 1500, days: 1, thresholdMin: 0, thresholdMax: 39 },
+          { label: 'Half Day (< 40 pax)', price: 1000, days: 0.5, thresholdMin: 0, thresholdMax: 39 },
+          { label: 'Full Day Group (40–100 pax)', price: 55000, days: 1, isGroup: true, thresholdMin: 40, thresholdMax: 100 },
+          { label: 'Half Day Group (40–100 pax)', price: 35000, days: 0.5, isGroup: true, thresholdMin: 40, thresholdMax: 100 }
+        ],
+        inclusions: ['Child facilitation', 'Themed props'],
+        participantsBring: ['Extra T-shirt', 'Sun hat'],
+        ccaProvides: ['Child safety officers', 'Fun gear']
+      }
+    ]
+  },
+  {
+    id: 'safety_training',
+    title: 'Safety & Training',
     icon: <ShieldCheck size={20} />,
     programs: [
       {
         id: 'first_aid',
+        category: 'safety_training',
         title: 'First Aid Training',
         icon: <Heart size={16} />,
-        quoteTitle: 'First Aid Mastery',
-        audience: 'Schools, Churches, Corporates',
-        description: 'Practical, hands-on training covering emergency response, CPR, burns, and fractures. Faith-sensitive care included.',
-        outcomes: 'Certification, Life-saving Confidence.',
-        image: 'https://images.unsplash.com/photo-1516574187841-69301976e499?q=80&w=1000',
-        basePrice: 4000,
-        priceType: 'per_person',
+        quoteTitle: 'Professional First Aid Certification',
+        audience: 'Corporates, NGOs, Schools, Chamas',
+        description: 'Comprehensive medical training for safety compliance.',
+        outcomes: 'Certification, Confidence, Lifesaving Readiness.',
+        image: 'https://i.imgur.com/77asrRI.jpg',
+        basePrice: 2800,
+        priceType: 'tier_based',
         durations: [
-          { label: '½ Day - Student', price: 2500, days: 0.5 },
-          { label: '½ Day - Corporate', price: 4000, days: 0.5 },
-          { label: '½ Day - Group (10–15)', price: 45000, days: 0.5, isGroup: true },
-          { label: '½ Day - Group (16–30)', price: 85000, days: 0.5, isGroup: true },
-          { label: '½ Day - Group (31–50)', price: 125000, days: 0.5, isGroup: true },
-          { label: 'Full Day - Student', price: 3500, days: 1 },
-          { label: 'Full Day - Corporate', price: 5000, days: 1 },
-          { label: 'Full Day - Group (10–15)', price: 70000, days: 1, isGroup: true },
-          { label: 'Full Day - Group (16–30)', price: 135000, days: 1, isGroup: true },
-          { label: 'Full Day - Group (31–50)', price: 195000, days: 1, isGroup: true }
+          { label: 'Full Day (< 30 pax)', price: 2800, days: 1, thresholdMin: 0, thresholdMax: 29 },
+          { label: 'Half Day (< 30 pax)', price: 1800, days: 0.5, thresholdMin: 0, thresholdMax: 29 },
+          { label: 'Full Day Group (30–60 pax)', price: 75000, days: 1, isGroup: true, thresholdMin: 30, thresholdMax: 60 },
+          { label: 'Half Day Group (30–60 pax)', price: 45000, days: 0.5, isGroup: true, thresholdMin: 30, thresholdMax: 60 }
         ],
-        inclusions: ['Certified trainer', 'Training materials', 'Practical demonstrations', 'Participation certificate'],
-        participantsBring: ['Notebook & pen', 'Closed shoes', 'Water bottle'],
-        ccaProvides: ['Professional facilitators', 'Safety equipment', 'Certification']
+        inclusions: ['Certified training', 'Assessment'],
+        participantsBring: ['Comfortable clothing'],
+        ccaProvides: ['Manikins', 'Training materials']
       },
       {
         id: 'fire_safety',
+        category: 'safety_training',
         title: 'Fire Safety & Evacuation',
         icon: <Flame size={16} />,
-        quoteTitle: 'Fire Safety Intensive',
-        audience: 'Workplaces, Schools, Churches',
-        description: 'Prevention, extinguisher use, and live drills. Essential for institutional compliance.',
-        outcomes: 'Marshal Certification, Compliance.',
-        image: 'https://images.unsplash.com/photo-1599423300746-b62533397364?q=80&w=1000',
-        basePrice: 4500,
-        priceType: 'per_person',
+        quoteTitle: 'Fire Safety Certification',
+        audience: 'Factories, Property Managers, Schools',
+        description: 'Live practice and compliance drills for high-safety zones.',
+        outcomes: 'Compliance, Risk Mitigation, Response Readiness.',
+        image: 'https://i.imgur.com/frE2TUN.jpg',
+        basePrice: 3200,
+        priceType: 'tier_based',
         durations: [
-          { label: 'Awareness - Student', price: 3000, days: 0.5 },
-          { label: 'Awareness - Corporate', price: 4500, days: 0.5 },
-          { label: 'Group (10–20 pax)', price: 80000, days: 0.5, isGroup: true },
-          { label: 'Group (21–40 pax)', price: 150000, days: 0.5, isGroup: true },
-          { label: 'Group (41–70 pax)', price: 220000, days: 0.5, isGroup: true }
+          { label: 'Full Day (< 30 pax)', price: 3200, days: 1, thresholdMin: 0, thresholdMax: 29 },
+          { label: 'Half Day (< 30 pax)', price: 2000, days: 0.5, thresholdMin: 0, thresholdMax: 29 },
+          { label: 'Full Day Group (30–60 pax)', price: 85000, days: 1, isGroup: true, thresholdMin: 30, thresholdMax: 60 },
+          { label: 'Half Day Group (30–60 pax)', price: 50000, days: 0.5, isGroup: true, thresholdMin: 30, thresholdMax: 60 }
         ],
-        inclusions: ['Live Drills', 'Written fire plan templates', 'Certification'],
-        participantsBring: ['Safety footwear', 'Note taking kit'],
-        ccaProvides: ['Drill equipment', 'Fire Marshal badges', 'Compliance audit']
+        inclusions: ['Practical drills', 'Report generation'],
+        participantsBring: ['Outdoor wear'],
+        ccaProvides: ['Extinguishers', 'Evacuation plan templates']
       },
       {
-        id: 'combined_safety',
-        title: 'Combined Safety Package',
-        icon: <ShieldCheck size={16} />,
-        quoteTitle: 'Total Institutional Safety',
-        audience: 'Institutions',
-        description: 'Highly recommended first aid and fire safety combined 1-day package.',
-        outcomes: 'Multi-Certification, Strategic Preparedness.',
-        image: 'https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?q=80&w=1000',
-        basePrice: 8000,
-        priceType: 'per_person',
+        id: 'medic_standby',
+        category: 'safety_training',
+        title: 'Medic Standby',
+        icon: <ShieldPlus size={16} />,
+        quoteTitle: 'Event Medical Support',
+        audience: 'Weddings, Sports, Rallies, Concerts',
+        description: 'Professional medical coverage with BLS/ALS options.',
+        outcomes: 'Peace of Mind, Rapid Response, Liability Reduction.',
+        image: 'https://i.imgur.com/dXyQVwQ.jpeg',
+        basePrice: 75000,
+        priceType: 'flat_rate',
         durations: [
-          { label: 'Combined - Student', price: 5500, days: 1 },
-          { label: 'Combined - Corporate', price: 8000, days: 1 },
-          { label: 'Group (15–25 pax)', price: 160000, days: 1, isGroup: true },
-          { label: 'Group (26–40 pax)', price: 260000, days: 1, isGroup: true },
-          { label: 'Group (41–70 pax)', price: 360000, days: 1, isGroup: true }
+          { label: 'Full Day (12–24 hrs)', price: 75000, days: 1 },
+          { label: '8–12 hours', price: 50000, days: 0.5 },
+          { label: '6–7 hours', price: 40000, days: 0.3 },
+          { label: '3–5 hours', price: 30000, days: 0.2 }
         ],
-        inclusions: ['All certifications', 'Evacuation drills', 'Leadership roles training'],
-        participantsBring: ['ID for travel & certification', 'Personal medication'],
-        ccaProvides: ['Full setup & breakdown', 'Safety management', 'Detailed follow-up']
+        inclusions: ['Licensed medic', 'Standard trauma kit'],
+        participantsBring: ['N/A'],
+        ccaProvides: ['Medic', 'First aid station']
       }
     ]
   },
   {
-    id: 'teambuilding',
-    title: 'Team Building',
-    icon: <Users size={20} />,
+    id: 'school_clubs',
+    title: 'Adventure Club',
+    icon: <School size={20} />,
     programs: [
       {
-        id: 'tb_schools',
-        title: 'School Team Building',
-        icon: <School size={16} />,
-        quoteTitle: 'Youth Grit Program',
-        audience: 'Primary & Secondary Students',
-        description: 'Full day of confidence building, problem solving, and trust exercises.',
-        outcomes: 'Unity, Character, Peer Leadership.',
-        image: 'https://images.unsplash.com/photo-1502086223501-7ea6ecd79368?q=80&w=1000',
-        basePrice: 2800,
-        priceType: 'per_person',
-        durations: [
-          { label: 'Per Student', price: 2800, days: 1 },
-          { label: 'Group (30–50 stds)', price: 140000, days: 1, isGroup: true },
-          { label: 'Group (51–80 stds)', price: 220000, days: 1, isGroup: true },
-          { label: 'Group (81–120 stds)', price: 320000, days: 1, isGroup: true }
-        ],
-        inclusions: ['Facilitation', 'Equipment setup', 'Structured learning outcomes'],
-        participantsBring: ['Outdoor gear', 'Water bottle'],
-        ccaProvides: ['Professional facilitators', 'Program design', 'Clear reporting']
-      },
-      {
-        id: 'tb_youth',
-        title: 'Youth & Teens',
+        id: 'club_basic',
+        category: 'school_clubs',
+        title: 'Basic Club Package',
         icon: <Target size={16} />,
-        quoteTitle: 'Mentorship Challenges',
-        audience: 'Teens & Young Adults',
-        description: 'Identity, character, discipline, and rites-of-passage mentorship.',
-        outcomes: 'Identity, Discipline, Faith Reflection.',
-        image: 'https://images.unsplash.com/photo-1544168190-79c17527004f?q=80&w=1000',
-        basePrice: 3500,
-        priceType: 'per_person',
-        durations: [
-          { label: 'Per Person', price: 3500, days: 1 },
-          { label: 'Group (20–30 pax)', price: 95000, days: 1, isGroup: true },
-          { label: 'Group (31–50 pax)', price: 155000, days: 1, isGroup: true }
-        ],
-        inclusions: ['Mentorship modules', 'Spiritual reflection', 'Outdoor games'],
-        participantsBring: ['Warm clothing', 'Personal toiletries', 'Open heart'],
-        ccaProvides: ['Mentors', 'Survival gear', 'Safety staff']
+        quoteTitle: 'School Adventure Club (Basic)',
+        audience: 'Primary/High Schools',
+        description: '30–40 students. 2 termly day adventures.',
+        outcomes: 'Team Spirit, Basic Survival Skills.',
+        image: 'https://images.unsplash.com/photo-1501555088652-021faa106b9b?q=80&w=1000',
+        basePrice: 120000,
+        priceType: 'flat_rate',
+        durations: [{ label: 'Annual (30-40 students)', price: 120000, days: 365 }],
+        inclusions: ['Coordination', 'Facilitation'],
+        participantsBring: ['Water bottle'],
+        ccaProvides: ['Guides', 'Logistics']
       },
       {
-        id: 'tb_boys',
-        title: 'Boys-to-Men Mentorship',
+        id: 'club_standard',
+        category: 'school_clubs',
+        title: 'Standard Club Package',
         icon: <Award size={16} />,
-        quoteTitle: 'Rites of Passage',
-        audience: 'Young Men',
-        description: '1-day intensive identity and character building challenges.',
-        outcomes: 'Maturity, Responsibility, Peer Brotherhood.',
-        image: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?q=80&w=1000',
-        basePrice: 4500,
-        priceType: 'per_person',
-        durations: [
-          { label: 'Per Person', price: 4500, days: 1 },
-          { label: 'Group (15–25 pax)', price: 110000, days: 1, isGroup: true },
-          { label: 'Group (26–40 pax)', price: 170000, days: 1, isGroup: true }
-        ],
-        inclusions: ['Intensive curriculum', 'Facilitation', 'Post-program debrief'],
-        participantsBring: ['Notebook & pen', 'Rugged outdoor wear'],
-        ccaProvides: ['Lead mentor', 'Ceremonial items', 'Workbook']
-      },
-      {
-        id: 'tb_corporate',
-        title: 'Corporate / Chama',
-        icon: <BriefcaseBusiness size={16} />,
-        quoteTitle: 'Strategy & Leadership Lab',
-        audience: 'Executives & Investment Groups',
-        description: 'Strategic labs, leadership simulations, and low-ropes challenges.',
-        outcomes: 'Strategy, Problem Solving, Debrief Reports.',
-        image: 'https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=1000',
-        basePrice: 6500,
-        priceType: 'per_person',
-        durations: [
-          { label: 'Per Person', price: 6500, days: 1 },
-          { label: 'Group (10–15 pax)', price: 90000, days: 1, isGroup: true },
-          { label: 'Group (16–25 pax)', price: 150000, days: 1, isGroup: true },
-          { label: 'Group (26–40 pax)', price: 230000, days: 1, isGroup: true }
-        ],
-        inclusions: ['Lead strategist', 'Simulations', 'Comprehensive debrief report'],
-        participantsBring: ['Comfortable outdoor wear', 'Notebook & pen'],
-        ccaProvides: ['Logistics', 'Equipment', 'Safety management']
-      }
-    ]
-  },
-  {
-    id: 'camps',
-    title: 'Camps',
-    icon: <Home size={20} />,
-    programs: [
-      {
-        id: 'camp_youth',
-        title: 'Youth / Church Camps',
-        icon: <CalendarIcon size={16} />,
-        quoteTitle: 'Spiritual Wilderness Camp',
-        audience: 'Kids & Teens',
-        description: 'Multi-day immersive experiences focusing on resilience and faith.',
-        outcomes: 'Independence, Skills, Faith.',
-        image: 'https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?q=80&w=1000',
-        basePrice: 7000,
-        priceType: 'per_person',
-        durations: [
-          { label: 'Per Person (2–3 Days)', price: 7000, days: 2.5 },
-          { label: 'Group (30–50 pax)', price: 210000, days: 2.5, isGroup: true },
-          { label: 'Group (51–80 pax)', price: 320000, days: 2.5, isGroup: true }
-        ],
-        inclusions: ['Facilitators', 'Activities & devotions', 'Safety staff'],
-        participantsBring: ['Personal gear', 'Toiletries', 'Sleeping bag'],
-        ccaProvides: ['Camping equipment', 'Security', 'Program design']
-      },
-      {
-        id: 'camp_corporate',
-        title: 'Corporate / Leadership',
-        icon: <Briefcase size={16} />,
-        quoteTitle: 'Executive Mission Retreat',
-        audience: 'Management Teams',
-        description: 'Intensive strategic retreats in varying wilderness environments.',
-        outcomes: 'Vision, Unity, Synergy.',
-        image: 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=1000',
-        basePrice: 12000,
-        priceType: 'per_person',
-        durations: [
-          { label: 'Per Person', price: 12000, days: 3 },
-          { label: 'Group (10–15 pax)', price: 170000, days: 3, isGroup: true },
-          { label: 'Group (16–25 pax)', price: 290000, days: 3, isGroup: true }
-        ],
-        inclusions: ['Advanced facilitation', 'Impact reports', 'Logistics coordination'],
-        participantsBring: ['Corporate casual', 'Personal items'],
-        ccaProvides: ['Safety management', 'Lead consultant', 'Security']
+        quoteTitle: 'School Adventure Club (Standard)',
+        audience: 'Schools (50–70 students)',
+        description: 'Monthly activities + 1 overnight camp.',
+        outcomes: 'Leadership Development, Independence.',
+        image: 'https://images.unsplash.com/photo-1475483768296-6163e08872a1?q=80&w=1000',
+        basePrice: 220000,
+        priceType: 'flat_rate',
+        durations: [{ label: 'Annual (50-70 students)', price: 220000, days: 365 }],
+        inclusions: ['Monthly missions', 'Camp logistics'],
+        participantsBring: ['Camping kit'],
+        ccaProvides: ['Professional facilitators', 'Safety officers']
       }
     ]
   },
   {
     id: 'expeditions',
-    title: 'Expeditions',
+    title: 'Hikes & Expeditions',
     icon: <Mountain size={20} />,
     programs: [
       {
-        id: 'hike_day',
-        title: 'Day Hikes',
+        id: 'hike_easy',
+        category: 'expeditions',
+        title: 'Easy / Nearby Hikes',
         icon: <Compass size={16} />,
-        quoteTitle: 'Standard Summit Hike',
-        audience: 'Groups & Individuals',
-        description: 'Guided treks through iconic ridges like Ngong or Longonot.',
-        outcomes: 'Fitness, Achievement.',
+        quoteTitle: 'Guided Day Hike (Easy)',
+        audience: 'Individuals & Community Groups',
+        description: 'From nearby easy trails to remote alpine peaks.',
+        outcomes: 'Physical Grit, Mental Clarity, Fellowship.',
         image: 'https://images.unsplash.com/photo-1551632811-561732d1e306?q=80&w=1000',
-        basePrice: 4500,
+        basePrice: 2200,
         priceType: 'per_person',
         durations: [
-          { label: 'Student Rate', price: 3000, days: 1 },
-          { label: 'Adult Rate', price: 4500, days: 1 },
-          { label: 'Group (15–25 pax)', price: 85000, days: 1, isGroup: true },
-          { label: 'Group (26–40 pax)', price: 140000, days: 1, isGroup: true }
+          { label: 'Easy / Nearby', price: 2200, days: 1 },
+          { label: 'Moderate', price: 3000, days: 1 }
         ],
-        inclusions: ['Guides', 'Medical standby', 'Permits', 'Water & energy cake'],
-        participantsBring: ['Hiking boots', 'Backpack', 'Sunscreen'],
-        ccaProvides: ['Transport', 'Safety equipment']
+        inclusions: ['Guide fees', 'Safety protocols'],
+        participantsBring: ['Hiking boots', 'Water bottle'],
+        ccaProvides: ['Navigation', 'Emergency first aid']
       },
       {
-        id: 'exp_overnight',
-        title: 'Overnight Expedition',
-        icon: <Anchor size={16} />,
-        quoteTitle: 'Wilderness Immersion',
-        audience: 'Adventure Seekers',
-        description: '2-day immersion mission in the Kenyan wilderness.',
-        outcomes: 'Endurance, Reflection.',
-        image: 'https://images.unsplash.com/photo-1506929113679-b62fd3ef0965?q=80&w=1000',
-        basePrice: 9500,
+        id: 'hike_remote',
+        category: 'expeditions',
+        title: 'Remote / Premium Hikes',
+        icon: <Star size={16} />,
+        quoteTitle: 'Alpine Expedition',
+        audience: 'Experienced Hikers, Adventure Seekers',
+        description: 'Multi-day remote peak navigation.',
+        outcomes: 'High-Altitude Grit, Mastery.',
+        image: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=1000',
+        basePrice: 15000,
         priceType: 'per_person',
         durations: [
-          { label: 'Per Person (2 Days)', price: 9500, days: 2 },
-          { label: 'Group (10–15 pax)', price: 140000, days: 2, isGroup: true },
-          { label: 'Group (16–25 pax)', price: 220000, days: 2, isGroup: true }
+          { label: 'Challenging', price: 3500, days: 1 },
+          { label: 'Remote / Premium', price: 15000, days: 3 }
         ],
-        inclusions: ['Field stay', 'Guides', 'Safety staff'],
-        participantsBring: ['Camping gear', 'ID'],
-        ccaProvides: ['Transfers', 'Equipment']
+        inclusions: ['Full board', 'Guides', 'Logistics'],
+        participantsBring: ['Sleeping gear', 'Alpine kit'],
+        ccaProvides: ['Expedition lead', 'Full camp setup']
       }
     ]
   },
   {
-    id: 'mc_services',
-    title: 'Professional Hosting',
+    id: 'hosting',
+    title: 'MC & Hosting',
     icon: <Mic2 size={20} />,
     programs: [
       {
-        id: 'mc_corporate',
-        title: 'Corporate & Institutional MC',
-        icon: <BriefcaseBusiness size={16} />,
-        quoteTitle: 'Executive Moderation',
-        audience: 'Corporates, NGOs, Institutions',
-        description: 'Elite moderation for AGMs, product launches, and high-stakes award ceremonies. Precise hour-based curation.',
-        outcomes: 'Flawless Flow, Brand Integrity, Executive Polish.',
-        image: 'https://images.unsplash.com/photo-1475721027785-f74dea327912?q=80&w=1000',
-        basePrice: 45000,
+        id: 'mc_standard',
+        category: 'hosting',
+        title: 'Professional MC Service',
+        icon: <Mic2 size={16} />,
+        quoteTitle: 'Professional Event Hosting',
+        audience: 'Weddings, Corporates, Galas',
+        description: 'High-energy hosting with script-writing services.',
+        outcomes: 'Flow, Engagement, Impact.',
+        image: 'https://images.unsplash.com/photo-1472653431158-6364773b2a56?q=80&w=1000',
+        basePrice: 150000,
         priceType: 'flat_rate',
         durations: [
-          { label: 'Standard Block (3-4 hrs)', price: 55000, days: 0.5 },
-          { label: 'Premium Session (6-7 hrs)', price: 95000, days: 1 },
-          { label: 'Summit Hosting (10-12 hrs)', price: 145000, days: 1 },
-          { label: 'Executive Tier (14 hrs+)', price: 170000, days: 1 }
+          { label: 'Full Day Hosting', price: 150000, days: 1, isGroup: true },
+          { label: '6–8 hours', price: 100000, days: 0.7, isGroup: true },
+          { label: '3–5 hours', price: 80000, days: 0.4, isGroup: true }
         ],
-        inclusions: ['Pre-event scripting sync', 'Professional moderation', 'Stage management coordination'],
-        participantsBring: ['Event program', 'Preferred script briefs'],
-        ccaProvides: ['Lead Consultant MC', 'Technical script oversight']
-      },
-      {
-        id: 'mc_wedding',
-        title: 'Wedding & Gala Excellence',
-        icon: <Sparkles size={16} />,
-        quoteTitle: 'Premium Social Hosting',
-        audience: 'Weddings & High-End Private Galas',
-        description: 'Elevated moderation for life’s most significant social milestones. Merging grace, humor, and dignity.',
-        outcomes: 'Atmospheric Joy, Seamless Timeline, Guest Engagement.',
-        image: 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?q=80&w=1000',
-        basePrice: 65000,
-        priceType: 'flat_rate',
-        durations: [
-          { label: 'Evening Reception (4 hrs)', price: 65000, days: 0.5 },
-          { label: 'Full Traditional (7-9 hrs)', price: 110000, days: 1 },
-          { label: 'Luxury Full Day (12 hrs+)', price: 155000, days: 1 }
-        ],
-        inclusions: ['Consultation session', 'Crowd engagement', 'Program management'],
-        participantsBring: ['Final event timeline', 'Speech list'],
-        ccaProvides: ['Elite Social MC', 'Event flow oversight']
-      },
-      {
-        id: 'mc_community',
-        title: 'Community & Church Leadership',
-        icon: <Church size={16} />,
-        quoteTitle: 'Ministry & Fellowship MC',
-        audience: 'Church Events, Youth Rallies, Fellowships',
-        description: 'Faith-rooted moderation focusing on spiritual depth and community synergy.',
-        outcomes: 'Congregational Unity, Spiritual Alignment, Smooth Transitions.',
-        image: 'https://images.unsplash.com/photo-1438232992991-995b7058bbb3?q=80&w=1000',
-        basePrice: 40000,
-        priceType: 'flat_rate',
-        durations: [
-          { label: 'Fellowship Block (3 hrs)', price: 40000, days: 0.5 },
-          { label: 'Rally/Conference (6 hrs)', price: 75000, days: 1 },
-          { label: 'Full Weekend Hosting', price: 130000, days: 2 }
-        ],
-        inclusions: ['Spiritual application', 'Interactive fellowship', 'Session timing'],
-        participantsBring: ['Ministry theme', 'Order of service'],
-        ccaProvides: ['Mentorship-focused MC', 'Fellowship facilitation']
-      },
-      {
-        id: 'mc_media',
-        title: 'Media & Broadcast Hosting',
-        icon: <Video size={16} />,
-        quoteTitle: 'On-Air Presence',
-        audience: 'Digital Launches, Virtual Summits, Media Sets',
-        description: 'Specialized hosting for hybrid environments. Mastering camera presence and audience telemetry.',
-        outcomes: 'Digital Engagement, Professional Broadcast Flow, Brand Impact.',
-        image: 'https://images.unsplash.com/photo-1593106410288-caf65eca7c9d?q=80&w=1000',
-        basePrice: 50000,
-        priceType: 'flat_rate',
-        durations: [
-          { label: 'Streaming Block (2-3 hrs)', price: 50000, days: 0.5 },
-          { label: 'Digital Summit (5-7 hrs)', price: 90000, days: 1 },
-          { label: 'Broadcast Residency (Full Day)', price: 160000, days: 1 }
-        ],
-        inclusions: ['Teleprompter support', 'Digital engagement strategy', 'Studio-ready polish'],
-        participantsBring: ['Tech requirements', 'Digital script'],
-        ccaProvides: ['Broadcast Specialist MC', 'Engagement analytics']
+        inclusions: ['MC duties', 'Planning session'],
+        participantsBring: ['N/A'],
+        ccaProvides: ['Bilingual MC', 'Engagement kit']
       }
     ]
   }
@@ -391,17 +332,19 @@ const formatKES = (v: number) => `KES ${v.toLocaleString()}`;
 
 const AdventureBuilder: React.FC<{ onNavigateToBooking: (data: BookingContextData) => void }> = ({ onNavigateToBooking }) => {
   const [loading, setLoading] = useState(false);
-  const [activeCategory, setActiveCategory] = useState<Category>(CATEGORIES[1]);
-  const [selectedProgram, setSelectedProgram] = useState<Program>(CATEGORIES[1].programs[0]);
+  const [activeCategory, setActiveCategory] = useState<Category>(CATEGORIES[0]);
+  const [selectedProgram, setSelectedProgram] = useState<Program>(CATEGORIES[0].programs[0]);
   const [durationIdx, setDurationIdx] = useState(0);
-  const [formData, setFormData] = useState({ groupSize: 0, focus: 'Character & Synergy' });
+  const [formData, setFormData] = useState({ groupSize: 0, focus: 'Team Resilience' });
   const [clientInfo, setClientInfo] = useState({ company: '', contact: '', email: '' });
   const [itinerary, setItinerary] = useState<GeneratedItinerary | null>(null);
+  const [originalItinerary, setOriginalItinerary] = useState<GeneratedItinerary | null>(null);
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
 
   useEffect(() => { 
     setDurationIdx(0); 
     setItinerary(null); 
+    setOriginalItinerary(null);
   }, [selectedProgram]);
 
   const currentRate = useMemo(() => {
@@ -412,16 +355,27 @@ const AdventureBuilder: React.FC<{ onNavigateToBooking: (data: BookingContextDat
     return selectedProgram.priceType === 'flat_rate' || selectedProgram.durations?.[durationIdx]?.isGroup || false;
   }, [selectedProgram, durationIdx]);
 
-  // If participants are 0, Investment is always 0 KES regardless of program type
   const estimatedInvestment = useMemo(() => {
-    if (formData.groupSize <= 0) return 0;
-    return isGroupRate ? currentRate : currentRate * formData.groupSize;
-  }, [formData.groupSize, isGroupRate, currentRate]);
+    if (formData.groupSize <= 0 && !isGroupRate) {
+       return 0;
+    }
+    if (isGroupRate) return currentRate;
+    
+    // Hiking Discounts (Special Logic for Builder Preview)
+    let total = currentRate * formData.groupSize;
+    if (selectedProgram.category === 'expeditions') {
+        if (formData.groupSize >= 50) total *= 0.8;
+        else if (formData.groupSize >= 20) total *= 0.9;
+    }
+    
+    return total;
+  }, [formData.groupSize, isGroupRate, currentRate, selectedProgram]);
 
   const handleGenerate = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setItinerary(null);
+    setOriginalItinerary(null);
     try {
       const days = selectedProgram.durations ? selectedProgram.durations[durationIdx].days : 1;
       const result = await generateAdventureItinerary(
@@ -429,6 +383,7 @@ const AdventureBuilder: React.FC<{ onNavigateToBooking: (data: BookingContextDat
         selectedProgram.title, selectedProgram.audience, formData.focus, []
       );
       setItinerary(result);
+      setOriginalItinerary(JSON.parse(JSON.stringify(result))); 
     } catch (err) { console.error(err); } finally { setLoading(false); }
   };
 
@@ -440,21 +395,31 @@ const AdventureBuilder: React.FC<{ onNavigateToBooking: (data: BookingContextDat
     });
   };
 
+  const restoreItineraryItem = (id: string) => {
+    if (!originalItinerary || !itinerary) return;
+    const originalItem = originalItinerary.items.find(item => item.id === id);
+    if (originalItem) {
+      setItinerary({
+        ...itinerary,
+        items: itinerary.items.map(item => item.id === id ? { ...originalItem } : item)
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-brand-cream pt-40 pb-32 px-6 md:px-12">
       <div className="max-w-screen-2xl mx-auto">
         <header className="mb-12 text-center animate-fade-in-up">
-           <span className="text-brand-gold text-[9px] font-bold uppercase tracking-[0.8em] mb-3 block">Strategy Architect</span>
-           <h1 className="text-3xl md:text-5xl font-serif text-brand-green font-bold tracking-tighter leading-tight mb-4 italic">Design Your <br/><span className="not-italic text-brand-gold">Mission.</span></h1>
-           <p className="text-gray-500 max-w-xl mx-auto font-serif italic text-sm leading-relaxed opacity-80">
-             "Refine your objective, define your scale, and let our Lead Strategist curate a professional field log for the 2026/27 season."
+           <span className="text-brand-gold text-[9px] font-bold uppercase tracking-[0.8em] mb-3 block">Mission Strategy</span>
+           <h1 className="text-3xl md:text-5xl font-serif text-brand-green font-bold tracking-tighter leading-tight mb-4 italic">Architect Your <br/><span className="not-italic text-brand-gold">Mission.</span></h1>
+           <p className="text-gray-500 max-w-xl mx-auto font-serif italic text-sm opacity-80">
+             "Choose your pillar, define your scale, and let us generate a high-impact field log for your evaluation."
            </p>
         </header>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
           <div className="lg:col-span-7 space-y-6">
-             <div className="bg-white p-8 rounded-none shadow-[0_40px_100px_rgba(0,0,0,0.05)] border border-brand-green/5 space-y-10">
-                
+             <div className="bg-white p-8 rounded-none shadow-xl border border-brand-green/5 space-y-10">
                 <section className="space-y-6">
                    <div className="flex items-center gap-3 border-b border-gray-100 pb-3">
                       <div className="w-8 h-8 bg-brand-green text-brand-gold flex items-center justify-center font-bold font-serif text-xs">01</div>
@@ -471,7 +436,7 @@ const AdventureBuilder: React.FC<{ onNavigateToBooking: (data: BookingContextDat
                       </div>
                       <div className="space-y-2">
                          <label className="text-[9px] font-bold text-brand-gold uppercase tracking-[0.4em] flex items-center gap-2"><Mail size={10}/> Email</label>
-                         <input type="email" value={clientInfo.email} onChange={(e) => setClientInfo({...clientInfo, email: e.target.value})} placeholder="crossconnectmisiions@protonmail.com" className="w-full p-3 bg-gray-50 border-none text-[10px] font-bold focus:ring-1 focus:ring-brand-green" />
+                         <input type="email" value={clientInfo.email} onChange={(e) => setClientInfo({...clientInfo, email: e.target.value})} placeholder="email@address.com" className="w-full p-3 bg-gray-50 border-none text-[10px] font-bold focus:ring-1 focus:ring-brand-green" />
                       </div>
                    </div>
                 </section>
@@ -479,7 +444,7 @@ const AdventureBuilder: React.FC<{ onNavigateToBooking: (data: BookingContextDat
                 <section className="space-y-8">
                    <div className="flex items-center gap-3 border-b border-gray-100 pb-3">
                       <div className="w-8 h-8 bg-brand-green text-brand-gold flex items-center justify-center font-bold font-serif text-xs">02</div>
-                      <h3 className="text-sm font-serif font-bold text-brand-green uppercase tracking-wider">Strategy Parameters</h3>
+                      <h3 className="text-sm font-serif font-bold text-brand-green uppercase tracking-wider">Parameters</h3>
                    </div>
                    
                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -503,7 +468,7 @@ const AdventureBuilder: React.FC<{ onNavigateToBooking: (data: BookingContextDat
                       </div>
 
                       <div className="space-y-4">
-                         <label className="text-[9px] font-bold text-brand-gold uppercase tracking-[0.6em] block">Mission Objective</label>
+                         <label className="text-[9px] font-bold text-brand-gold uppercase tracking-[0.6em] block">Selection</label>
                          <div className="space-y-1.5 max-h-[180px] overflow-y-auto pr-2 custom-scrollbar">
                             {activeCategory.programs.map(prog => (
                                <button
@@ -603,23 +568,12 @@ const AdventureBuilder: React.FC<{ onNavigateToBooking: (data: BookingContextDat
                             </ul>
                          </div>
                       </div>
-                      <div className="space-y-4 pt-4 border-t border-gray-100">
-                         <label className="text-[9px] font-bold text-brand-gold uppercase tracking-[0.7em] block">Mission Covers</label>
-                         <ul className="grid grid-cols-1 gap-2">
-                            {selectedProgram.inclusions.map((inc, i) => (
-                               <li key={i} className="flex items-center gap-2 text-[9px] font-bold uppercase tracking-widest text-brand-green font-bold">
-                                  <CheckCircle2 size={12} className="text-brand-gold shrink-0" /> {inc}
-                               </li>
-                            ))}
-                         </ul>
-                      </div>
                    </div>
                 </div>
              )}
 
              {itinerary && !loading && (
                 <div className="bg-white p-8 md:p-10 shadow-2xl border border-gray-100 paper-texture animate-fade-in-up relative overflow-hidden flex flex-col min-h-[600px]">
-                   
                    <header className="border-b-4 border-brand-green pb-6 mb-8 flex flex-col justify-between items-start gap-4 relative z-10">
                       <div className="space-y-2">
                          <span className="text-brand-gold text-[8px] font-bold uppercase tracking-[0.8em]">Interactive Field Record</span>
@@ -627,7 +581,7 @@ const AdventureBuilder: React.FC<{ onNavigateToBooking: (data: BookingContextDat
                          <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest">Theme: {itinerary.theme}</p>
                       </div>
                       <div className="bg-brand-sand/50 p-4 border border-brand-green/10 w-full flex justify-between items-center">
-                         <div className="text-[8px] text-gray-400 font-bold uppercase tracking-widest">Est. Investment</div>
+                         <div className="text-[8px] text-gray-400 font-bold uppercase tracking-widest">Est. Base Invest</div>
                          <div className="text-xl font-serif font-bold text-brand-green">
                            {formatKES(estimatedInvestment)}
                          </div>
@@ -637,20 +591,27 @@ const AdventureBuilder: React.FC<{ onNavigateToBooking: (data: BookingContextDat
                    <div className="flex-grow space-y-6 relative z-10 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
                       {itinerary.items.map((item) => (
                          <div key={item.id} className="group/item border-b border-gray-50 pb-6 last:border-0 relative">
-                            <button 
-                               onClick={() => setEditingItemId(editingItemId === item.id ? null : item.id)}
-                               className="absolute -right-1 top-0 p-1.5 text-brand-gold opacity-0 group-hover/item:opacity-100 transition-opacity"
-                            >
-                               {editingItemId === item.id ? <Save size={12}/> : <Edit3 size={12}/>}
-                            </button>
-                            
+                            <div className="absolute -right-1 top-0 flex items-center gap-2 opacity-0 group-hover/item:opacity-100 transition-opacity">
+                               {editingItemId === item.id && (
+                                  <button onClick={() => restoreItineraryItem(item.id)} className="p-1.5 text-brand-gold hover:scale-110"><RotateCcw size={12}/></button>
+                               )}
+                               <button onClick={() => setEditingItemId(editingItemId === item.id ? null : item.id)} className="p-1.5 text-brand-gold hover:scale-110">
+                                  {editingItemId === item.id ? <Save size={12}/> : <Edit3 size={12}/>}
+                               </button>
+                            </div>
                             <div className="flex gap-4">
-                               <div className="flex-shrink-0 pt-1">
-                                  <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-brand-gold">{item.time}</span>
-                               </div>
+                               <div className="flex-shrink-0 pt-1"><span className="text-[9px] font-bold uppercase tracking-[0.3em] text-brand-gold">{item.time}</span></div>
                                <div className="flex-grow space-y-1">
-                                  <h4 className="text-base font-serif font-bold text-brand-green italic leading-tight">{item.activity}</h4>
-                                  <p className="text-[10px] text-gray-500 font-serif italic leading-relaxed">{item.description}</p>
+                                  {editingItemId === item.id ? (
+                                    <input className="w-full bg-brand-sand/30 border-none p-1 text-sm font-serif font-bold italic" value={item.activity} onChange={(e) => updateItineraryItem(item.id, 'activity', e.target.value)} />
+                                  ) : (
+                                    <h4 className="text-base font-serif font-bold text-brand-green italic leading-tight">{item.activity}</h4>
+                                  )}
+                                  {editingItemId === item.id ? (
+                                    <textarea className="w-full bg-brand-sand/10 border-none p-1 text-[10px] text-gray-500 font-serif italic h-20" value={item.description} onChange={(e) => updateItineraryItem(item.id, 'description', e.target.value)} />
+                                  ) : (
+                                    <p className="text-[10px] text-gray-500 font-serif italic leading-relaxed">{item.description}</p>
+                                  )}
                                </div>
                             </div>
                          </div>
@@ -671,25 +632,17 @@ const AdventureBuilder: React.FC<{ onNavigateToBooking: (data: BookingContextDat
                       >
                          Secure Proposal <ArrowRight size={14} />
                       </button>
-                      <div className="flex items-center justify-center gap-2 text-brand-gold opacity-40">
-                         <ShieldCheck size={10} />
-                         <span className="text-[7px] text-center uppercase tracking-[0.3em]">Operational Readiness Log V.6.3</span>
-                      </div>
                    </footer>
                 </div>
              )}
 
              {loading && (
                 <div className="h-full min-h-[500px] flex flex-col items-center justify-center p-12 bg-white rounded-none shadow-2xl border border-brand-green/5 text-center relative overflow-hidden">
-                   <div className="absolute inset-0 bg-noise opacity-[0.03]"></div>
                    <div className="relative mb-6">
                       <div className="w-32 h-32 border-2 border-brand-gold/10 border-t-brand-gold rounded-full animate-spin"></div>
                       <Compass className="absolute inset-0 m-auto text-brand-green animate-pulse" size={40} />
                    </div>
                    <h3 className="text-2xl font-serif text-brand-green font-bold mb-3 italic tracking-tight">Syncing Field Archives...</h3>
-                   <p className="text-gray-400 max-w-xs italic font-serif text-base leading-relaxed opacity-70">
-                     "Our Lead Strategist is curating your custom mission itinerary."
-                   </p>
                 </div>
              )}
           </div>

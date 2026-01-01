@@ -112,28 +112,6 @@ export const CATEGORIES: Category[] = [
         inclusions: ['Mentorship', 'Group activities'],
         participantsBring: ['Sporty shoes'],
         ccaProvides: ['Mentors', 'Safety team']
-      },
-      {
-        id: 'tb_children',
-        category: 'team_building',
-        title: 'Children (Schools)',
-        icon: <Target size={16} />,
-        quoteTitle: 'Junior Adventure Day',
-        audience: 'Primary Schools, Clubs',
-        description: 'Safety-first fun and foundational character building.',
-        outcomes: 'Early Teamwork, Nature Appreciation.',
-        image: 'https://images.unsplash.com/photo-1484069560501-87d72b0c3669?q=80&w=1000',
-        basePrice: 1500,
-        priceType: 'tier_based',
-        durations: [
-          { label: 'Full Day (< 40 pax)', price: 1500, days: 1, thresholdMin: 0, thresholdMax: 39 },
-          { label: 'Half Day (< 40 pax)', price: 1000, days: 0.5, thresholdMin: 0, thresholdMax: 39 },
-          { label: 'Full Day Group (40–100 pax)', price: 55000, days: 1, isGroup: true, thresholdMin: 40, thresholdMax: 100 },
-          { label: 'Half Day Group (40–100 pax)', price: 35000, days: 0.5, isGroup: true, thresholdMin: 40, thresholdMax: 100 }
-        ],
-        inclusions: ['Child facilitation', 'Themed props'],
-        participantsBring: ['Extra T-shirt', 'Sun hat'],
-        ccaProvides: ['Child safety officers', 'Fun gear']
       }
     ]
   },
@@ -199,10 +177,10 @@ export const CATEGORIES: Category[] = [
         basePrice: 75000,
         priceType: 'flat_rate',
         durations: [
-          { label: 'Full Day (12–24 hrs)', price: 75000, days: 1 },
-          { label: '8–12 hours', price: 50000, days: 0.5 },
-          { label: '6–7 hours', price: 40000, days: 0.3 },
-          { label: '3–5 hours', price: 30000, days: 0.2 }
+          { label: '12–24hrs', price: 75000, days: 1 },
+          { label: '8–12 hrs', price: 50000, days: 0.5 },
+          { label: '6–7hrs', price: 40000, days: 0.3 },
+          { label: '3–5hrs', price: 30000, days: 0.2 }
         ],
         inclusions: ['Licensed medic', 'Standard trauma kit'],
         participantsBring: ['N/A'],

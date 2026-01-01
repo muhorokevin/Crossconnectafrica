@@ -95,29 +95,35 @@ const Calculator: React.FC<{ initialData?: BookingContextData | null }> = ({ ini
 
   const results = useMemo(() => {
     const isHosting = selectedProgram?.category === 'hosting';
+    const isMedic = selectedProgram?.id === 'medic_standby';
     
-    if (!selectedProgram || (pax <= 0 && !isHosting && selectedProgram.priceType !== 'flat_rate')) {
+    if (!selectedProgram || (pax <= 0 && !isHosting && !isMedic && selectedProgram.priceType !== 'flat_rate')) {
       return { subtotal: 0, deposit: 0, missionBase: 0, logisticsBase: 0, addonsBase: 0, days: 0, venuePrice: 0, transportPrice: 0, mealsPrice: 0 };
     }
 
     const variant = selectedProgram.durations ? selectedProgram.durations[durationIdx] : { price: selectedProgram.basePrice, days: 1, isGroup: false };
     const days = Math.ceil(variant.days || 1);
     
+    // 1. Mission Core
     let missionBase = 0;
     if (variant.isGroup || selectedProgram.priceType === 'flat_rate') {
         missionBase = variant.price;
     } else {
         missionBase = variant.price * pax;
+        
+        // Apply Hiking Group Discounts
         if (selectedProgram.category === 'expeditions') {
             if (pax >= 50) missionBase *= 0.8;
             else if (pax >= 20) missionBase *= 0.9;
         }
     }
 
-    if (selectedProgram.id === 'medic_standby') {
+    // Medic Standby Risk Multiplier
+    if (isMedic) {
         missionBase *= EVENT_TYPE_RISK[eventType].multiplier;
     }
 
+    // 2. Logistics
     const venuePrice = VENUE_TYPES[venueType].price * days;
     const fleet = FLEET_SOLUTIONS[fleetType];
     let transportPrice = 0;
@@ -138,6 +144,7 @@ const Calculator: React.FC<{ initialData?: BookingContextData | null }> = ({ ini
 
     const logisticsBase = venuePrice + transportPrice + mealsPrice;
 
+    // 3. Strategic Add-ons
     const addonsBase = chosenAddons.reduce((sum, id) => {
         const a = STRATEGIC_ADDONS.find(x => x.id === id);
         if (!a) return sum;
@@ -369,7 +376,7 @@ Contact: ${clientInfo.contact || 'Not Specified'}`;
                               const prog = CATEGORIES.flatMap(c => c.programs).find(p => p.id === e.target.value);
                               if (prog) { setSelectedProgram(prog); setDurationIdx(0); }
                            }}
-                           className="w-full p-5 bg-gray-50 border-none text-[11px] font-bold uppercase tracking-widest"
+                           className="w-full p-5 bg-gray-50 border-none text-[11px] font-bold uppercase tracking-widest text-brand-green"
                         >
                            <option value="">Choose your Mission...</option>
                            {CATEGORIES.map(cat => (
@@ -381,10 +388,11 @@ Contact: ${clientInfo.contact || 'Not Specified'}`;
                      </div>
                      <div className="space-y-3">
                         <label className="text-[10px] font-bold text-brand-gold uppercase tracking-[0.4em]">Tier Configuration</label>
-                        <select value={durationIdx} onChange={(e) => setDurationIdx(parseInt(e.target.value))} className="w-full p-5 bg-gray-50 border-none text-[11px] font-bold uppercase">
-                           {selectedProgram?.durations?.map((d, i) => (
-                              <option key={i} value={i}>{d.label} — {formatKES(d.price)} {d.isGroup ? 'Flat' : 'pp'}</option>
-                           )) || <option>Selection Required</option>}
+                        <select value={durationIdx} onChange={(e) => setDurationIdx(parseInt(e.target.value))} className="w-full p-5 bg-gray-50 border-none text-[11px] font-bold uppercase text-brand-green">
+                           {selectedProgram?.durations?.map((d, i) => {
+                              const isFlat = selectedProgram.priceType === 'flat_rate' || d.isGroup;
+                              return <option key={i} value={i}>{d.label} — {formatKES(d.price)} {isFlat ? '' : 'pp'}</option>
+                           }) || <option>Selection Required</option>}
                         </select>
                      </div>
                   </div>
@@ -395,7 +403,7 @@ Contact: ${clientInfo.contact || 'Not Specified'}`;
                      </div>
                      <div className="space-y-3">
                         <label className="text-[10px] font-bold text-brand-gold uppercase tracking-[0.4em]">Participants (Pax)</label>
-                        <input type="number" value={pax} onChange={(e) => setPax(Math.max(0, parseInt(e.target.value) || 0))} className="w-full p-3.5 bg-gray-50 border-none font-serif font-bold text-2xl" />
+                        <input type="number" value={pax} onChange={(e) => setPax(Math.max(0, parseInt(e.target.value) || 0))} className="w-full p-3.5 bg-gray-50 border-none font-serif font-bold text-2xl text-brand-green" />
                      </div>
                   </div>
                </div>
@@ -411,12 +419,12 @@ Contact: ${clientInfo.contact || 'Not Specified'}`;
                <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
                   <div className="space-y-6">
                      <label className="text-[10px] font-bold text-brand-gold uppercase tracking-[0.4em] flex items-center gap-2"><Map size={14}/> Venue Coordination</label>
-                     <select value={venueType} onChange={(e) => setVenueType(e.target.value as any)} className="w-full p-4 bg-gray-50 border-none text-xs font-bold uppercase text-brand-green font-bold">
+                     <select value={venueType} onChange={(e) => setVenueType(e.target.value as any)} className="w-full p-4 bg-gray-50 border-none text-xs font-bold uppercase text-brand-green">
                         {Object.values(VENUE_TYPES).map(v => <option key={v.id} value={v.id}>{v.label} ({v.price > 0 ? formatKES(v.price) : 'Provided'})</option>)}
                      </select>
 
                      <label className="text-[10px] font-bold text-brand-gold uppercase tracking-[0.4em] flex items-center gap-2 pt-4"><Truck size={14}/> Mission Fleet</label>
-                     <select value={fleetType} onChange={(e) => setFleetType(e.target.value as any)} className="w-full p-4 bg-gray-50 border-none text-xs font-bold uppercase text-brand-green font-bold">
+                     <select value={fleetType} onChange={(e) => setFleetType(e.target.value as any)} className="w-full p-4 bg-gray-50 border-none text-xs font-bold uppercase text-brand-green">
                         {Object.values(FLEET_SOLUTIONS).map(f => <option key={f.id} value={f.id}>{f.label} ({f.capacity > 0 ? f.capacity + ' pax — ' + formatKES(f.price) : 'Self Drive'})</option>)}
                      </select>
                   </div>
@@ -539,7 +547,7 @@ Contact: ${clientInfo.contact || 'Not Specified'}`;
                  <div className="pt-8 flex flex-col gap-4">
                     <button 
                       onClick={handleWhatsApp} 
-                      disabled={!selectedProgram || (pax === 0 && selectedProgram.priceType !== 'flat_rate' && selectedProgram.category !== 'hosting')}
+                      disabled={!selectedProgram || (pax === 0 && selectedProgram.priceType !== 'flat_rate' && selectedProgram.category !== 'hosting' && selectedProgram.id !== 'medic_standby')}
                       className="w-full py-5 bg-[#25D366] text-white font-bold uppercase tracking-[0.5em] text-[10px] shadow-lg flex items-center justify-center gap-3 disabled:opacity-50"
                     >
                        <MessageCircle size={20} /> Request Proposal

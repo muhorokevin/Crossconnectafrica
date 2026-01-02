@@ -276,20 +276,24 @@ Contact: ${clientInfo.contact || 'Not Specified'}`;
                     <td className="py-4 px-4 border-b border-gray-100 text-right font-bold">{formatKES(results.logisticsBase)}</td>
                   </tr>
                 )}
-                {/* 03: Add-ons */}
-                {results.addonsBase > 0 && (
-                  <tr>
-                    <td className="py-4 px-4 border-b border-gray-100 font-bold italic">
-                      03 Strategic Enhancements
-                      <ul className="text-[9px] font-normal text-gray-500 uppercase tracking-wider not-italic mt-2 space-y-1">
-                        {chosenAddons.map(id => (
-                          <li key={id}>• {STRATEGIC_ADDONS.find(a => a.id === id)?.label}</li>
-                        ))}
-                      </ul>
-                    </td>
-                    <td className="py-4 px-4 border-b border-gray-100 text-right font-bold">{formatKES(results.addonsBase)}</td>
-                  </tr>
-                )}
+                {/* 03: Add-ons Itemized */}
+                {chosenAddons.length > 0 && chosenAddons.map((id, index) => {
+                  const addon = STRATEGIC_ADDONS.find(a => a.id === id);
+                  if (!addon) return null;
+                  const price = addon.type === 'pp' ? addon.price * (pax > 0 ? pax : 1) : addon.price;
+                  return (
+                    <tr key={id}>
+                      <td className="py-4 px-4 border-b border-gray-100 font-bold italic">
+                        {index === 0 ? '03 Strategic Enhancements' : ''}
+                        <div className="text-[11px] font-normal text-brand-green not-italic flex items-center gap-2 mt-1">
+                           • {addon.label} 
+                           <span className="text-[8px] text-gray-400 uppercase">({addon.type === 'pp' ? 'Per Person' : 'Flat Rate'})</span>
+                        </div>
+                      </td>
+                      <td className="py-4 px-4 border-b border-gray-100 text-right font-bold">{formatKES(price)}</td>
+                    </tr>
+                  );
+                })}
               </tbody>
               <tfoot>
                 <tr>
@@ -525,13 +529,24 @@ Contact: ${clientInfo.contact || 'Not Specified'}`;
                    </div>
                  )}
 
-                 {results.addonsBase > 0 && (
-                   <div className="flex justify-between items-end border-b border-gray-50 pb-4 animate-reveal">
-                      <div className="space-y-1">
-                         <span className="text-[8px] font-bold text-gray-400 uppercase tracking-widest block">03 Itemized Selection</span>
-                         <span className="text-[11px] font-serif font-bold italic text-brand-green">{chosenAddons.length} Enhancement(s)</span>
-                      </div>
-                      <span className="text-sm font-bold text-brand-green">{formatKES(results.addonsBase)}</span>
+                 {/* Itemized Enhancements in Quote Sidebar */}
+                 {chosenAddons.length > 0 && (
+                   <div className="space-y-4 animate-reveal pt-2">
+                      <span className="text-[8px] font-bold text-gray-400 uppercase tracking-widest block">03 Strategic Enhancements</span>
+                      {chosenAddons.map(id => {
+                        const addon = STRATEGIC_ADDONS.find(a => a.id === id);
+                        if (!addon) return null;
+                        const price = addon.type === 'pp' ? addon.price * (pax > 0 ? pax : 1) : addon.price;
+                        return (
+                          <div key={id} className="flex justify-between items-end border-b border-gray-50 pb-2 last:border-0">
+                             <div className="space-y-0.5">
+                                <span className="text-[10px] font-serif italic text-brand-green leading-tight block">{addon.label}</span>
+                                <span className="text-[7px] text-gray-400 uppercase tracking-tighter">({addon.type === 'pp' ? 'Per Pax' : 'Flat'})</span>
+                             </div>
+                             <span className="text-[11px] font-bold text-brand-green">{formatKES(price)}</span>
+                          </div>
+                        );
+                      })}
                    </div>
                  )}
 

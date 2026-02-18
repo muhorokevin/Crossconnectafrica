@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Mail, Phone, MapPin, MessageCircle, Send } from 'lucide-react';
 
@@ -34,7 +33,7 @@ ${form.message}`;
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
           
           {/* Contact Info */}
-          <div className="bg-brand-green text-white p-10 rounded-2xl relative overflow-hidden flex flex-col justify-between shadow-xl">
+          <div className="bg-brand-green text-white p-6 md:p-10 rounded-2xl relative overflow-hidden flex flex-col justify-between shadow-xl min-h-[400px]">
             <div className="absolute top-0 right-0 p-32 bg-brand-gold rounded-full blur-3xl opacity-10 translate-x-1/2 -translate-y-1/2"></div>
             
             <div className="relative z-10">
@@ -42,26 +41,26 @@ ${form.message}`;
                 
                 <div className="space-y-8">
                     <div className="flex items-start gap-4">
-                        <div className="bg-white/10 p-3 rounded-lg"><Phone size={24} className="text-brand-gold" /></div>
+                        <div className="bg-white/10 p-3 rounded-lg shrink-0"><Phone size={24} className="text-brand-gold" /></div>
                         <div>
-                            <p className="font-bold text-lg">+254 710 974 670</p>
-                            <p className="text-white/60 text-sm">Mon-Fri, 8am-5pm</p>
+                            <p className="font-bold text-base md:text-lg">+254 710 974 670</p>
+                            <p className="text-white/60 text-xs md:text-sm">Mon-Fri, 8am-5pm</p>
                         </div>
                     </div>
                     
                     <div className="flex items-start gap-4">
-                        <div className="bg-white/10 p-3 rounded-lg"><Mail size={24} className="text-brand-gold" /></div>
-                        <div>
-                            <p className="font-bold text-lg">crossconnectmisiions@protonmail.com</p>
-                            <p className="text-white/60 text-sm">Response within 24 hours</p>
+                        <div className="bg-white/10 p-3 rounded-lg shrink-0"><Mail size={24} className="text-brand-gold" /></div>
+                        <div className="min-w-0 flex-1">
+                            <p className="font-bold text-sm sm:text-base md:text-lg break-words">crossconnectmissions@protonmail.com</p>
+                            <p className="text-white/60 text-xs md:text-sm">Response within 24 hours</p>
                         </div>
                     </div>
                     
                     <div className="flex items-start gap-4">
-                        <div className="bg-white/10 p-3 rounded-lg"><MapPin size={24} className="text-brand-gold" /></div>
+                        <div className="bg-white/10 p-3 rounded-lg shrink-0"><MapPin size={24} className="text-brand-gold" /></div>
                         <div>
-                            <p className="font-bold text-lg">Valley View Office Park</p>
-                            <p className="text-white/60 text-sm">B1 Office 1<br/>P.O. Box 18923-00100 Nairobi</p>
+                            <p className="font-bold text-base md:text-lg">Valley View Office Park</p>
+                            <p className="text-white/60 text-xs md:text-sm">B1 Office 1<br/>P.O. Box 18923-00100 Nairobi</p>
                         </div>
                     </div>
                 </div>
@@ -73,26 +72,26 @@ ${form.message}`;
           </div>
 
           {/* Form */}
-          <div className="bg-white p-10 rounded-2xl shadow-sm border border-gray-100">
+          <div className="bg-white p-6 md:p-10 rounded-2xl shadow-sm border border-gray-100">
             <h3 className="text-2xl font-serif font-bold text-brand-green mb-6">Send a Message</h3>
             <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
-                    <label className="block text-xs font-bold text-gray-500 uppercase mb-2">Your Name</label>
+                    <label className="block text-[10px] font-bold text-gray-500 uppercase mb-2 tracking-widest">Your Name</label>
                     <input 
                         type="text" 
                         value={form.name}
                         onChange={(e) => setForm({...form, name: e.target.value})}
-                        className="w-full p-4 bg-gray-50 border border-gray-200 rounded-lg focus:border-brand-green transition-colors"
+                        className="w-full p-4 bg-gray-50 border border-gray-200 rounded-lg focus:border-brand-green transition-colors outline-none text-sm"
                         placeholder="John Doe"
                         required
                     />
                 </div>
                 <div>
-                    <label className="block text-xs font-bold text-gray-500 uppercase mb-2">Subject</label>
+                    <label className="block text-[10px] font-bold text-gray-500 uppercase mb-2 tracking-widest">Subject</label>
                     <select 
                         value={form.subject}
                         onChange={(e) => setForm({...form, subject: e.target.value})}
-                        className="w-full p-4 bg-gray-50 border border-gray-200 rounded-lg focus:border-brand-green transition-colors"
+                        className="w-full p-4 bg-gray-50 border border-gray-200 rounded-lg focus:border-brand-green transition-colors outline-none text-sm appearance-none"
                     >
                         <option value="">Select a Topic</option>
                         <option value="General Inquiry">General Inquiry</option>
@@ -103,11 +102,11 @@ ${form.message}`;
                     </select>
                 </div>
                 <div>
-                    <label className="block text-xs font-bold text-gray-500 uppercase mb-2">Message</label>
+                    <label className="block text-[10px] font-bold text-gray-500 uppercase mb-2 tracking-widest">Message</label>
                     <textarea 
                         value={form.message}
                         onChange={(e) => setForm({...form, message: e.target.value})}
-                        className="w-full p-4 bg-gray-50 border border-gray-200 rounded-lg focus:border-brand-green transition-colors h-32 resize-none"
+                        className="w-full p-4 bg-gray-50 border border-gray-200 rounded-lg focus:border-brand-green transition-colors h-32 resize-none outline-none text-sm"
                         placeholder="How can we help you?"
                         required
                     />
@@ -115,7 +114,7 @@ ${form.message}`;
                 
                 <button 
                     type="submit" 
-                    className="w-full py-4 bg-brand-green text-white font-bold uppercase tracking-widest rounded-lg hover:bg-brand-green/90 transition-all flex items-center justify-center gap-2"
+                    className="w-full py-4 bg-brand-green text-white font-bold uppercase tracking-widest rounded-lg hover:bg-brand-green/90 transition-all flex items-center justify-center gap-2 shadow-lg active:scale-[0.98]"
                 >
                     <Send size={18} /> Send via WhatsApp
                 </button>

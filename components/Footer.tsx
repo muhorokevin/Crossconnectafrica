@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Instagram, Mail, Phone, MapPin } from 'lucide-react';
 import { ViewState } from '../types';
@@ -94,15 +93,15 @@ const Footer: React.FC<FooterProps> = ({ setView }) => {
             <ul className="space-y-4 text-gray-300">
                 <li className="flex items-start gap-3">
                     <MapPin size={18} className="text-brand-gold shrink-0 mt-1" />
-                    <span>Valley View Office Park<br/>B1 Office 1<br/>P.O. Box 18923-00100 Nairobi</span>
+                    <span className="text-sm">Valley View Office Park<br/>B1 Office 1<br/>P.O. Box 18923-00100 Nairobi</span>
                 </li>
                 <li className="flex items-center gap-3">
                     <Phone size={18} className="text-brand-gold shrink-0" />
-                    <span>+254 710 974 670</span>
+                    <span className="text-sm">+254 710 974 670</span>
                 </li>
-                 <li className="flex items-center gap-3">
-                    <Mail size={18} className="text-brand-gold shrink-0" />
-                    <span>crossconnectmisiions@protonmail.com</span>
+                 <li className="flex items-start gap-3">
+                    <Mail size={18} className="text-brand-gold shrink-0 mt-1" />
+                    <span className="text-sm break-words">crossconnectmissions@protonmail.com</span>
                 </li>
             </ul>
           </div>

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo } from 'react';
 import { 
   MessageCircle, User, Mail, Building2, Map, Truck, Home, Calendar as CalendarIcon, 
@@ -202,7 +201,7 @@ Contact: ${clientInfo.contact || 'Not Specified'}`;
   }, [selectedProgram]);
 
   return (
-    <div className="min-h-screen bg-brand-cream pt-40 pb-32 px-6 md:px-12">
+    <div className="min-h-screen bg-brand-cream pt-32 md:pt-40 pb-32 px-4 md:px-12">
       
       {/* 1. PRINT-ONLY COMPONENT (High Fidelity PDF Design) */}
       <div className="hidden print:block fixed inset-0 bg-white z-[9999] p-0 text-brand-green font-serif">
@@ -230,7 +229,7 @@ Contact: ${clientInfo.contact || 'Not Specified'}`;
               <div className="space-y-1">
                 <p className="text-lg font-bold italic">{clientInfo.company || 'Prospective Partner'}</p>
                 <p className="text-sm">Attn: {clientInfo.contact || 'Lead Representative'}</p>
-                <p className="text-sm opacity-60">{clientInfo.email}</p>
+                <p className="text-sm opacity-60 break-words">{clientInfo.email || 'missions@crossconnect.africa'}</p>
               </div>
             </div>
             <div className="space-y-4">
@@ -329,37 +328,37 @@ Contact: ${clientInfo.contact || 'Not Specified'}`;
 
           {/* Footer Contact */}
           <div className="mt-auto pt-8 border-t border-gray-100 flex justify-between items-center text-[8px] font-bold uppercase tracking-[0.3em] text-gray-400">
-            <span>missions@cca.africa • +254 710 974 670</span>
+            <span>missions@crossconnect.africa • +254 710 974 670</span>
             <span>Valley View Office Park, Nairobi</span>
           </div>
         </div>
       </div>
 
       {/* 2. MAIN WEB UI */}
-      <div className="max-w-[1800px] mx-auto grid lg:grid-cols-12 gap-12 items-stretch print:hidden">
+      <div className="max-w-[1800px] mx-auto grid lg:grid-cols-12 gap-8 md:gap-12 items-stretch print:hidden">
         
         {/* INPUTS COLUMN */}
-        <div className="lg:col-span-8 space-y-10">
-          <div className="bg-white p-10 shadow-2xl border border-brand-green/5 space-y-16">
+        <div className="lg:col-span-8 space-y-8 md:space-y-10">
+          <div className="bg-white p-6 md:p-10 shadow-2xl border border-brand-green/5 space-y-12 md:space-y-16">
             
             {/* 01: IDENTITY */}
             <section className="space-y-8">
                <div className="flex items-center gap-4 border-b border-gray-100 pb-4">
                   <div className="w-10 h-10 bg-brand-green text-brand-gold flex items-center justify-center font-bold font-serif">01</div>
-                  <h3 className="text-xl font-serif font-bold text-brand-green uppercase">Mission Identity</h3>
+                  <h3 className="text-xl font-serif font-bold text-brand-green uppercase tracking-tight">Mission Identity</h3>
                </div>
                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div className="space-y-2">
                      <label className="text-[10px] font-bold text-brand-gold uppercase tracking-[0.4em]">Organization</label>
-                     <input type="text" value={clientInfo.company} onChange={(e) => setClientInfo({...clientInfo, company: e.target.value})} placeholder="Group Name" className="w-full p-4 bg-gray-50 border-none text-sm font-bold" />
+                     <input type="text" value={clientInfo.company} onChange={(e) => setClientInfo({...clientInfo, company: e.target.value})} placeholder="Group Name" className="w-full p-4 bg-gray-50 border-none text-sm font-bold outline-none" />
                   </div>
                   <div className="space-y-2">
                      <label className="text-[10px] font-bold text-brand-gold uppercase tracking-[0.4em]">Lead Contact</label>
-                     <input type="text" value={clientInfo.contact} onChange={(e) => setClientInfo({...clientInfo, contact: e.target.value})} placeholder="Full Name" className="w-full p-4 bg-gray-50 border-none text-sm font-bold" />
+                     <input type="text" value={clientInfo.contact} onChange={(e) => setClientInfo({...clientInfo, contact: e.target.value})} placeholder="Full Name" className="w-full p-4 bg-gray-50 border-none text-sm font-bold outline-none" />
                   </div>
                   <div className="space-y-2">
                      <label className="text-[10px] font-bold text-brand-gold uppercase tracking-[0.4em]">Email</label>
-                     <input type="email" value={clientInfo.email} onChange={(e) => setClientInfo({...clientInfo, email: e.target.value})} placeholder="missions@cca.africa" className="w-full p-4 bg-gray-50 border-none text-sm font-bold" />
+                     <input type="email" value={clientInfo.email} onChange={(e) => setClientInfo({...clientInfo, email: e.target.value})} placeholder="missions@crossconnect.africa" className="w-full p-4 bg-gray-50 border-none text-sm font-bold outline-none" />
                   </div>
                </div>
             </section>
@@ -368,7 +367,7 @@ Contact: ${clientInfo.contact || 'Not Specified'}`;
             <section className="space-y-10">
                <div className="flex items-center gap-4 border-b border-gray-100 pb-4">
                   <div className="w-10 h-10 bg-brand-green text-brand-gold flex items-center justify-center font-bold font-serif">02</div>
-                  <h3 className="text-xl font-serif font-bold text-brand-green uppercase">Pillar Selection</h3>
+                  <h3 className="text-xl font-serif font-bold text-brand-green uppercase tracking-tight">Pillar Selection</h3>
                </div>
                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                   <div className="space-y-6">
@@ -380,7 +379,7 @@ Contact: ${clientInfo.contact || 'Not Specified'}`;
                               const prog = CATEGORIES.flatMap(c => c.programs).find(p => p.id === e.target.value);
                               if (prog) { setSelectedProgram(prog); setDurationIdx(0); }
                            }}
-                           className="w-full p-5 bg-gray-50 border-none text-[11px] font-bold uppercase tracking-widest text-brand-green"
+                           className="w-full p-5 bg-gray-50 border-none text-[11px] font-bold uppercase tracking-widest text-brand-green outline-none"
                         >
                            <option value="">Choose your Mission...</option>
                            {CATEGORIES.map(cat => (
@@ -392,7 +391,7 @@ Contact: ${clientInfo.contact || 'Not Specified'}`;
                      </div>
                      <div className="space-y-3">
                         <label className="text-[10px] font-bold text-brand-gold uppercase tracking-[0.4em]">Tier Configuration</label>
-                        <select value={durationIdx} onChange={(e) => setDurationIdx(parseInt(e.target.value))} className="w-full p-5 bg-gray-50 border-none text-[11px] font-bold uppercase text-brand-green">
+                        <select value={durationIdx} onChange={(e) => setDurationIdx(parseInt(e.target.value))} className="w-full p-5 bg-gray-50 border-none text-[11px] font-bold uppercase text-brand-green outline-none">
                            {selectedProgram?.durations?.map((d, i) => {
                               const isFlat = selectedProgram.priceType === 'flat_rate' || d.isGroup;
                               return <option key={i} value={i}>{d.label} — {formatKES(d.price)} {isFlat ? '' : 'pp'}</option>
@@ -400,14 +399,14 @@ Contact: ${clientInfo.contact || 'Not Specified'}`;
                         </select>
                      </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                      <div className="space-y-3">
                         <label className="text-[10px] font-bold text-brand-gold uppercase tracking-[0.4em]">Deployment Date</label>
                         <CustomCalendar value={missionDate} onChange={setMissionDate} />
                      </div>
                      <div className="space-y-3">
                         <label className="text-[10px] font-bold text-brand-gold uppercase tracking-[0.4em]">Participants (Pax)</label>
-                        <input type="number" value={pax} onChange={(e) => setPax(Math.max(0, parseInt(e.target.value) || 0))} className="w-full p-3.5 bg-gray-50 border-none font-serif font-bold text-2xl text-brand-green" />
+                        <input type="number" value={pax} onChange={(e) => setPax(Math.max(0, parseInt(e.target.value) || 0))} className="w-full p-3.5 bg-gray-50 border-none font-serif font-bold text-2xl text-brand-green outline-none" />
                      </div>
                   </div>
                </div>
@@ -417,24 +416,24 @@ Contact: ${clientInfo.contact || 'Not Specified'}`;
             <section className="space-y-10">
                <div className="flex items-center gap-4 border-b border-gray-100 pb-4">
                   <div className="w-10 h-10 bg-brand-green text-brand-gold flex items-center justify-center font-bold font-serif">03</div>
-                  <h3 className="text-xl font-serif font-bold text-brand-green uppercase">Field Logistics</h3>
+                  <h3 className="text-xl font-serif font-bold text-brand-green uppercase tracking-tight">Field Logistics</h3>
                </div>
                
                <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
                   <div className="space-y-6">
                      <label className="text-[10px] font-bold text-brand-gold uppercase tracking-[0.4em] flex items-center gap-2"><Map size={14}/> Venue Coordination</label>
-                     <select value={venueType} onChange={(e) => setVenueType(e.target.value as any)} className="w-full p-4 bg-gray-50 border-none text-xs font-bold uppercase text-brand-green">
+                     <select value={venueType} onChange={(e) => setVenueType(e.target.value as any)} className="w-full p-4 bg-gray-50 border-none text-xs font-bold uppercase text-brand-green outline-none">
                         {Object.values(VENUE_TYPES).map(v => <option key={v.id} value={v.id}>{v.label} ({v.price > 0 ? formatKES(v.price) : 'Provided'})</option>)}
                      </select>
 
                      <label className="text-[10px] font-bold text-brand-gold uppercase tracking-[0.4em] flex items-center gap-2 pt-4"><Truck size={14}/> Mission Fleet</label>
-                     <select value={fleetType} onChange={(e) => setFleetType(e.target.value as any)} className="w-full p-4 bg-gray-50 border-none text-xs font-bold uppercase text-brand-green">
+                     <select value={fleetType} onChange={(e) => setFleetType(e.target.value as any)} className="w-full p-4 bg-gray-50 border-none text-xs font-bold uppercase text-brand-green outline-none">
                         {Object.values(FLEET_SOLUTIONS).map(f => <option key={f.id} value={f.id}>{f.label} ({f.capacity > 0 ? f.capacity + ' pax — ' + formatKES(f.price) : 'Self Drive'})</option>)}
                      </select>
                   </div>
 
                   <div className="space-y-6">
-                     <label className="text-[10px] font-bold text-brand-gold uppercase tracking-[0.4em] flex items-center gap-2 pt-4"><Utensils size={14}/> Field Catering</label>
+                     <label className="text-[10px] font-bold text-brand-gold uppercase tracking-[0.4em] flex items-center gap-2 md:pt-4"><Utensils size={14}/> Field Catering</label>
                      <div className="grid grid-cols-2 gap-3">
                         {[
                           { id: 'breakfast', label: 'Breakfast', price: 800 },
@@ -442,7 +441,7 @@ Contact: ${clientInfo.contact || 'Not Specified'}`;
                           { id: 'dinner', label: 'Dinner', price: 2200 },
                           { id: 'tea', label: 'Tea & Snacks', price: 500 }
                         ].map(m => (
-                           <button key={m.id} onClick={() => setSelectedMeals(prev => prev.includes(m.id) ? prev.filter(x => x !== m.id) : [...prev, m.id])} className={`p-5 border text-center transition-all ${selectedMeals.includes(m.id) ? 'bg-brand-green text-brand-gold border-brand-green' : 'bg-gray-50 border-transparent opacity-50'}`}>
+                           <button key={m.id} onClick={() => setSelectedMeals(prev => prev.includes(m.id) ? prev.filter(x => x !== m.id) : [...prev, m.id])} className={`p-4 md:p-5 border text-center transition-all ${selectedMeals.includes(m.id) ? 'bg-brand-green text-brand-gold border-brand-green' : 'bg-gray-50 border-transparent opacity-50'}`}>
                               <div className="text-[9px] font-bold uppercase tracking-widest">{m.label}</div>
                               <div className="text-[11px] font-bold mt-1">{formatKES(m.price)}</div>
                            </button>
@@ -456,7 +455,7 @@ Contact: ${clientInfo.contact || 'Not Specified'}`;
             <section className="space-y-10">
                <div className="flex items-center gap-4 border-b border-gray-100 pb-4">
                   <div className="w-10 h-10 bg-brand-green text-brand-gold flex items-center justify-center font-bold font-serif">04</div>
-                  <h3 className="text-xl font-serif font-bold text-brand-green uppercase">Strategic Enhancements</h3>
+                  <h3 className="text-xl font-serif font-bold text-brand-green uppercase tracking-tight">Strategic Enhancements</h3>
                </div>
 
                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -495,7 +494,7 @@ Contact: ${clientInfo.contact || 'Not Specified'}`;
 
         {/* QUOTE STUB COLUMN */}
         <div className="lg:col-span-4 print:hidden">
-           <div id="quote-doc" className="bg-white p-12 shadow-2xl paper-texture sticky top-32 border border-gray-100">
+           <div id="quote-doc" className="bg-white p-8 md:p-12 shadow-2xl paper-texture sticky top-32 border border-gray-100">
               <header className="border-b-[6px] border-brand-green pb-8 mb-10">
                  <div className="flex justify-between items-start mb-6">
                     <Logo className="w-14 h-14" />
@@ -538,21 +537,21 @@ Contact: ${clientInfo.contact || 'Not Specified'}`;
                         if (!addon) return null;
                         const price = addon.type === 'pp' ? addon.price * (pax > 0 ? pax : 1) : addon.price;
                         return (
-                          <div key={id} className="flex justify-between items-end border-b border-gray-50 pb-2 last:border-0">
-                             <div className="space-y-0.5">
-                                <span className="text-[10px] font-serif italic text-brand-green leading-tight block">{addon.label}</span>
+                          <div key={id} className="flex justify-between items-end border-b border-gray-50 pb-2 last:border-0 pr-1">
+                             <div className="space-y-0.5 max-w-[70%]">
+                                <span className="text-[10px] font-serif italic text-brand-green leading-tight block truncate">{addon.label}</span>
                                 <span className="text-[7px] text-gray-400 uppercase tracking-tighter">({addon.type === 'pp' ? 'Per Pax' : 'Flat'})</span>
                              </div>
-                             <span className="text-[11px] font-bold text-brand-green">{formatKES(price)}</span>
+                             <span className="text-[11px] font-bold text-brand-green whitespace-nowrap">{formatKES(price)}</span>
                           </div>
                         );
                       })}
                    </div>
                  )}
 
-                 <section className="bg-brand-green text-white p-8 mt-12 space-y-4 shadow-xl">
+                 <section className="bg-brand-green text-white p-6 md:p-8 mt-12 space-y-4 shadow-xl">
                     <span className="text-brand-gold text-[10px] font-bold uppercase tracking-[0.5em] block">Total Investment</span>
-                    <div className="text-5xl font-serif font-bold text-brand-gold tracking-tighter leading-none">{formatKES(results.subtotal)}</div>
+                    <div className="text-3xl md:text-5xl font-serif font-bold text-brand-gold tracking-tighter leading-none">{formatKES(results.subtotal)}</div>
                     <div className="pt-4 border-t border-white/10 flex justify-between items-center">
                        <span className="text-[9px] uppercase font-bold tracking-[0.3em] opacity-60">Security Deposit (50%)</span>
                        <span className="text-xl font-serif font-bold text-brand-gold">{formatKES(results.deposit)}</span>
@@ -563,13 +562,13 @@ Contact: ${clientInfo.contact || 'Not Specified'}`;
                     <button 
                       onClick={handleWhatsApp} 
                       disabled={!selectedProgram || (pax === 0 && selectedProgram.priceType !== 'flat_rate' && selectedProgram.category !== 'hosting' && selectedProgram.id !== 'medic_standby')}
-                      className="w-full py-5 bg-[#25D366] text-white font-bold uppercase tracking-[0.5em] text-[10px] shadow-lg flex items-center justify-center gap-3 disabled:opacity-50"
+                      className="w-full py-5 bg-[#25D366] text-white font-bold uppercase tracking-[0.5em] text-[10px] shadow-lg flex items-center justify-center gap-3 disabled:opacity-50 active:scale-[0.98]"
                     >
                        <MessageCircle size={20} /> Request Proposal
                     </button>
                     <button 
                       onClick={handlePrint} 
-                      className="w-full py-4 border border-brand-green text-brand-green font-bold text-[9px] uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-brand-green hover:text-white transition-colors"
+                      className="w-full py-4 border border-brand-green text-brand-green font-bold text-[9px] uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-brand-green hover:text-white transition-colors active:scale-[0.98]"
                     >
                       <Printer size={16} /> Generate Strategy PDF
                     </button>

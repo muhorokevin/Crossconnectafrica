@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Shield, Lock, FileText } from 'lucide-react';
 
@@ -76,7 +75,7 @@ const PrivacyPolicy: React.FC = () => {
             <h2 className="text-xl font-bold text-brand-green mb-3 border-b border-brand-green/10 pb-2">7. Contact Data Controller</h2>
             <p>
               If you have any questions regarding this policy or wish to exercise your rights, please contact our Data Protection Officer at: <br />
-              <strong>Email:</strong> crossconnectmisiions@protonmail.com <br />
+              <strong>Email:</strong> crossconnectmissions@protonmail.com <br />
               <strong>Phone:</strong> +254 710 974 670 <br />
               <strong>Physical Address:</strong> Valley View Office Park, B1 Office 1, Nairobi, Kenya
             </p>

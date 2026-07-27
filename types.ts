@@ -61,7 +61,8 @@ export interface ChatMessage {
 export enum ViewState {
   HOME = 'HOME',
   ABOUT = 'ABOUT',
-  ADVENTURE_BUILDER = 'ADVENTURE_BUILDER',
+  GALLERY = 'GALLERY',
+  ADVENTURE_BUILDER = 'GALLERY', // Map builder to gallery for compatibility
   CALCULATOR = 'CALCULATOR',
   EVENTS = 'EVENTS',
   SHOP = 'SHOP',

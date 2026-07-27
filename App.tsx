@@ -4,6 +4,7 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Home from './pages/Home';
 import About from './pages/About';
+import Gallery from './pages/Gallery';
 import AdventureBuilder, { Program } from './pages/AdventureBuilder';
 import Calculator from './pages/Calculator';
 import Events from './pages/Events';
@@ -45,8 +46,9 @@ const App: React.FC = () => {
         return <Home setView={setCurrentView} />;
       case ViewState.ABOUT:
         return <About />;
+      case ViewState.GALLERY:
       case ViewState.ADVENTURE_BUILDER:
-        return <AdventureBuilder onNavigateToBooking={handleNavigateToBooking} />;
+        return <Gallery setView={setCurrentView} onNavigateToBooking={handleNavigateToBooking} />;
       case ViewState.CALCULATOR:
         return <Calculator initialData={bookingContext} />;
       case ViewState.EVENTS:

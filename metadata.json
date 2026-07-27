@@ -1,5 +1,6 @@
 {
   "name": "Cross Connect Africa",
-  "description": "Forging character through wilderness experiences. Rooted in faith, driven by excellence. Nairobi's premier adventure and leadership platform.",
-  "requestFramePermissions": []
+  "description": "Kenya's premier corporate team building, certified first aid & fire safety training, event medical standby, school adventure clubs, mountain hikes, and event MC hosting platform.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

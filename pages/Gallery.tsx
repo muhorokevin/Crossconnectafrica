@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { 
   Maximize2, X, ChevronLeft, ChevronRight, Share2, ArrowRight,
-  Play, Film, Image as ImageIcon, Grid, Upload, Plus, CheckCircle2
+  Play, Film, Image as ImageIcon, Grid
 } from 'lucide-react';
 import { ViewState } from '../types';
 import { BookingContextData } from '../App';
@@ -10,10 +10,10 @@ export interface GalleryItem {
   id: string;
   type: 'photo' | 'video';
   url: string;
-  posterUrl?: string; // Optional custom poster image for videos
+  posterUrl?: string;
 }
 
-const INITIAL_GALLERY_ITEMS: GalleryItem[] = [
+const GALLERY_ITEMS: GalleryItem[] = [
   // Featured Videos
   { 
     id: 'cca-vid-1', 
@@ -69,32 +69,10 @@ interface GalleryProps {
 }
 
 const Gallery: React.FC<GalleryProps> = ({ setView, onNavigateToBooking }) => {
-  const [items, setItems] = useState<GalleryItem[]>(() => {
-    const saved = localStorage.getItem('cca_gallery_items');
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        return [...parsed, ...INITIAL_GALLERY_ITEMS];
-      } catch (e) {
-        return INITIAL_GALLERY_ITEMS;
-      }
-    }
-    return INITIAL_GALLERY_ITEMS;
-  });
-
   const [activeFilter, setActiveFilter] = useState<'all' | 'photo' | 'video'>('all');
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
-  // Upload Modal State
-  const [isUploadOpen, setIsUploadOpen] = useState(false);
-  const [uploadType, setUploadType] = useState<'photo' | 'video'>('video');
-  const [uploadUrl, setUploadUrl] = useState('');
-  const [uploadFile, setUploadFile] = useState<File | null>(null);
-  const [filePreview, setFilePreview] = useState<string | null>(null);
-  const [isUploading, setIsUploading] = useState(false);
-  const [uploadSuccess, setUploadSuccess] = useState(false);
-
-  const filteredItems = items.filter(
+  const filteredItems = GALLERY_ITEMS.filter(
     item => activeFilter === 'all' || item.type === activeFilter
   );
 
@@ -118,64 +96,6 @@ const Gallery: React.FC<GalleryProps> = ({ setView, onNavigateToBooking }) => {
     if (lightboxIndex !== null) {
       setLightboxIndex((lightboxIndex + 1) % filteredItems.length);
     }
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      setUploadFile(file);
-      const isVid = file.type.startsWith('video');
-      setUploadType(isVid ? 'video' : 'photo');
-
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setFilePreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleUploadSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    let finalUrl = filePreview || uploadUrl.trim();
-
-    if (!finalUrl) return;
-
-    // Convert Imgur gallery links to direct mp4 if provided
-    if (finalUrl.includes('imgur.com/gallery/') || finalUrl.includes('imgur.com/a/')) {
-      const hashMatch = finalUrl.match(/#([a-zA-Z0-9]+)/) || finalUrl.match(/\/([a-zA-Z0-9]+)$/);
-      if (hashMatch && hashMatch[1]) {
-        finalUrl = `https://i.imgur.com/${hashMatch[1]}.mp4`;
-      }
-    }
-
-    setIsUploading(true);
-
-    const newItem: GalleryItem = {
-      id: `custom-${Date.now()}`,
-      type: uploadType,
-      url: finalUrl
-    };
-
-    setTimeout(() => {
-      const updated = [newItem, ...items];
-      setItems(updated);
-      try {
-        const userUploaded = updated.filter(i => i.id.startsWith('custom-'));
-        localStorage.setItem('cca_gallery_items', JSON.stringify(userUploaded));
-      } catch (err) {}
-
-      setIsUploading(false);
-      setUploadSuccess(true);
-
-      setTimeout(() => {
-        setUploadSuccess(false);
-        setIsUploadOpen(false);
-        setUploadUrl('');
-        setUploadFile(null);
-        setFilePreview(null);
-      }, 1000);
-    }, 500);
   };
 
   const handleQuoteClick = () => {
@@ -206,16 +126,6 @@ const Gallery: React.FC<GalleryProps> = ({ setView, onNavigateToBooking }) => {
           <p className="text-gray-300 text-base md:text-lg max-w-2xl mx-auto font-serif italic leading-relaxed">
             Moments and video clips captured in action across Kenya — featuring corporate team building, first aid & fire safety drills, event medical standby, school adventure clubs, hikes, and professional event hosting.
           </p>
-
-          {/* Action buttons */}
-          <div className="mt-6 flex items-center justify-center gap-3">
-            <button
-              onClick={() => setIsUploadOpen(true)}
-              className="px-5 py-2.5 bg-brand-gold text-brand-green rounded-full font-bold text-xs uppercase tracking-widest hover:bg-white transition-all shadow-md flex items-center gap-2"
-            >
-              <Upload size={14} /> Add Media
-            </button>
-          </div>
         </div>
       </div>
 
@@ -231,7 +141,7 @@ const Gallery: React.FC<GalleryProps> = ({ setView, onNavigateToBooking }) => {
                 : 'bg-white text-gray-700 hover:bg-brand-cream border border-gray-200'
             }`}
           >
-            <Grid size={15} /> All Media ({items.length})
+            <Grid size={15} /> All Media ({GALLERY_ITEMS.length})
           </button>
 
           <button
@@ -242,7 +152,7 @@ const Gallery: React.FC<GalleryProps> = ({ setView, onNavigateToBooking }) => {
                 : 'bg-white text-gray-700 hover:bg-brand-cream border border-gray-200'
             }`}
           >
-            <ImageIcon size={15} /> Photos ({items.filter(i => i.type === 'photo').length})
+            <ImageIcon size={15} /> Photos ({GALLERY_ITEMS.filter(i => i.type === 'photo').length})
           </button>
 
           <button
@@ -253,7 +163,7 @@ const Gallery: React.FC<GalleryProps> = ({ setView, onNavigateToBooking }) => {
                 : 'bg-white text-gray-700 hover:bg-brand-cream border border-gray-200'
             }`}
           >
-            <Film size={15} /> Videos ({items.filter(i => i.type === 'video').length})
+            <Film size={15} /> Videos ({GALLERY_ITEMS.filter(i => i.type === 'video').length})
           </button>
         </div>
 
@@ -400,131 +310,6 @@ const Gallery: React.FC<GalleryProps> = ({ setView, onNavigateToBooking }) => {
             </div>
           </div>
 
-        </div>
-      )}
-
-      {/* Upload Media Modal */}
-      {isUploadOpen && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 md:p-8 shadow-2xl border border-gray-100 relative">
-            <button
-              onClick={() => setIsUploadOpen(false)}
-              className="absolute top-5 right-5 text-gray-400 hover:text-gray-700 p-2 rounded-full hover:bg-gray-100 transition-colors"
-            >
-              <X size={20} />
-            </button>
-
-            <div className="mb-6">
-              <span className="text-brand-gold text-[10px] font-bold uppercase tracking-[0.4em] block mb-1">
-                Add To Gallery
-              </span>
-              <h2 className="text-2xl font-serif font-bold text-brand-green">Add Photos or Videos</h2>
-              <p className="text-gray-500 text-xs mt-1">
-                Upload a video file or enter an Imgur video link / MP4 URL.
-              </p>
-            </div>
-
-            {uploadSuccess ? (
-              <div className="py-12 text-center space-y-3">
-                <CheckCircle2 size={48} className="mx-auto text-green-600 animate-bounce" />
-                <h3 className="text-xl font-bold text-brand-green">Media Added Successfully!</h3>
-                <p className="text-xs text-gray-500">Your content is now live in the gallery.</p>
-              </div>
-            ) : (
-              <form onSubmit={handleUploadSubmit} className="space-y-4">
-                
-                {/* Type Selection */}
-                <div className="grid grid-cols-2 gap-3 p-1 bg-gray-100 rounded-2xl">
-                  <button
-                    type="button"
-                    onClick={() => setUploadType('video')}
-                    className={`py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all ${
-                      uploadType === 'video'
-                        ? 'bg-brand-green text-brand-gold shadow'
-                        : 'text-gray-600 hover:text-gray-900'
-                    }`}
-                  >
-                    <Film size={14} /> Video
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setUploadType('photo')}
-                    className={`py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all ${
-                      uploadType === 'photo'
-                        ? 'bg-brand-green text-brand-gold shadow'
-                        : 'text-gray-600 hover:text-gray-900'
-                    }`}
-                  >
-                    <ImageIcon size={14} /> Photo
-                  </button>
-                </div>
-
-                {/* File Upload Dropzone */}
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
-                    Upload File from Device
-                  </label>
-                  <div className="border-2 border-dashed border-gray-300 hover:border-brand-green rounded-2xl p-4 text-center cursor-pointer transition-colors bg-brand-cream/30 relative">
-                    <input
-                      type="file"
-                      accept={uploadType === 'video' ? 'video/*' : 'image/*'}
-                      onChange={handleFileChange}
-                      className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
-                    />
-                    {filePreview ? (
-                      <div className="relative aspect-video max-h-36 mx-auto rounded-xl overflow-hidden bg-black flex items-center justify-center">
-                        {uploadType === 'video' ? (
-                          <video src={filePreview} controls className="max-h-36 w-full object-contain" />
-                        ) : (
-                          <img src={filePreview} alt="Preview" className="w-full h-full object-cover" />
-                        )}
-                      </div>
-                    ) : (
-                      <div className="py-3 text-gray-500 flex flex-col items-center">
-                        <Upload size={28} className="text-brand-gold mb-1" />
-                        <span className="text-xs font-bold text-brand-green">Select {uploadType === 'video' ? 'Video' : 'Photo'} File</span>
-                        <span className="text-[10px] text-gray-400 mt-0.5">Supports MP4, MOV, WEBM, JPG, PNG</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* OR URL Input */}
-                <div>
-                  <div className="relative flex py-1 items-center">
-                    <div className="flex-grow border-t border-gray-200"></div>
-                    <span className="flex-shrink mx-3 text-gray-400 text-[10px] font-bold uppercase tracking-widest">OR Enter Link</span>
-                    <div className="flex-grow border-t border-gray-200"></div>
-                  </div>
-                  <input
-                    type="url"
-                    value={uploadUrl}
-                    onChange={e => setUploadUrl(e.target.value)}
-                    placeholder={uploadType === 'video' ? "e.g. https://imgur.com/gallery/hike-1aALh4l#zP0E5jy or .mp4" : "https://i.imgur.com/..."}
-                    className="w-full px-3.5 py-2.5 bg-gray-50 rounded-xl text-xs border border-gray-200 focus:outline-none focus:border-brand-green text-gray-800"
-                  />
-                  <p className="text-[10px] text-gray-400 mt-1">Direct video links, Imgur gallery URLs, or MP4 files work automatically.</p>
-                </div>
-
-                <div className="pt-2 flex gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setIsUploadOpen(false)}
-                    className="w-1/3 py-3 bg-gray-100 text-gray-600 rounded-xl text-xs font-bold uppercase tracking-wider hover:bg-gray-200 transition-colors"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={isUploading || (!filePreview && !uploadUrl.trim())}
-                    className="w-2/3 py-3 bg-brand-green text-brand-gold rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-brand-gold hover:text-brand-green transition-all shadow-md disabled:opacity-50"
-                  >
-                    {isUploading ? 'Adding...' : 'Publish to Gallery'}
-                  </button>
-                </div>
-              </form>
-            )}
-          </div>
         </div>
       )}
 

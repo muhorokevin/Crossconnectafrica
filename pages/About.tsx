@@ -63,7 +63,7 @@ const About: React.FC = () => {
                           "I believe that true leadership isn't learned in a classroom—it's forged in the fire of challenge and the quiet of nature."
                       </p>
                       <p>
-                          As the Lead Facilitator of Cross Connect Africa, Kevin Muhoro has dedicated his life to mentoring youth and coaching corporate teams. His approach combines rigorous outdoor training with deep spiritual mentorship, rooted in the uncompromising landscape of the Kenyan wild.
+                          As the Lead Facilitator of Cross Connect Africa, Kevin Muhoro has dedicated his life to facilitating team building, conducting certified first aid and fire safety training, offering event medical standby, leading school adventure clubs, guiding expeditions across Kenya, and hosting corporate events with distinction.
                       </p>
                     </div>
 

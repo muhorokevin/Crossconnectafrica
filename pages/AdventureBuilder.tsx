@@ -5,7 +5,7 @@ import { generateAdventureItinerary } from '../services/geminiService';
 import { 
   Loader2, CheckCircle2, Users, Mountain, Compass, ArrowRight, Flame, School, 
   Zap, Briefcase, ChevronRight, ShieldCheck, Heart, ShieldX, Backpack, 
-  Mic2, Edit3, Save, User, Mail, Building2, RotateCcw, Target, Award, Users2, Star, ShieldPlus
+  Mic2, Edit3, Save, User, Mail, Building2, RotateCcw, Target, Award, Users2, Star, ShieldPlus, ShieldAlert
 } from 'lucide-react';
 import { BookingContextData } from '../App';
 
@@ -57,13 +57,11 @@ export const CATEGORIES: Category[] = [
         description: 'Elite engagement. Professional behavioral debrief included.',
         outcomes: 'Strategy Alignment, Trust, High Performance.',
         image: 'https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=1000',
-        basePrice: 3500,
-        priceType: 'tier_based',
+        basePrice: 2000,
+        priceType: 'per_person',
         durations: [
-          { label: 'Full Day (< 40 pax)', price: 3500, days: 1, thresholdMin: 0, thresholdMax: 39 },
-          { label: 'Half Day (< 40 pax)', price: 2200, days: 0.5, thresholdMin: 0, thresholdMax: 39 },
-          { label: 'Full Day Group (40–100 pax)', price: 120000, days: 1, isGroup: true, thresholdMin: 40, thresholdMax: 100 },
-          { label: 'Half Day Group (40–100 pax)', price: 75000, days: 0.5, isGroup: true, thresholdMin: 40, thresholdMax: 100 }
+          { label: 'Full Day (2,000 KES pp)', price: 2000, days: 1 },
+          { label: 'Half Day (1,000 KES pp)', price: 1000, days: 0.5 }
         ],
         inclusions: ['Facilitation', 'Strategic debrief', 'Prop logistics'],
         participantsBring: ['Active wear', 'Notebook'],
@@ -79,13 +77,11 @@ export const CATEGORIES: Category[] = [
         description: 'Relationship focused. Breaking walls through shared experience.',
         outcomes: 'Cohesion, Fellowship, Shared Values.',
         image: 'https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?q=80&w=1000',
-        basePrice: 2500,
-        priceType: 'tier_based',
+        basePrice: 1000,
+        priceType: 'per_person',
         durations: [
-          { label: 'Full Day (< 40 pax)', price: 2500, days: 1, thresholdMin: 0, thresholdMax: 39 },
-          { label: 'Half Day (< 40 pax)', price: 1500, days: 0.5, thresholdMin: 0, thresholdMax: 39 },
-          { label: 'Full Day Group (40–100 pax)', price: 90000, days: 1, isGroup: true, thresholdMin: 40, thresholdMax: 100 },
-          { label: 'Half Day Group (40–100 pax)', price: 55000, days: 0.5, isGroup: true, thresholdMin: 40, thresholdMax: 100 }
+          { label: 'Full Day (1,000 KES pp)', price: 1000, days: 1 },
+          { label: 'Half Day (800 KES pp)', price: 800, days: 0.5 }
         ],
         inclusions: ['Facilitation', 'Game gear'],
         participantsBring: ['Casual wear'],
@@ -101,13 +97,11 @@ export const CATEGORIES: Category[] = [
         description: 'Character-focused modules for young leaders.',
         outcomes: 'Resilience, Peer Leadership, Character Forge.',
         image: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=1000',
-        basePrice: 1800,
-        priceType: 'tier_based',
+        basePrice: 500,
+        priceType: 'per_person',
         durations: [
-          { label: 'Full Day (< 40 pax)', price: 1800, days: 1, thresholdMin: 0, thresholdMax: 39 },
-          { label: 'Half Day (< 40 pax)', price: 1200, days: 0.5, thresholdMin: 0, thresholdMax: 39 },
-          { label: 'Full Day Group (40–100 pax)', price: 65000, days: 1, isGroup: true, thresholdMin: 40, thresholdMax: 100 },
-          { label: 'Half Day Group (40–100 pax)', price: 40000, days: 0.5, isGroup: true, thresholdMin: 40, thresholdMax: 100 }
+          { label: 'Full Day (500 KES pp)', price: 500, days: 1 },
+          { label: 'Half Day (300 KES pp)', price: 300, days: 0.5 }
         ],
         inclusions: ['Mentorship', 'Group activities'],
         participantsBring: ['Sporty shoes'],
@@ -130,39 +124,57 @@ export const CATEGORIES: Category[] = [
         description: 'Comprehensive medical training for safety compliance.',
         outcomes: 'Certification, Confidence, Lifesaving Readiness.',
         image: 'https://i.imgur.com/77asrRI.jpg',
-        basePrice: 2800,
-        priceType: 'tier_based',
+        basePrice: 3000,
+        priceType: 'per_person',
         durations: [
-          { label: 'Full Day (< 30 pax)', price: 2800, days: 1, thresholdMin: 0, thresholdMax: 29 },
-          { label: 'Half Day (< 30 pax)', price: 1800, days: 0.5, thresholdMin: 0, thresholdMax: 29 },
-          { label: 'Full Day Group (30–60 pax)', price: 75000, days: 1, isGroup: true, thresholdMin: 30, thresholdMax: 60 },
-          { label: 'Half Day Group (30–60 pax)', price: 45000, days: 0.5, isGroup: true, thresholdMin: 30, thresholdMax: 60 }
+          { label: 'Standard (3,000 KES pp)', price: 3000, days: 1 },
+          { label: 'Group Discount 16–30 pax (2,700 KES pp)', price: 2700, days: 1 },
+          { label: 'Corporate Discount 31–50 pax (2,400 KES pp)', price: 2400, days: 1 },
+          { label: 'Large Group 51+ pax (2,100 KES pp)', price: 2100, days: 1 }
         ],
         inclusions: ['Certified training', 'Assessment'],
         participantsBring: ['Comfortable clothing'],
         ccaProvides: ['Manikins', 'Training materials']
       },
       {
-        id: 'fire_safety',
+        id: 'fire_safety_training',
         category: 'safety_training',
-        title: 'Fire Safety & Evacuation',
+        title: 'Fire Safety Training',
         icon: <Flame size={16} />,
-        quoteTitle: 'Fire Safety Certification',
-        audience: 'Factories, Property Managers, Schools',
-        description: 'Live practice and compliance drills for high-safety zones.',
-        outcomes: 'Compliance, Risk Mitigation, Response Readiness.',
+        quoteTitle: 'Fire Safety Training Certification',
+        audience: 'Factories, Property Managers, Schools, Corporates',
+        description: 'Comprehensive fire safety compliance and handling techniques.',
+        outcomes: 'Compliance, Risk Mitigation, Fire Readiness.',
         image: 'https://i.imgur.com/frE2TUN.jpg',
-        basePrice: 3200,
-        priceType: 'tier_based',
+        basePrice: 3000,
+        priceType: 'per_person',
         durations: [
-          { label: 'Full Day (< 30 pax)', price: 3200, days: 1, thresholdMin: 0, thresholdMax: 29 },
-          { label: 'Half Day (< 30 pax)', price: 2000, days: 0.5, thresholdMin: 0, thresholdMax: 29 },
-          { label: 'Full Day Group (30–60 pax)', price: 85000, days: 1, isGroup: true, thresholdMin: 30, thresholdMax: 60 },
-          { label: 'Half Day Group (30–60 pax)', price: 50000, days: 0.5, isGroup: true, thresholdMin: 30, thresholdMax: 60 }
+          { label: 'Standard Training (3,000 KES pp)', price: 3000, days: 1 },
+          { label: 'Group Discount 30+ pax (2,500 KES pp)', price: 2500, days: 1 }
         ],
-        inclusions: ['Practical drills', 'Report generation'],
+        inclusions: ['Practical fire handling', 'Report generation'],
         participantsBring: ['Outdoor wear'],
-        ccaProvides: ['Extinguishers', 'Evacuation plan templates']
+        ccaProvides: ['Extinguishers', 'Training manual']
+      },
+      {
+        id: 'fire_drill',
+        category: 'safety_training',
+        title: 'Fire & Evacuation Drill',
+        icon: <ShieldAlert size={16} />,
+        quoteTitle: 'Evacuation Drill Simulation',
+        audience: 'Commercial Buildings, Industrial Sites, Schools',
+        description: 'Live evacuation drills and emergency response simulation.',
+        outcomes: 'Rapid Evacuation, Panic Reduction, Safety Audit.',
+        image: 'https://i.imgur.com/frE2TUN.jpg',
+        basePrice: 50000,
+        priceType: 'flat_rate',
+        durations: [
+          { label: 'Half Day Drill (50,000 KES)', price: 50000, days: 0.5, isGroup: true },
+          { label: 'Full Day Drill (85,000 KES)', price: 85000, days: 1, isGroup: true }
+        ],
+        inclusions: ['Evacuation simulation', 'Safety audit report'],
+        participantsBring: ['Active wear'],
+        ccaProvides: ['Smoke generators', 'Safety Marshals', 'Audit report']
       },
       {
         id: 'medic_standby',
@@ -171,16 +183,17 @@ export const CATEGORIES: Category[] = [
         icon: <ShieldPlus size={16} />,
         quoteTitle: 'Event Medical Support',
         audience: 'Weddings, Sports, Rallies, Concerts',
-        description: 'Professional medical coverage with BLS/ALS options.',
+        description: 'Professional medical coverage charged at KES 3,000 per hour.',
         outcomes: 'Peace of Mind, Rapid Response, Liability Reduction.',
         image: 'https://i.imgur.com/dXyQVwQ.jpeg',
-        basePrice: 75000,
+        basePrice: 3000,
         priceType: 'flat_rate',
         durations: [
-          { label: '12–24hrs', price: 75000, days: 1 },
-          { label: '8–12 hrs', price: 50000, days: 0.5 },
-          { label: '6–7hrs', price: 40000, days: 0.3 },
-          { label: '3–5hrs', price: 30000, days: 0.2 }
+          { label: '3 Hours (9,000 KES)', price: 9000, days: 0.125, isGroup: true },
+          { label: '5 Hours (15,000 KES)', price: 15000, days: 0.2, isGroup: true },
+          { label: '8 Hours / Full Day (24,000 KES)', price: 24000, days: 0.33, isGroup: true },
+          { label: '12 Hours (36,000 KES)', price: 36000, days: 0.5, isGroup: true },
+          { label: '24 Hours (72,000 KES)', price: 72000, days: 1, isGroup: true }
         ],
         inclusions: ['Licensed medic', 'Standard trauma kit'],
         participantsBring: ['N/A'],
@@ -205,7 +218,7 @@ export const CATEGORIES: Category[] = [
         image: 'https://images.unsplash.com/photo-1501555088652-021faa106b9b?q=80&w=1000',
         basePrice: 120000,
         priceType: 'flat_rate',
-        durations: [{ label: 'Annual (30-40 students)', price: 120000, days: 365 }],
+        durations: [{ label: 'Annual (30-40 students)', price: 120000, days: 365, isGroup: true }],
         inclusions: ['Coordination', 'Facilitation'],
         participantsBring: ['Water bottle'],
         ccaProvides: ['Guides', 'Logistics']
@@ -222,7 +235,7 @@ export const CATEGORIES: Category[] = [
         image: 'https://images.unsplash.com/photo-1475483768296-6163e08872a1?q=80&w=1000',
         basePrice: 220000,
         priceType: 'flat_rate',
-        durations: [{ label: 'Annual (50-70 students)', price: 220000, days: 365 }],
+        durations: [{ label: 'Annual (50-70 students)', price: 220000, days: 365, isGroup: true }],
         inclusions: ['Monthly missions', 'Camp logistics'],
         participantsBring: ['Camping kit'],
         ccaProvides: ['Professional facilitators', 'Safety officers']
@@ -239,16 +252,21 @@ export const CATEGORIES: Category[] = [
         category: 'expeditions',
         title: 'Easy / Nearby Hikes',
         icon: <Compass size={16} />,
-        quoteTitle: 'Guided Day Hike (Easy)',
-        audience: 'Individuals & Community Groups',
-        description: 'From nearby easy trails to remote alpine peaks.',
+        quoteTitle: 'Guided Day Hike (Easy/Nearby)',
+        audience: 'Individuals, Families & Community Groups',
+        description: 'Accessible day trails in scenic Kenya hiking locations.',
         outcomes: 'Physical Grit, Mental Clarity, Fellowship.',
         image: 'https://images.unsplash.com/photo-1551632811-561732d1e306?q=80&w=1000',
-        basePrice: 2200,
+        basePrice: 2000,
         priceType: 'per_person',
         durations: [
-          { label: 'Easy / Nearby', price: 2200, days: 1 },
-          { label: 'Moderate', price: 3000, days: 1 }
+          { label: 'Ngong Hills Trail (2,000 KES pp)', price: 2000, days: 1 },
+          { label: 'Karura Forest Trail (1,500 KES pp)', price: 1500, days: 1 },
+          { label: 'Mt Longonot Crater (2,500 KES pp)', price: 2500, days: 1 },
+          { label: 'Sleeping Warrior & Ugali Hill (3,000 KES pp)', price: 3000, days: 1 },
+          { label: 'Kijabe Hills & Darkvale (2,800 KES pp)', price: 2800, days: 1 },
+          { label: 'Menengai Crater (2,800 KES pp)', price: 2800, days: 1 },
+          { label: 'Ol Donyo Sabuk (2,500 KES pp)', price: 2500, days: 1 }
         ],
         inclusions: ['Guide fees', 'Safety protocols'],
         participantsBring: ['Hiking boots', 'Water bottle'],
@@ -259,16 +277,20 @@ export const CATEGORIES: Category[] = [
         category: 'expeditions',
         title: 'Remote / Premium Hikes',
         icon: <Star size={16} />,
-        quoteTitle: 'Alpine Expedition',
+        quoteTitle: 'Alpine Expedition (Remote)',
         audience: 'Experienced Hikers, Adventure Seekers',
-        description: 'Multi-day remote peak navigation.',
+        description: 'Challenging peaks and multi-day alpine navigation across Kenya.',
         outcomes: 'High-Altitude Grit, Mastery.',
         image: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=1000',
-        basePrice: 15000,
+        basePrice: 3800,
         priceType: 'per_person',
         durations: [
-          { label: 'Challenging', price: 3500, days: 1 },
-          { label: 'Remote / Premium', price: 15000, days: 3 }
+          { label: 'Elephant Hill - Aberdares (3,800 KES pp)', price: 3800, days: 1 },
+          { label: "Mt Satima & Dragon's Teeth (4,200 KES pp)", price: 4200, days: 1 },
+          { label: 'Ol Olokwe Summit - Samburu 2-Day (12,000 KES pp)', price: 12000, days: 2 },
+          { label: 'Mt Mtelo - Pokot 3-Day (18,000 KES pp)', price: 18000, days: 3 },
+          { label: 'Mt Kenya Sirimon Peak 4-Day (35,000 KES pp)', price: 35000, days: 4 },
+          { label: 'Mt Elgon Speke Peak 3-Day (25,000 KES pp)', price: 25000, days: 3 }
         ],
         inclusions: ['Full board', 'Guides', 'Logistics'],
         participantsBring: ['Sleeping gear', 'Alpine kit'],
@@ -291,12 +313,12 @@ export const CATEGORIES: Category[] = [
         description: 'High-energy hosting with script-writing services.',
         outcomes: 'Flow, Engagement, Impact.',
         image: 'https://images.unsplash.com/photo-1472653431158-6364773b2a56?q=80&w=1000',
-        basePrice: 150000,
+        basePrice: 100000,
         priceType: 'flat_rate',
         durations: [
-          { label: 'Full Day Hosting', price: 150000, days: 1, isGroup: true },
-          { label: '6–8 hours', price: 100000, days: 0.7, isGroup: true },
-          { label: '3–5 hours', price: 80000, days: 0.4, isGroup: true }
+          { label: 'Full Day Corporate Gala / Major Event (100,000 KES)', price: 100000, days: 1, isGroup: true },
+          { label: '6–8 Hours (60,000 KES)', price: 60000, days: 0.7, isGroup: true },
+          { label: '3–5 Hours (35,000 KES)', price: 35000, days: 0.4, isGroup: true }
         ],
         inclusions: ['MC duties', 'Planning session'],
         participantsBring: ['N/A'],

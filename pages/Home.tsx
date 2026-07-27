@@ -33,7 +33,7 @@ const Home: React.FC<HomeProps> = ({ setView }) => {
           </h1>
           
           <p className="text-gray-300 text-base md:text-xl mb-10 md:mb-12 max-w-3xl mx-auto leading-relaxed font-serif italic opacity-90 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-            "Nairobi's elite destination for character mentorship, institutional safety, and high-stakes corporate adventure."
+            "Nairobi's premier partner for corporate team building, certified first aid & fire safety training, event medical standby, youth clubs, guided hikes, and event hosting."
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 md:gap-6 justify-center items-center animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
@@ -80,7 +80,7 @@ const Home: React.FC<HomeProps> = ({ setView }) => {
                 </h2>
                 <div className="w-16 md:w-20 h-1.5 bg-brand-gold/30"></div>
                 <p className="text-xl md:text-2xl text-gray-500 leading-relaxed font-serif italic max-w-3xl">
-                   "We don't teach leadership in boardrooms. We forge it at 12,000 feet. Our missions combine elite facilitation with the uncompromising challenge of the African wild."
+                   "We combine experiential learning, safety certification, event medical standby, character mentorship, and professional event hosting to transform organizations and communities across Kenya."
                 </p>
                 <div className="grid grid-cols-2 gap-8 pt-4">
                    <div className="group">
@@ -101,29 +101,31 @@ const Home: React.FC<HomeProps> = ({ setView }) => {
       <section className="py-20 md:py-24 bg-brand-sand border-y border-brand-green/5">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16 md:mb-24">
-             <span className="text-brand-gold text-xs font-bold uppercase tracking-[0.6em] mb-4 block">Service Ecosystem</span>
-             <h2 className="text-3xl md:text-6xl font-serif font-bold text-brand-green tracking-tighter leading-none italic">Four Pillars of <br/><span className="not-italic text-brand-gold">Transformation.</span></h2>
+             <span className="text-brand-gold text-xs font-bold uppercase tracking-[0.6em] mb-4 block">Comprehensive Ecosystem</span>
+             <h2 className="text-3xl md:text-6xl font-serif font-bold text-brand-green tracking-tighter leading-none italic">Full Range of <br/><span className="not-italic text-brand-gold">Missions & Services.</span></h2>
           </div>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px bg-brand-green/5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-px bg-brand-green/5">
             {[
-              { icon: <Shield size={28} />, title: 'Safety', desc: 'Certified First Aid & Fire Compliance.', img: 'https://i.imgur.com/dXyQVwQ.jpeg' },
-              { icon: <Briefcase size={28} />, title: 'Corporate', desc: 'Strategic Retreats & Executive Labs.', img: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=1000' },
-              { icon: <Compass size={28} />, title: 'Youth', desc: 'Mentorship & Character Camps.', img: 'https://images.unsplash.com/photo-1475483768296-6163e08872a1?q=80&w=1000' },
-              { icon: <Flame size={28} />, title: 'Adventure', desc: 'Alpine Expeditions & Coastal Peaks.', img: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=1000' },
+              { icon: <Briefcase size={28} />, title: 'Team Building', desc: 'Corporate, Chama & Youth Facilitation.', img: 'https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=1000' },
+              { icon: <Shield size={28} />, title: 'Safety Training', desc: 'First Aid & Fire Safety Certification.', img: 'https://i.imgur.com/77asrRI.jpg' },
+              { icon: <Flame size={28} />, title: 'Fire Drills', desc: 'Evacuation Drills & Compliance Audits.', img: 'https://i.imgur.com/frE2TUN.jpg' },
+              { icon: <Zap size={28} />, title: 'Medic Standby', desc: 'Event Medical & Emergency Support.', img: 'https://i.imgur.com/dXyQVwQ.jpeg' },
+              { icon: <Compass size={28} />, title: 'School Clubs', desc: 'Junior Adventurers & Senior Pioneers.', img: 'https://images.unsplash.com/photo-1475483768296-6163e08872a1?q=80&w=1000' },
+              { icon: <Award size={28} />, title: 'MC & Hosting', desc: 'Professional MC & Gala Moderation.', img: 'https://images.unsplash.com/photo-1472653431158-6364773b2a56?q=80&w=1000' },
             ].map((pillar, i) => (
               <div key={i} className="group relative overflow-hidden aspect-[4/6] bg-brand-green">
                  <img src={pillar.img} className="absolute inset-0 w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-110 transition-all duration-[2s] opacity-60 group-hover:opacity-100" alt={pillar.title} />
                  <div className="absolute inset-0 bg-gradient-to-t from-brand-green via-brand-green/20 to-transparent"></div>
-                 <div className="absolute inset-0 flex flex-col justify-end p-8 md:p-10 translate-y-6 md:translate-y-8 group-hover:translate-y-0 transition-transform duration-700">
-                    <div className="text-brand-gold mb-4 md:mb-6 opacity-0 group-hover:opacity-100 transition-opacity delay-100">{pillar.icon}</div>
-                    <h3 className="text-2xl md:text-3xl font-serif font-bold text-white mb-3 md:mb-4 tracking-tighter italic">{pillar.title}</h3>
-                    <p className="text-gray-300 text-sm md:text-base font-serif italic mb-6 md:mb-8 opacity-0 group-hover:opacity-100 transition-opacity delay-200">{pillar.desc}</p>
+                 <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-8 translate-y-6 md:translate-y-8 group-hover:translate-y-0 transition-transform duration-700">
+                    <div className="text-brand-gold mb-3 md:mb-4 opacity-0 group-hover:opacity-100 transition-opacity delay-100">{pillar.icon}</div>
+                    <h3 className="text-xl md:text-2xl font-serif font-bold text-white mb-2 md:mb-3 tracking-tighter italic">{pillar.title}</h3>
+                    <p className="text-gray-300 text-xs md:text-sm font-serif italic mb-4 md:mb-6 opacity-0 group-hover:opacity-100 transition-opacity delay-200">{pillar.desc}</p>
                     <button 
                       onClick={() => setView(ViewState.ADVENTURE_BUILDER)} 
-                      className="text-[8px] md:text-[9px] font-bold uppercase tracking-[0.5em] text-brand-gold flex items-center gap-2 md:gap-3 group/btn w-fit"
+                      className="text-[8px] md:text-[9px] font-bold uppercase tracking-[0.4em] text-brand-gold flex items-center gap-2 group/btn w-fit"
                     >
-                      Architect Mission <ArrowRight size={12} className="group-hover/btn:translate-x-2 transition-transform" />
+                      Explore <ArrowRight size={12} className="group-hover/btn:translate-x-2 transition-transform" />
                     </button>
                  </div>
               </div>

@@ -3,29 +3,29 @@ import {
   MessageCircle, User, Mail, Building2, Map, Truck, Home, Calendar as CalendarIcon, 
   AlertTriangle, Utensils, Zap, ShieldAlert, Award, FileText, Activity, Tent, 
   Camera, Mic2, Star, Heart, ShieldCheck, Flame, Users2, Mountain, School, 
-  Pocket, HardHat, Info, Plus, CheckCircle2, Ruler, ChevronDown, ChevronUp, Printer
+  Pocket, HardHat, Info, Plus, CheckCircle2, Ruler, ChevronDown, ChevronUp, Printer, ChevronRight
 } from 'lucide-react';
-import { CATEGORIES, Program } from './AdventureBuilder';
+import { CATEGORIES, Program, Category } from './AdventureBuilder';
 import { BookingContextData } from '../App';
 import Logo from '../components/Logo';
 import CustomCalendar from '../components/CustomCalendar';
 
 const VENUE_TYPES = {
   none: { id: 'none', label: 'Venue Provided / Not Required', price: 0 },
-  public: { id: 'public', label: 'Public Grounds / Parks', price: 15000 },
-  private: { id: 'private', label: 'Private Training Grounds', price: 30000 },
-  school: { id: 'school', label: 'School Grounds (Weekend)', price: 20000 },
-  resort: { id: 'resort', label: 'Resorts / Hotels (Day Use)', price: 75000 }
+  public: { id: 'public', label: 'Public Grounds / Parks', price: 5000 },
+  private: { id: 'private', label: 'Private Training Grounds', price: 15000 },
+  school: { id: 'school', label: 'School Grounds (Weekend)', price: 10000 },
+  resort: { id: 'resort', label: 'Resorts / Hotels (Day Use)', price: 35000 }
 };
 
 const FLEET_SOLUTIONS = {
   none: { id: 'none', label: 'Self Drive', price: 0, capacity: 0 },
-  prado: { id: 'prado', label: 'Land Rover / Prado (4x4)', price: 15000, capacity: 6 },
-  van: { id: 'van', label: 'Tour Van', price: 20000, capacity: 14 },
-  minibus: { id: 'minibus', label: 'Mini Bus (18-25 pax)', price: 30000, capacity: 25 },
-  coaster: { id: 'coaster', label: 'Coaster (28-33 pax)', price: 40000, capacity: 33 },
-  bus45: { id: 'bus45', label: 'Bus (37-45 pax)', price: 55000, capacity: 45 },
-  bus55: { id: 'bus55', label: 'Bus (50-55 pax)', price: 80000, capacity: 55 }
+  prado: { id: 'prado', label: 'Land Rover / Prado (4x4)', price: 10000, capacity: 6 },
+  van: { id: 'van', label: 'Tour Van', price: 12000, capacity: 14 },
+  minibus: { id: 'minibus', label: 'Mini Bus (18-25 pax)', price: 18000, capacity: 25 },
+  coaster: { id: 'coaster', label: 'Coaster (28-33 pax)', price: 25000, capacity: 33 },
+  bus45: { id: 'bus45', label: 'Bus (37-45 pax)', price: 35000, capacity: 45 },
+  bus55: { id: 'bus55', label: 'Bus (50-55 pax)', price: 45000, capacity: 55 }
 };
 
 const EVENT_TYPE_RISK = {
@@ -39,44 +39,55 @@ const EVENT_TYPE_RISK = {
 };
 
 const STRATEGIC_ADDONS = [
-  { id: 'fa_cert_branded', label: 'Branded Certificates', price: 350, type: 'pp', category: 'safety_training' },
-  { id: 'fa_manuals', label: 'Training Manuals', price: 750, type: 'pp', category: 'safety_training' },
-  { id: 'fa_manikins', label: 'CPR Manikins & AED Sim', price: 15000, type: 'flat', category: 'safety_training' },
-  { id: 'fa_amb_standby', label: 'Ambulance Standby (Day)', price: 30000, type: 'flat', category: 'safety_training' },
-  { id: 'fa_refresher', label: 'Refresher (6 Months)', price: 20000, type: 'flat', category: 'safety_training' },
-  { id: 'fs_live_practice', label: 'Extinguisher Live Practice', price: 15000, type: 'flat', category: 'safety_training' },
-  { id: 'fs_truck_demo', label: 'Fire Truck (Demo & Water)', price: 85000, type: 'flat', category: 'safety_training' },
-  { id: 'fs_evac_drill', label: 'Evacuation Drill Simulation', price: 25000, type: 'flat', category: 'safety_training' },
-  { id: 'fs_compliance', label: 'Fire Compliance Report', price: 15000, type: 'flat', category: 'safety_training' },
-  { id: 'med_extra', label: 'Additional Medic', price: 10000, type: 'flat', category: 'safety_training' },
-  { id: 'med_tent', label: 'Medical Treatment Area', price: 12000, type: 'flat', category: 'safety_training' },
-  { id: 'med_trauma_up', label: 'Oxygen & Trauma Kit Up', price: 6000, type: 'flat', category: 'safety_training' },
-  { id: 'med_amb_bls', label: 'Ambulance (BLS)', price: 35000, type: 'flat', category: 'safety_training' },
-  { id: 'med_amb_als', label: 'Ambulance (ALS Upgrade)', price: 90000, type: 'flat', category: 'safety_training' },
-  { id: 'tb_extra_facil', label: 'Extra Professional Facil', price: 25000, type: 'flat', category: 'team_building' },
-  { id: 'tb_props', label: 'Team Props & Games Kit', price: 15000, type: 'flat', category: 'team_building' },
-  { id: 'tb_sound', label: 'Sound System & Mics', price: 20000, type: 'flat', category: 'team_building' },
-  { id: 'tb_tshirts', label: 'Branded T-Shirts', price: 1200, type: 'pp', category: 'team_building' },
-  { id: 'tb_photo_video', label: 'Photography & Video', price: 35000, type: 'flat', category: 'team_building' },
-  { id: 'tb_mc_energizer', label: 'MC & Energizer Host', price: 30000, type: 'flat', category: 'team_building' },
-  { id: 'ac_extra_student', label: 'Extra Student Surcharge', price: 3500, type: 'pp', category: 'school_clubs' },
-  { id: 'ac_gear_rental', label: 'Camping Gear Rental', price: 2000, type: 'pp', category: 'school_clubs' },
-  { id: 'ac_medic_amb', label: 'Medic & Amb per Activity', price: 35000, type: 'flat', category: 'school_clubs' },
-  { id: 'ac_badges', label: 'Badges & Certificates', price: 500, type: 'pp', category: 'school_clubs' },
-  { id: 'mc_extra_hr', label: 'Extra Hour Surcharge', price: 10000, type: 'flat', category: 'hosting' },
-  { id: 'mc_script', label: 'Script Writing & Planning', price: 15000, type: 'flat', category: 'hosting' },
-  { id: 'mc_engagement', label: 'Crowd Engagement Kit', price: 12000, type: 'flat', category: 'hosting' },
-  { id: 'mc_tb_combo', label: 'Team Building MC Combo', price: 40000, type: 'flat', category: 'hosting' },
-  { id: 'hi_snacks', label: 'Snacks & Hydration', price: 1000, type: 'pp', category: 'expeditions' },
-  { id: 'hi_merch', label: 'Branded Hike Merch', price: 1800, type: 'pp', category: 'expeditions' },
-  { id: 'hi_photo', label: 'Pro Photographer', price: 20000, type: 'flat', category: 'expeditions' },
-  { id: 'log_long_dist', label: 'Equipment Trailer', price: 10000, type: 'flat', category: 'all' },
-  { id: 'log_driver_allowance', label: 'Overnight Driver Allow', price: 3000, type: 'flat', category: 'all' }
+  { id: 'fa_cert_branded', label: 'Branded Certificates', price: 200, type: 'pp', category: 'safety_training' },
+  { id: 'fa_manuals', label: 'Training Manuals', price: 400, type: 'pp', category: 'safety_training' },
+  { id: 'fa_manikins', label: 'CPR Manikins & AED Sim', price: 8000, type: 'flat', category: 'safety_training' },
+  { id: 'fa_amb_standby', label: 'Ambulance Standby (Day)', price: 18000, type: 'flat', category: 'safety_training' },
+  { id: 'fa_refresher', label: 'Refresher (6 Months)', price: 10000, type: 'flat', category: 'safety_training' },
+  { id: 'fs_live_practice', label: 'Extinguisher Live Practice', price: 8000, type: 'flat', category: 'safety_training' },
+  { id: 'fs_truck_demo', label: 'Fire Truck (Demo & Water)', price: 45000, type: 'flat', category: 'safety_training' },
+  { id: 'fs_evac_drill', label: 'Evacuation Drill Simulation', price: 15000, type: 'flat', category: 'safety_training' },
+  { id: 'fs_compliance', label: 'Fire Compliance Report', price: 8000, type: 'flat', category: 'safety_training' },
+  { id: 'med_extra', label: 'Additional Medic', price: 5000, type: 'flat', category: 'safety_training' },
+  { id: 'med_tent', label: 'Medical Treatment Area', price: 6000, type: 'flat', category: 'safety_training' },
+  { id: 'med_trauma_up', label: 'Oxygen & Trauma Kit Up', price: 3000, type: 'flat', category: 'safety_training' },
+  { id: 'med_amb_bls', label: 'Ambulance (BLS)', price: 20000, type: 'flat', category: 'safety_training' },
+  { id: 'med_amb_als', label: 'Ambulance (ALS Upgrade)', price: 45000, type: 'flat', category: 'safety_training' },
+  { id: 'tb_extra_facil', label: 'Extra Professional Facil', price: 12000, type: 'flat', category: 'team_building' },
+  { id: 'tb_props', label: 'Team Props & Games Kit', price: 8000, type: 'flat', category: 'team_building' },
+  { id: 'tb_sound', label: 'Sound System & Mics', price: 10000, type: 'flat', category: 'team_building' },
+  { id: 'tb_tshirts', label: 'Branded T-Shirts', price: 700, type: 'pp', category: 'team_building' },
+  { id: 'tb_photo_video', label: 'Photography & Video', price: 18000, type: 'flat', category: 'team_building' },
+  { id: 'tb_mc_energizer', label: 'MC & Energizer Host', price: 15000, type: 'flat', category: 'team_building' },
+  { id: 'ac_extra_student', label: 'Extra Student Surcharge', price: 1500, type: 'pp', category: 'school_clubs' },
+  { id: 'ac_gear_rental', label: 'Camping Gear Rental', price: 1000, type: 'pp', category: 'school_clubs' },
+  { id: 'ac_medic_amb', label: 'Medic & Amb per Activity', price: 20000, type: 'flat', category: 'school_clubs' },
+  { id: 'ac_badges', label: 'Badges & Certificates', price: 250, type: 'pp', category: 'school_clubs' },
+  { id: 'mc_extra_hr', label: 'Extra Hour Surcharge', price: 5000, type: 'flat', category: 'hosting' },
+  { id: 'mc_script', label: 'Script Writing & Planning', price: 8000, type: 'flat', category: 'hosting' },
+  { id: 'mc_engagement', label: 'Crowd Engagement Kit', price: 6000, type: 'flat', category: 'hosting' },
+  { id: 'mc_tb_combo', label: 'Team Building MC Combo', price: 20000, type: 'flat', category: 'hosting' },
+  { id: 'hi_snacks', label: 'Snacks & Hydration', price: 500, type: 'pp', category: 'expeditions' },
+  { id: 'hi_merch', label: 'Branded Hike Merch', price: 1000, type: 'pp', category: 'expeditions' },
+  { id: 'hi_photo', label: 'Pro Photographer', price: 10000, type: 'flat', category: 'expeditions' },
+  { id: 'log_long_dist', label: 'Equipment Trailer', price: 5000, type: 'flat', category: 'all' },
+  { id: 'log_driver_allowance', label: 'Overnight Driver Allow', price: 2000, type: 'flat', category: 'all' }
 ];
 
 const Calculator: React.FC<{ initialData?: BookingContextData | null }> = ({ initialData }) => {
   const [clientInfo, setClientInfo] = useState({ company: '', contact: '', email: '' });
-  const [selectedProgram, setSelectedProgram] = useState<Program | null>(initialData?.program || null); 
+
+  const [activeCategory, setActiveCategory] = useState<Category>(() => {
+    if (initialData?.program) {
+      const foundCat = CATEGORIES.find(c => c.programs.some(p => p.id === initialData.program?.id));
+      if (foundCat) return foundCat;
+    }
+    return CATEGORIES[0];
+  });
+
+  const [selectedProgram, setSelectedProgram] = useState<Program | null>(
+    initialData?.program || CATEGORIES[0].programs[0]
+  ); 
   const [durationIdx, setDurationIdx] = useState(initialData?.durationIndex || 0);
   const [pax, setPax] = useState(initialData?.pax || 0);
   const [missionDate, setMissionDate] = useState(new Date().toISOString().split('T')[0]);
@@ -101,14 +112,14 @@ const Calculator: React.FC<{ initialData?: BookingContextData | null }> = ({ ini
     }
 
     const variant = selectedProgram.durations ? selectedProgram.durations[durationIdx] : { price: selectedProgram.basePrice, days: 1, isGroup: false };
-    const days = Math.ceil(variant.days || 1);
+    const days = Math.ceil(variant?.days || 1);
     
     // 1. Mission Core
     let missionBase = 0;
-    if (variant.isGroup || selectedProgram.priceType === 'flat_rate') {
-        missionBase = variant.price;
+    if (variant?.isGroup || selectedProgram.priceType === 'flat_rate') {
+        missionBase = variant?.price || selectedProgram.basePrice;
     } else {
-        missionBase = variant.price * pax;
+        missionBase = (variant?.price || selectedProgram.basePrice) * pax;
         
         // Apply Hiking Group Discounts
         if (selectedProgram.category === 'expeditions') {
@@ -133,10 +144,10 @@ const Calculator: React.FC<{ initialData?: BookingContextData | null }> = ({ ini
     }
     const mealsPrice = selectedMeals.reduce((sum, id) => {
         const m = [
-          { id: 'breakfast', price: 800 },
-          { id: 'lunch', price: 1500 },
-          { id: 'dinner', price: 2200 },
-          { id: 'tea', price: 500 }
+          { id: 'breakfast', price: 400 },
+          { id: 'lunch', price: 800 },
+          { id: 'dinner', price: 1200 },
+          { id: 'tea', price: 250 }
         ].find(x => x.id === id);
         return sum + (m?.price || 0) * (pax > 0 ? pax : 1) * days;
     }, 0);
@@ -335,248 +346,376 @@ Contact: ${clientInfo.contact || 'Not Specified'}`;
       </div>
 
       {/* 2. MAIN WEB UI */}
-      <div className="max-w-[1800px] mx-auto grid lg:grid-cols-12 gap-8 md:gap-12 items-stretch print:hidden">
+      <div className="max-w-screen-2xl mx-auto print:hidden">
         
-        {/* INPUTS COLUMN */}
-        <div className="lg:col-span-8 space-y-8 md:space-y-10">
-          <div className="bg-white p-6 md:p-10 shadow-2xl border border-brand-green/5 space-y-12 md:space-y-16">
-            
-            {/* 01: IDENTITY */}
-            <section className="space-y-8">
-               <div className="flex items-center gap-4 border-b border-gray-100 pb-4">
-                  <div className="w-10 h-10 bg-brand-green text-brand-gold flex items-center justify-center font-bold font-serif">01</div>
-                  <h3 className="text-xl font-serif font-bold text-brand-green uppercase tracking-tight">Mission Identity</h3>
-               </div>
-               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div className="space-y-2">
-                     <label className="text-[10px] font-bold text-brand-gold uppercase tracking-[0.4em]">Organization</label>
-                     <input type="text" value={clientInfo.company} onChange={(e) => setClientInfo({...clientInfo, company: e.target.value})} placeholder="Group Name" className="w-full p-4 bg-gray-50 border-none text-sm font-bold outline-none" />
-                  </div>
-                  <div className="space-y-2">
-                     <label className="text-[10px] font-bold text-brand-gold uppercase tracking-[0.4em]">Lead Contact</label>
-                     <input type="text" value={clientInfo.contact} onChange={(e) => setClientInfo({...clientInfo, contact: e.target.value})} placeholder="Full Name" className="w-full p-4 bg-gray-50 border-none text-sm font-bold outline-none" />
-                  </div>
-                  <div className="space-y-2">
-                     <label className="text-[10px] font-bold text-brand-gold uppercase tracking-[0.4em]">Email</label>
-                     <input type="email" value={clientInfo.email} onChange={(e) => setClientInfo({...clientInfo, email: e.target.value})} placeholder="missions@crossconnect.africa" className="w-full p-4 bg-gray-50 border-none text-sm font-bold outline-none" />
-                  </div>
-               </div>
-            </section>
+        {/* BUILDER-STYLE HERO HEADER */}
+        <header className="mb-12 text-center animate-fade-in-up">
+           <span className="text-brand-gold text-[9px] font-bold uppercase tracking-[0.8em] mb-3 block">Mission Strategy & Pricing</span>
+           <h1 className="text-3xl md:text-5xl font-serif text-brand-green font-bold tracking-tighter leading-tight mb-4 italic">
+             Architect Your <br/><span className="not-italic text-brand-gold">Custom Quote.</span>
+           </h1>
+           <p className="text-gray-500 max-w-xl mx-auto font-serif italic text-sm opacity-80">
+             "Select your service pillar, fine-tune field logistics, and customize strategic enhancements to generate an instant live proposal."
+           </p>
+        </header>
 
-            {/* 02: CORE PILLAR */}
-            <section className="space-y-10">
-               <div className="flex items-center gap-4 border-b border-gray-100 pb-4">
-                  <div className="w-10 h-10 bg-brand-green text-brand-gold flex items-center justify-center font-bold font-serif">02</div>
-                  <h3 className="text-xl font-serif font-bold text-brand-green uppercase tracking-tight">Pillar Selection</h3>
-               </div>
-               <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                  <div className="space-y-6">
-                     <div className="space-y-3">
-                        <label className="text-[10px] font-bold text-brand-gold uppercase tracking-[0.4em]">Service Selection</label>
-                        <select 
-                           value={selectedProgram?.id || ''} 
-                           onChange={(e) => {
-                              const prog = CATEGORIES.flatMap(c => c.programs).find(p => p.id === e.target.value);
-                              if (prog) { setSelectedProgram(prog); setDurationIdx(0); }
-                           }}
-                           className="w-full p-5 bg-gray-50 border-none text-[11px] font-bold uppercase tracking-widest text-brand-green outline-none"
-                        >
-                           <option value="">Choose your Mission...</option>
-                           {CATEGORIES.map(cat => (
-                              <optgroup key={cat.id} label={cat.title}>
-                                 {cat.programs.map(p => <option key={p.id} value={p.id}>{p.title}</option>)}
-                              </optgroup>
-                           ))}
-                        </select>
-                     </div>
-                     <div className="space-y-3">
-                        <label className="text-[10px] font-bold text-brand-gold uppercase tracking-[0.4em]">Tier Configuration</label>
-                        <select value={durationIdx} onChange={(e) => setDurationIdx(parseInt(e.target.value))} className="w-full p-5 bg-gray-50 border-none text-[11px] font-bold uppercase text-brand-green outline-none">
-                           {selectedProgram?.durations?.map((d, i) => {
-                              const isFlat = selectedProgram.priceType === 'flat_rate' || d.isGroup;
-                              return <option key={i} value={i}>{d.label} — {formatKES(d.price)} {isFlat ? '' : 'pp'}</option>
-                           }) || <option>Selection Required</option>}
-                        </select>
-                     </div>
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                     <div className="space-y-3">
-                        <label className="text-[10px] font-bold text-brand-gold uppercase tracking-[0.4em]">Deployment Date</label>
-                        <CustomCalendar value={missionDate} onChange={setMissionDate} />
-                     </div>
-                     <div className="space-y-3">
-                        <label className="text-[10px] font-bold text-brand-gold uppercase tracking-[0.4em]">Participants (Pax)</label>
-                        <input type="number" value={pax} onChange={(e) => setPax(Math.max(0, parseInt(e.target.value) || 0))} className="w-full p-3.5 bg-gray-50 border-none font-serif font-bold text-2xl text-brand-green outline-none" />
-                     </div>
-                  </div>
-               </div>
-            </section>
-
-            {/* 03: LOGISTICS */}
-            <section className="space-y-10">
-               <div className="flex items-center gap-4 border-b border-gray-100 pb-4">
-                  <div className="w-10 h-10 bg-brand-green text-brand-gold flex items-center justify-center font-bold font-serif">03</div>
-                  <h3 className="text-xl font-serif font-bold text-brand-green uppercase tracking-tight">Field Logistics</h3>
-               </div>
-               
-               <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-                  <div className="space-y-6">
-                     <label className="text-[10px] font-bold text-brand-gold uppercase tracking-[0.4em] flex items-center gap-2"><Map size={14}/> Venue Coordination</label>
-                     <select value={venueType} onChange={(e) => setVenueType(e.target.value as any)} className="w-full p-4 bg-gray-50 border-none text-xs font-bold uppercase text-brand-green outline-none">
-                        {Object.values(VENUE_TYPES).map(v => <option key={v.id} value={v.id}>{v.label} ({v.price > 0 ? formatKES(v.price) : 'Provided'})</option>)}
-                     </select>
-
-                     <label className="text-[10px] font-bold text-brand-gold uppercase tracking-[0.4em] flex items-center gap-2 pt-4"><Truck size={14}/> Mission Fleet</label>
-                     <select value={fleetType} onChange={(e) => setFleetType(e.target.value as any)} className="w-full p-4 bg-gray-50 border-none text-xs font-bold uppercase text-brand-green outline-none">
-                        {Object.values(FLEET_SOLUTIONS).map(f => <option key={f.id} value={f.id}>{f.label} ({f.capacity > 0 ? f.capacity + ' pax — ' + formatKES(f.price) : 'Self Drive'})</option>)}
-                     </select>
-                  </div>
-
-                  <div className="space-y-6">
-                     <label className="text-[10px] font-bold text-brand-gold uppercase tracking-[0.4em] flex items-center gap-2 md:pt-4"><Utensils size={14}/> Field Catering</label>
-                     <div className="grid grid-cols-2 gap-3">
-                        {[
-                          { id: 'breakfast', label: 'Breakfast', price: 800 },
-                          { id: 'lunch', label: 'Lunch', price: 1500 },
-                          { id: 'dinner', label: 'Dinner', price: 2200 },
-                          { id: 'tea', label: 'Tea & Snacks', price: 500 }
-                        ].map(m => (
-                           <button key={m.id} onClick={() => setSelectedMeals(prev => prev.includes(m.id) ? prev.filter(x => x !== m.id) : [...prev, m.id])} className={`p-4 md:p-5 border text-center transition-all ${selectedMeals.includes(m.id) ? 'bg-brand-green text-brand-gold border-brand-green' : 'bg-gray-50 border-transparent opacity-50'}`}>
-                              <div className="text-[9px] font-bold uppercase tracking-widest">{m.label}</div>
-                              <div className="text-[11px] font-bold mt-1">{formatKES(m.price)}</div>
-                           </button>
-                        ))}
-                     </div>
-                  </div>
-               </div>
-            </section>
-
-            {/* 04: ENHANCEMENTS */}
-            <section className="space-y-10">
-               <div className="flex items-center gap-4 border-b border-gray-100 pb-4">
-                  <div className="w-10 h-10 bg-brand-green text-brand-gold flex items-center justify-center font-bold font-serif">04</div>
-                  <h3 className="text-xl font-serif font-bold text-brand-green uppercase tracking-tight">Strategic Enhancements</h3>
-               </div>
-
-               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                  {filteredAddons.map(addon => (
-                    <button
-                      key={addon.id}
-                      onClick={() => toggleAddon(addon.id)}
-                      className={`p-5 border text-left transition-all flex flex-col justify-between h-32 group ${
-                        chosenAddons.includes(addon.id) 
-                        ? 'bg-brand-green text-brand-gold border-brand-green ring-2 ring-brand-gold shadow-lg' 
-                        : 'bg-white text-gray-400 border-gray-100 opacity-60 hover:opacity-100'
-                      }`}
-                    >
-                      <div>
-                        <div className="flex justify-between items-start mb-2">
-                           <span className="text-[10px] font-bold uppercase tracking-widest leading-tight">{addon.label}</span>
-                           {chosenAddons.includes(addon.id) && <CheckCircle2 size={16} />}
-                        </div>
-                        <p className="text-[8px] opacity-70 uppercase tracking-[0.2em]">{addon.type === 'pp' ? 'Per Participant' : 'Flat Mission Rate'}</p>
-                      </div>
-                      <div className={`text-sm font-serif font-bold ${chosenAddons.includes(addon.id) ? 'text-white' : 'text-brand-green'}`}>
-                        {formatKES(addon.price)}
-                      </div>
-                    </button>
-                  ))}
-               </div>
-               
-               {filteredAddons.length === 0 && (
-                 <div className="p-12 text-center bg-gray-50 border border-dashed border-gray-200">
-                    <p className="text-sm font-serif italic text-gray-400">"Select a pillar to view available strategic enhancements."</p>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+          
+          {/* INPUTS COLUMN (BUILDER OUTLOOK) */}
+          <div className="lg:col-span-7 space-y-6">
+            <div className="bg-white p-6 md:p-8 rounded-none shadow-xl border border-brand-green/5 space-y-10">
+              
+              {/* 01: MISSION LEAD IDENTITY */}
+              <section className="space-y-6">
+                 <div className="flex items-center gap-3 border-b border-gray-100 pb-3">
+                    <div className="w-8 h-8 bg-brand-green text-brand-gold flex items-center justify-center font-bold font-serif text-xs">01</div>
+                    <h3 className="text-sm font-serif font-bold text-brand-green uppercase tracking-wider">Mission Lead</h3>
                  </div>
-               )}
-            </section>
+                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="space-y-2">
+                       <label className="text-[9px] font-bold text-brand-gold uppercase tracking-[0.4em] flex items-center gap-2"><Building2 size={10}/> Organization</label>
+                       <input 
+                         type="text" 
+                         value={clientInfo.company} 
+                         onChange={(e) => setClientInfo({...clientInfo, company: e.target.value})} 
+                         placeholder="Group Name" 
+                         className="w-full p-3 bg-gray-50 border-none text-[10px] font-bold focus:ring-1 focus:ring-brand-green outline-none" 
+                       />
+                    </div>
+                    <div className="space-y-2">
+                       <label className="text-[9px] font-bold text-brand-gold uppercase tracking-[0.4em] flex items-center gap-2"><User size={10}/> Lead Contact</label>
+                       <input 
+                         type="text" 
+                         value={clientInfo.contact} 
+                         onChange={(e) => setClientInfo({...clientInfo, contact: e.target.value})} 
+                         placeholder="Lead Name" 
+                         className="w-full p-3 bg-gray-50 border-none text-[10px] font-bold focus:ring-1 focus:ring-brand-green outline-none" 
+                       />
+                    </div>
+                    <div className="space-y-2">
+                       <label className="text-[9px] font-bold text-brand-gold uppercase tracking-[0.4em] flex items-center gap-2"><Mail size={10}/> Email</label>
+                       <input 
+                         type="email" 
+                         value={clientInfo.email} 
+                         onChange={(e) => setClientInfo({...clientInfo, email: e.target.value})} 
+                         placeholder="email@address.com" 
+                         className="w-full p-3 bg-gray-50 border-none text-[10px] font-bold focus:ring-1 focus:ring-brand-green outline-none" 
+                       />
+                    </div>
+                 </div>
+              </section>
+
+              {/* 02: CORE PILLAR & PROGRAM SELECTION (BUILDER STYLE) */}
+              <section className="space-y-8">
+                 <div className="flex items-center gap-3 border-b border-gray-100 pb-3">
+                    <div className="w-8 h-8 bg-brand-green text-brand-gold flex items-center justify-center font-bold font-serif text-xs">02</div>
+                    <h3 className="text-sm font-serif font-bold text-brand-green uppercase tracking-wider">Service Pillars & Selection</h3>
+                 </div>
+                 
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    {/* Category Selector Grid */}
+                    <div className="space-y-4">
+                       <label className="text-[9px] font-bold text-brand-gold uppercase tracking-[0.6em] block">Service Pillar</label>
+                       <div className="grid grid-cols-2 gap-2">
+                          {CATEGORIES.map(cat => (
+                             <button
+                               key={cat.id}
+                               type="button"
+                               onClick={() => { 
+                                 setActiveCategory(cat); 
+                                 setSelectedProgram(cat.programs[0]); 
+                                 setDurationIdx(0);
+                               }}
+                               className={`p-3 rounded-none border transition-all text-left text-[8px] font-bold uppercase tracking-widest flex items-center gap-2 ${
+                                 activeCategory.id === cat.id 
+                                 ? 'bg-brand-green text-brand-gold border-brand-green shadow-xl' 
+                                 : 'bg-gray-50 text-gray-400 border-transparent hover:border-brand-gold/30'
+                               }`}
+                             >
+                                {cat.icon} {cat.title}
+                             </button>
+                          ))}
+                       </div>
+                    </div>
+
+                    {/* Program Selection Buttons */}
+                    <div className="space-y-4">
+                       <label className="text-[9px] font-bold text-brand-gold uppercase tracking-[0.6em] block">Program Selection</label>
+                       <div className="space-y-1.5 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">
+                          {activeCategory.programs.map(prog => (
+                             <button
+                               key={prog.id}
+                               type="button"
+                               onClick={() => {
+                                 setSelectedProgram(prog);
+                                 setDurationIdx(0);
+                               }}
+                               className={`w-full text-left p-3 rounded-none border transition-all flex items-center justify-between ${
+                                 selectedProgram?.id === prog.id 
+                                 ? 'bg-brand-sand border-brand-green shadow-sm' 
+                                 : 'bg-gray-50 border-transparent hover:border-brand-gold/20'
+                               }`}
+                             >
+                                <div className="flex items-center gap-3">
+                                   <div className={`p-1.5 rounded-none ${selectedProgram?.id === prog.id ? 'bg-brand-green text-brand-gold' : 'bg-white text-gray-300'}`}>
+                                     {prog.icon}
+                                   </div>
+                                   <div>
+                                     <span className="font-bold text-[8px] uppercase tracking-wider text-brand-green block">{prog.title}</span>
+                                     <span className="text-[7px] text-gray-400 font-serif italic">{prog.audience}</span>
+                                   </div>
+                                </div>
+                                <ChevronRight size={12} className="text-brand-gold flex-shrink-0" />
+                             </button>
+                          ))}
+                       </div>
+                    </div>
+                 </div>
+
+                 {/* Configuration Row */}
+                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4 border-t border-gray-100">
+                    <div className="space-y-3">
+                       <label className="text-[9px] font-bold text-brand-gold uppercase tracking-[0.6em] block">Variant Configuration</label>
+                       <select 
+                          value={durationIdx} 
+                          onChange={(e) => setDurationIdx(parseInt(e.target.value))}
+                          className="w-full p-3.5 bg-gray-50 border-none rounded-none text-[9px] font-bold uppercase tracking-widest text-brand-green focus:ring-1 focus:ring-brand-green shadow-sm outline-none"
+                       >
+                          {selectedProgram?.durations?.map((d, i) => {
+                             const isFlat = selectedProgram.priceType === 'flat_rate' || d.isGroup;
+                             return <option key={i} value={i}>{d.label} — {formatKES(d.price)} {isFlat ? '(Flat)' : '(pp)'}</option>
+                          }) || <option value={0}>Standard — {selectedProgram ? formatKES(selectedProgram.basePrice) : ''}</option>}
+                       </select>
+                    </div>
+
+                    <div className="space-y-3">
+                       <label className="text-[9px] font-bold text-brand-gold uppercase tracking-[0.6em] block">Deployment Date</label>
+                       <CustomCalendar value={missionDate} onChange={setMissionDate} />
+                    </div>
+
+                    <div className="space-y-3">
+                       <label className="text-[9px] font-bold text-brand-gold uppercase tracking-[0.6em] block">Participant Scale (Pax)</label>
+                       <input 
+                          type="number" 
+                          value={pax} 
+                          onChange={(e) => setPax(Math.max(0, parseInt(e.target.value) || 0))}
+                          className="w-full p-3.5 bg-gray-50 border-none rounded-none font-serif font-bold text-xl text-brand-green focus:ring-1 focus:ring-brand-green outline-none" 
+                       />
+                    </div>
+                 </div>
+
+                 {/* Medic Standby Risk Multiplier */}
+                 {selectedProgram?.id === 'medic_standby' && (
+                   <div className="p-4 bg-brand-sand/50 border border-brand-green/10 rounded-none space-y-2">
+                      <label className="text-[9px] font-bold text-brand-gold uppercase tracking-[0.4em] flex items-center gap-2">
+                        <AlertTriangle size={12} className="text-brand-gold" /> Event Risk Profile Surcharge
+                      </label>
+                      <select 
+                         value={eventType} 
+                         onChange={(e) => setEventType(e.target.value as any)}
+                         className="w-full p-3 bg-white border border-gray-200 text-[10px] font-bold uppercase text-brand-green outline-none"
+                      >
+                         {Object.values(EVENT_TYPE_RISK).map(e => (
+                            <option key={e.id} value={e.id}>{e.label} (Risk Factor: x{e.multiplier})</option>
+                         ))}
+                      </select>
+                   </div>
+                 )}
+              </section>
+
+              {/* 03: FIELD LOGISTICS */}
+              <section className="space-y-8">
+                 <div className="flex items-center gap-3 border-b border-gray-100 pb-3">
+                    <div className="w-8 h-8 bg-brand-green text-brand-gold flex items-center justify-center font-bold font-serif text-xs">03</div>
+                    <h3 className="text-sm font-serif font-bold text-brand-green uppercase tracking-wider">Field Logistics</h3>
+                 </div>
+                 
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="space-y-6">
+                       <div className="space-y-2">
+                          <label className="text-[9px] font-bold text-brand-gold uppercase tracking-[0.4em] flex items-center gap-2"><Map size={12}/> Venue Coordination</label>
+                          <select value={venueType} onChange={(e) => setVenueType(e.target.value as any)} className="w-full p-3.5 bg-gray-50 border-none text-[10px] font-bold uppercase text-brand-green outline-none">
+                             {Object.values(VENUE_TYPES).map(v => <option key={v.id} value={v.id}>{v.label} ({v.price > 0 ? formatKES(v.price) : 'Provided'})</option>)}
+                          </select>
+                       </div>
+
+                       <div className="space-y-2">
+                          <label className="text-[9px] font-bold text-brand-gold uppercase tracking-[0.4em] flex items-center gap-2"><Truck size={12}/> Mission Fleet</label>
+                          <select value={fleetType} onChange={(e) => setFleetType(e.target.value as any)} className="w-full p-3.5 bg-gray-50 border-none text-[10px] font-bold uppercase text-brand-green outline-none">
+                             {Object.values(FLEET_SOLUTIONS).map(f => <option key={f.id} value={f.id}>{f.label} ({f.capacity > 0 ? f.capacity + ' pax — ' + formatKES(f.price) : 'Self Drive'})</option>)}
+                          </select>
+                          {fleetType !== 'none' && (
+                            <label className="flex items-center gap-2 cursor-pointer pt-1">
+                              <input 
+                                type="checkbox" 
+                                checked={offroadSurcharge} 
+                                onChange={(e) => setOffroadSurcharge(e.target.checked)} 
+                                className="accent-brand-green" 
+                              />
+                              <span className="text-[9px] font-bold uppercase text-gray-500 tracking-wider">Off-road Terrain Upgrade (+40% fleet rate)</span>
+                            </label>
+                          )}
+                       </div>
+                    </div>
+
+                    <div className="space-y-3">
+                       <label className="text-[9px] font-bold text-brand-gold uppercase tracking-[0.4em] flex items-center gap-2"><Utensils size={12}/> Field Catering</label>
+                       <div className="grid grid-cols-2 gap-2">
+                          {[
+                            { id: 'breakfast', label: 'Breakfast', price: 400 },
+                            { id: 'lunch', label: 'Lunch', price: 800 },
+                            { id: 'dinner', label: 'Dinner', price: 1200 },
+                            { id: 'tea', label: 'Tea & Snacks', price: 250 }
+                          ].map(m => (
+                             <button 
+                                key={m.id} 
+                                type="button"
+                                onClick={() => setSelectedMeals(prev => prev.includes(m.id) ? prev.filter(x => x !== m.id) : [...prev, m.id])} 
+                                className={`p-3 border text-center transition-all ${selectedMeals.includes(m.id) ? 'bg-brand-green text-brand-gold border-brand-green shadow-md' : 'bg-gray-50 border-transparent text-gray-400 hover:border-brand-gold/30'}`}
+                             >
+                                <div className="text-[8px] font-bold uppercase tracking-widest">{m.label}</div>
+                                <div className="text-[10px] font-bold mt-0.5">{formatKES(m.price)}</div>
+                             </button>
+                          ))}
+                       </div>
+                    </div>
+                 </div>
+              </section>
+
+              {/* 04: STRATEGIC ENHANCEMENTS */}
+              <section className="space-y-8">
+                 <div className="flex items-center gap-3 border-b border-gray-100 pb-3">
+                    <div className="w-8 h-8 bg-brand-green text-brand-gold flex items-center justify-center font-bold font-serif text-xs">04</div>
+                    <h3 className="text-sm font-serif font-bold text-brand-green uppercase tracking-wider">Strategic Enhancements</h3>
+                 </div>
+
+                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                    {filteredAddons.map(addon => (
+                      <button
+                        key={addon.id}
+                        type="button"
+                        onClick={() => toggleAddon(addon.id)}
+                        className={`p-4 border text-left transition-all flex flex-col justify-between min-h-[110px] ${
+                          chosenAddons.includes(addon.id) 
+                          ? 'bg-brand-green text-brand-gold border-brand-green ring-1 ring-brand-gold shadow-lg' 
+                          : 'bg-white text-gray-500 border-gray-100 hover:border-brand-gold/30'
+                        }`}
+                      >
+                        <div>
+                          <div className="flex justify-between items-start mb-1 gap-1">
+                             <span className="text-[9px] font-bold uppercase tracking-wider leading-tight">{addon.label}</span>
+                             {chosenAddons.includes(addon.id) && <CheckCircle2 size={14} className="flex-shrink-0 text-brand-gold" />}
+                          </div>
+                          <p className="text-[7px] opacity-70 uppercase tracking-[0.2em]">{addon.type === 'pp' ? 'Per Participant' : 'Flat Mission Rate'}</p>
+                        </div>
+                        <div className={`text-xs font-serif font-bold ${chosenAddons.includes(addon.id) ? 'text-white' : 'text-brand-green'}`}>
+                          {formatKES(addon.price)}
+                        </div>
+                      </button>
+                    ))}
+                 </div>
+
+                 {filteredAddons.length === 0 && (
+                   <div className="p-8 text-center bg-gray-50 border border-dashed border-gray-200">
+                      <p className="text-xs font-serif italic text-gray-400">"Select a pillar to view available strategic enhancements."</p>
+                   </div>
+                 )}
+              </section>
+            </div>
+          </div>
+
+          {/* QUOTE STUB COLUMN (RIGHT SIDE) */}
+          <div className="lg:col-span-5 print:hidden">
+             <div id="quote-doc" className="bg-white p-8 md:p-10 shadow-2xl paper-texture sticky top-32 border border-gray-100">
+                <header className="border-b-[6px] border-brand-green pb-6 mb-8">
+                   <div className="flex justify-between items-start mb-4">
+                      <Logo className="w-12 h-12" />
+                      <div className="text-right">
+                         <div className="text-[8px] font-bold uppercase text-gray-400 tracking-widest">{quoteId}</div>
+                         <div className="text-[9px] font-bold uppercase text-brand-gold tracking-[0.4em]">Strategy Record</div>
+                      </div>
+                   </div>
+                   <h2 className="text-2xl font-serif font-bold text-brand-green italic truncate leading-none mb-2">{clientInfo.company || 'Prospective Partner'}</h2>
+                   <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{new Date(missionDate).toLocaleDateString('en-KE')} — {pax} PAX</p>
+                </header>
+
+                <div className="space-y-5">
+                   {results.missionBase > 0 && (
+                     <div className="flex justify-between items-end border-b border-gray-50 pb-3">
+                        <div className="space-y-0.5">
+                           <span className="text-[8px] font-bold text-gray-400 uppercase tracking-widest block">01 Mission Core</span>
+                           <span className="text-[11px] font-serif font-bold italic text-brand-green">{selectedProgram?.title}</span>
+                        </div>
+                        <span className="text-xs font-bold text-brand-green">{formatKES(results.missionBase)}</span>
+                     </div>
+                   )}
+
+                   {results.logisticsBase > 0 && (
+                     <div className="flex justify-between items-end border-b border-gray-50 pb-3">
+                        <div className="space-y-0.5">
+                           <span className="text-[8px] font-bold text-gray-400 uppercase tracking-widest block">02 Logistics & Hospitality</span>
+                           <span className="text-[11px] font-serif font-bold italic text-brand-green">Venue, Transport, Field Meals</span>
+                        </div>
+                        <span className="text-xs font-bold text-brand-green">{formatKES(results.logisticsBase)}</span>
+                     </div>
+                   )}
+
+                   {/* Itemized Enhancements in Quote Sidebar */}
+                   {chosenAddons.length > 0 && (
+                     <div className="space-y-3 pt-1">
+                        <span className="text-[8px] font-bold text-gray-400 uppercase tracking-widest block">03 Strategic Enhancements</span>
+                        {chosenAddons.map(id => {
+                          const addon = STRATEGIC_ADDONS.find(a => a.id === id);
+                          if (!addon) return null;
+                          const price = addon.type === 'pp' ? addon.price * (pax > 0 ? pax : 1) : addon.price;
+                          return (
+                            <div key={id} className="flex justify-between items-end border-b border-gray-50 pb-1.5 last:border-0 pr-1">
+                               <div className="space-y-0.5 max-w-[70%]">
+                                  <span className="text-[9px] font-serif italic text-brand-green leading-tight block truncate">{addon.label}</span>
+                                  <span className="text-[7px] text-gray-400 uppercase tracking-tighter">({addon.type === 'pp' ? 'Per Pax' : 'Flat'})</span>
+                               </div>
+                               <span className="text-[10px] font-bold text-brand-green whitespace-nowrap">{formatKES(price)}</span>
+                            </div>
+                          );
+                        })}
+                     </div>
+                   )}
+
+                   <section className="bg-brand-green text-white p-6 mt-8 space-y-3 shadow-xl">
+                      <span className="text-brand-gold text-[9px] font-bold uppercase tracking-[0.5em] block">Total Investment</span>
+                      <div className="text-2xl md:text-4xl font-serif font-bold text-brand-gold tracking-tighter leading-none">{formatKES(results.subtotal)}</div>
+                      <div className="pt-3 border-t border-white/10 flex justify-between items-center">
+                         <span className="text-[8px] uppercase font-bold tracking-[0.3em] opacity-60">Security Deposit (50%)</span>
+                         <span className="text-lg font-serif font-bold text-brand-gold">{formatKES(results.deposit)}</span>
+                      </div>
+                   </section>
+
+                   <div className="pt-6 flex flex-col gap-3">
+                      <button 
+                        onClick={handleWhatsApp} 
+                        disabled={!selectedProgram || (pax === 0 && selectedProgram.priceType !== 'flat_rate' && selectedProgram.category !== 'hosting' && selectedProgram.id !== 'medic_standby')}
+                        className="w-full py-4 bg-[#25D366] text-white font-bold uppercase tracking-[0.4em] text-[9px] shadow-lg flex items-center justify-center gap-3 disabled:opacity-50 active:scale-[0.98] transition-all hover:brightness-105"
+                      >
+                         <MessageCircle size={18} /> Request Proposal
+                      </button>
+                      <button 
+                        onClick={handlePrint} 
+                        className="w-full py-3.5 border border-brand-green text-brand-green font-bold text-[8px] uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-brand-green hover:text-white transition-colors active:scale-[0.98]"
+                      >
+                        <Printer size={14} /> Generate Strategy PDF
+                      </button>
+                   </div>
+                </div>
+             </div>
           </div>
         </div>
-
-        {/* QUOTE STUB COLUMN */}
-        <div className="lg:col-span-4 print:hidden">
-           <div id="quote-doc" className="bg-white p-8 md:p-12 shadow-2xl paper-texture sticky top-32 border border-gray-100">
-              <header className="border-b-[6px] border-brand-green pb-8 mb-10">
-                 <div className="flex justify-between items-start mb-6">
-                    <Logo className="w-14 h-14" />
-                    <div className="text-right">
-                       <div className="text-[8px] font-bold uppercase text-gray-400 tracking-widest">{quoteId}</div>
-                       <div className="text-[9px] font-bold uppercase text-brand-gold tracking-[0.4em]">Strategy Record</div>
-                    </div>
-                 </div>
-                 <h2 className="text-3xl font-serif font-bold text-brand-green italic truncate leading-none mb-2">{clientInfo.company || 'Prospective Partner'}</h2>
-                 <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{new Date(missionDate).toLocaleDateString('en-KE')} — {pax} PAX</p>
-              </header>
-
-              <div className="space-y-6">
-                 {results.missionBase > 0 && (
-                   <div className="flex justify-between items-end border-b border-gray-50 pb-4 animate-reveal">
-                      <div className="space-y-1">
-                         <span className="text-[8px] font-bold text-gray-400 uppercase tracking-widest block">01 Mission Core</span>
-                         <span className="text-[11px] font-serif font-bold italic text-brand-green">{selectedProgram?.title}</span>
-                      </div>
-                      <span className="text-sm font-bold text-brand-green">{formatKES(results.missionBase)}</span>
-                   </div>
-                 )}
-
-                 {results.logisticsBase > 0 && (
-                   <div className="flex justify-between items-end border-b border-gray-50 pb-4 animate-reveal">
-                      <div className="space-y-1">
-                         <span className="text-[8px] font-bold text-gray-400 uppercase tracking-widest block">02 Logistics & Hospitality</span>
-                         <span className="text-[11px] font-serif font-bold italic text-brand-green">Venue, Transport, Field Meals</span>
-                      </div>
-                      <span className="text-sm font-bold text-brand-green">{formatKES(results.logisticsBase)}</span>
-                   </div>
-                 )}
-
-                 {/* Itemized Enhancements in Quote Sidebar */}
-                 {chosenAddons.length > 0 && (
-                   <div className="space-y-4 animate-reveal pt-2">
-                      <span className="text-[8px] font-bold text-gray-400 uppercase tracking-widest block">03 Strategic Enhancements</span>
-                      {chosenAddons.map(id => {
-                        const addon = STRATEGIC_ADDONS.find(a => a.id === id);
-                        if (!addon) return null;
-                        const price = addon.type === 'pp' ? addon.price * (pax > 0 ? pax : 1) : addon.price;
-                        return (
-                          <div key={id} className="flex justify-between items-end border-b border-gray-50 pb-2 last:border-0 pr-1">
-                             <div className="space-y-0.5 max-w-[70%]">
-                                <span className="text-[10px] font-serif italic text-brand-green leading-tight block truncate">{addon.label}</span>
-                                <span className="text-[7px] text-gray-400 uppercase tracking-tighter">({addon.type === 'pp' ? 'Per Pax' : 'Flat'})</span>
-                             </div>
-                             <span className="text-[11px] font-bold text-brand-green whitespace-nowrap">{formatKES(price)}</span>
-                          </div>
-                        );
-                      })}
-                   </div>
-                 )}
-
-                 <section className="bg-brand-green text-white p-6 md:p-8 mt-12 space-y-4 shadow-xl">
-                    <span className="text-brand-gold text-[10px] font-bold uppercase tracking-[0.5em] block">Total Investment</span>
-                    <div className="text-3xl md:text-5xl font-serif font-bold text-brand-gold tracking-tighter leading-none">{formatKES(results.subtotal)}</div>
-                    <div className="pt-4 border-t border-white/10 flex justify-between items-center">
-                       <span className="text-[9px] uppercase font-bold tracking-[0.3em] opacity-60">Security Deposit (50%)</span>
-                       <span className="text-xl font-serif font-bold text-brand-gold">{formatKES(results.deposit)}</span>
-                    </div>
-                 </section>
-
-                 <div className="pt-8 flex flex-col gap-4">
-                    <button 
-                      onClick={handleWhatsApp} 
-                      disabled={!selectedProgram || (pax === 0 && selectedProgram.priceType !== 'flat_rate' && selectedProgram.category !== 'hosting' && selectedProgram.id !== 'medic_standby')}
-                      className="w-full py-5 bg-[#25D366] text-white font-bold uppercase tracking-[0.5em] text-[10px] shadow-lg flex items-center justify-center gap-3 disabled:opacity-50 active:scale-[0.98]"
-                    >
-                       <MessageCircle size={20} /> Request Proposal
-                    </button>
-                    <button 
-                      onClick={handlePrint} 
-                      className="w-full py-4 border border-brand-green text-brand-green font-bold text-[9px] uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-brand-green hover:text-white transition-colors active:scale-[0.98]"
-                    >
-                      <Printer size={16} /> Generate Strategy PDF
-                    </button>
-                 </div>
-              </div>
-           </div>
-        </div>
       </div>
+
+      <style>{`
+        .custom-scrollbar::-webkit-scrollbar { width: 3px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #d97706; opacity: 0.2; }
+      `}</style>
     </div>
   );
 };

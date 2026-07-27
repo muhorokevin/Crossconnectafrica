@@ -95,10 +95,13 @@ ${form.message}`;
                     >
                         <option value="">Select a Topic</option>
                         <option value="General Inquiry">General Inquiry</option>
-                        <option value="Corporate Booking">Corporate Booking</option>
-                        <option value="School Program">School Program</option>
-                        <option value="Safety Training">Safety Training (First Aid/Fire)</option>
-                        <option value="Expedition/Hike">Expedition/Hike</option>
+                        <option value="Team Building">Team Building (Corporate, Chama & Youth)</option>
+                        <option value="First Aid Training">First Aid Training</option>
+                        <option value="Fire Safety & Drills">Fire Safety & Evacuation Drills</option>
+                        <option value="Medic Standby">Medic & Event Medical Standby</option>
+                        <option value="School Clubs">School & Youth Clubs</option>
+                        <option value="Expeditions & Hikes">Expeditions & Hikes</option>
+                        <option value="MC & Event Hosting">MC & Event Hosting</option>
                     </select>
                 </div>
                 <div>

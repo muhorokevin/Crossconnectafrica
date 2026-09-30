@@ -57,11 +57,11 @@ export const CATEGORIES: Category[] = [
         description: 'Elite engagement. Professional behavioral debrief included.',
         outcomes: 'Strategy Alignment, Trust, High Performance.',
         image: 'https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=1000',
-        basePrice: 2000,
+        basePrice: 1000,
         priceType: 'per_person',
         durations: [
-          { label: 'Full Day (2,000 KES pp)', price: 2000, days: 1 },
-          { label: 'Half Day (1,000 KES pp)', price: 1000, days: 0.5 }
+          { label: 'Full Day (1,000 KES pp)', price: 1000, days: 1 },
+          { label: 'Half Day (500 KES pp)', price: 500, days: 0.5 }
         ],
         inclusions: ['Facilitation', 'Strategic debrief', 'Prop logistics'],
         participantsBring: ['Active wear', 'Notebook'],
@@ -77,11 +77,11 @@ export const CATEGORIES: Category[] = [
         description: 'Relationship focused. Breaking walls through shared experience.',
         outcomes: 'Cohesion, Fellowship, Shared Values.',
         image: 'https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?q=80&w=1000',
-        basePrice: 1000,
+        basePrice: 800,
         priceType: 'per_person',
         durations: [
-          { label: 'Full Day (1,000 KES pp)', price: 1000, days: 1 },
-          { label: 'Half Day (800 KES pp)', price: 800, days: 0.5 }
+          { label: 'Full Day (800 KES pp)', price: 800, days: 1 },
+          { label: 'Half Day (400 KES pp)', price: 400, days: 0.5 }
         ],
         inclusions: ['Facilitation', 'Game gear'],
         participantsBring: ['Casual wear'],

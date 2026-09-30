@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Maximize2, X, ChevronLeft, ChevronRight, Share2, ArrowRight,
-  Play, Film, Image as ImageIcon, Grid
+  Play, Film, Image as ImageIcon, Grid, Check
 } from 'lucide-react';
 import { ViewState } from '../types';
 import { BookingContextData } from '../App';
@@ -71,6 +71,7 @@ interface GalleryProps {
 const Gallery: React.FC<GalleryProps> = ({ setView, onNavigateToBooking }) => {
   const [activeFilter, setActiveFilter] = useState<'all' | 'photo' | 'video'>('all');
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const [copiedLink, setCopiedLink] = useState(false);
 
   const filteredItems = GALLERY_ITEMS.filter(
     item => activeFilter === 'all' || item.type === activeFilter
@@ -91,12 +92,30 @@ const Gallery: React.FC<GalleryProps> = ({ setView, onNavigateToBooking }) => {
     }
   };
 
-  const handleNext = (e: React.MouseEvent) => {
-    e.stopPropagation();
+  const handleNext = (e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
     if (lightboxIndex !== null) {
       setLightboxIndex((lightboxIndex + 1) % filteredItems.length);
     }
   };
+
+  // Keyboard navigation for lightbox
+  useEffect(() => {
+    if (lightboxIndex === null) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        closeLightbox();
+      } else if (e.key === 'ArrowLeft') {
+        setLightboxIndex(prev => (prev !== null ? (prev - 1 + filteredItems.length) % filteredItems.length : null));
+      } else if (e.key === 'ArrowRight') {
+        setLightboxIndex(prev => (prev !== null ? (prev + 1) % filteredItems.length : null));
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [lightboxIndex, filteredItems.length]);
 
   const handleQuoteClick = () => {
     closeLightbox();
@@ -227,15 +246,25 @@ const Gallery: React.FC<GalleryProps> = ({ setView, onNavigateToBooking }) => {
       {lightboxIndex !== null && filteredItems[lightboxIndex] && (
         <div 
           onClick={closeLightbox}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Media Lightbox"
           className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex items-center justify-center p-4 md:p-8 animate-fade-in"
         >
           {/* Top Control Bar */}
+          <div className="absolute top-4 left-4 md:top-6 md:left-6 z-20 hidden sm:flex items-center gap-2">
+            <span className="text-white/60 text-[11px] font-mono uppercase tracking-wider bg-white/10 px-3 py-1.5 rounded-full border border-white/10">
+              ⌨️ ESC to close • ← → to browse
+            </span>
+          </div>
+
           <div className="absolute top-4 right-4 md:top-6 md:right-6 z-20 flex items-center gap-3">
             <span className="text-white/70 text-xs font-mono uppercase tracking-widest bg-white/10 px-3 py-1.5 rounded-full border border-white/10">
               {lightboxIndex + 1} / {filteredItems.length}
             </span>
             <button
               onClick={closeLightbox}
+              aria-label="Close Lightbox"
               className="p-3 rounded-full bg-white/10 text-white hover:bg-brand-gold hover:text-brand-green transition-all"
             >
               <X size={22} />
@@ -300,12 +329,21 @@ const Gallery: React.FC<GalleryProps> = ({ setView, onNavigateToBooking }) => {
                     }).catch(() => {});
                   } else {
                     navigator.clipboard.writeText(url);
-                    alert('Media link copied to clipboard!');
+                    setCopiedLink(true);
+                    setTimeout(() => setCopiedLink(false), 2500);
                   }
                 }}
                 className="px-5 py-2.5 bg-white/10 text-white rounded-full font-bold text-xs uppercase tracking-widest hover:bg-white/20 transition-all border border-white/10 flex items-center gap-2"
               >
-                <Share2 size={14} /> Share Link
+                {copiedLink ? (
+                  <>
+                    <Check size={14} className="text-emerald-400" /> Copied!
+                  </>
+                ) : (
+                  <>
+                    <Share2 size={14} /> Share Link
+                  </>
+                )}
               </button>
             </div>
           </div>

@@ -3,7 +3,8 @@ import {
   MessageCircle, User, Mail, Building2, Map, Truck, Home, Calendar as CalendarIcon, 
   AlertTriangle, Utensils, Zap, ShieldAlert, Award, FileText, Activity, Tent, 
   Camera, Mic2, Star, Heart, ShieldCheck, Flame, Users2, Mountain, School, 
-  Pocket, HardHat, Info, Plus, CheckCircle2, Ruler, ChevronDown, ChevronUp, Printer, ChevronRight
+  Pocket, HardHat, Info, Plus, CheckCircle2, Ruler, ChevronDown, ChevronUp, Printer, ChevronRight,
+  Download, FileDown, Check, Copy, Tag, Phone, Eye, X
 } from 'lucide-react';
 import { CATEGORIES, Program, Category } from './AdventureBuilder';
 import { BookingContextData } from '../App';
@@ -75,7 +76,18 @@ const STRATEGIC_ADDONS = [
 ];
 
 const Calculator: React.FC<{ initialData?: BookingContextData | null }> = ({ initialData }) => {
-  const [clientInfo, setClientInfo] = useState({ company: '', contact: '', email: '' });
+  const [clientInfo, setClientInfo] = useState({
+    leadContact: initialData?.clientInfo?.contact || '',
+    leadEmail: initialData?.clientInfo?.email || '',
+    leadPhone: initialData?.clientInfo?.phone || '',
+    organization: initialData?.clientInfo?.company || '',
+    needEtims: initialData?.clientInfo?.needEtims || false,
+    companyName: initialData?.clientInfo?.companyName || initialData?.clientInfo?.company || '',
+    kraPin: initialData?.clientInfo?.kraPin || '',
+    etimsEmail: initialData?.clientInfo?.etimsEmail || initialData?.clientInfo?.email || '',
+    etimsPhone: initialData?.clientInfo?.etimsPhone || initialData?.clientInfo?.phone || ''
+  });
+  const [showInvoiceModal, setShowInvoiceModal] = useState(false);
 
   const [activeCategory, setActiveCategory] = useState<Category>(() => {
     if (initialData?.program) {
@@ -98,6 +110,7 @@ const Calculator: React.FC<{ initialData?: BookingContextData | null }> = ({ ini
   const [selectedMeals, setSelectedMeals] = useState<string[]>([]);
   const [eventType, setEventType] = useState<keyof typeof EVENT_TYPE_RISK>('corporate');
   const [chosenAddons, setChosenAddons] = useState<string[]>(initialData?.addons || []);
+  const [copiedQuote, setCopiedQuote] = useState(false);
 
   const [quoteId] = useState(`CCA-Q-${new Date().toISOString().slice(0,10).replace(/-/g,'')}-${Math.floor(1000 + Math.random() * 9000)}`);
 
@@ -115,22 +128,39 @@ const Calculator: React.FC<{ initialData?: BookingContextData | null }> = ({ ini
     const days = Math.ceil(variant?.days || 1);
     
     // 1. Mission Core
+    let undiscountedMissionBase = 0;
     let missionBase = 0;
+    let discountPercent = 0;
+    let discountLabel = '';
+
     if (variant?.isGroup || selectedProgram.priceType === 'flat_rate') {
-        missionBase = variant?.price || selectedProgram.basePrice;
+        undiscountedMissionBase = variant?.price || selectedProgram.basePrice;
+        missionBase = undiscountedMissionBase;
     } else {
-        missionBase = (variant?.price || selectedProgram.basePrice) * pax;
+        undiscountedMissionBase = (variant?.price || selectedProgram.basePrice) * pax;
         
-        // Apply Hiking Group Discounts
-        if (selectedProgram.category === 'expeditions') {
-            if (pax >= 50) missionBase *= 0.8;
-            else if (pax >= 20) missionBase *= 0.9;
+        // Tiered Volume Concession Protocol
+        if (pax >= 100) {
+            discountPercent = 15;
+            discountLabel = 'Enterprise Scale Concession (100+ Pax — 15% Off Core)';
+            missionBase = undiscountedMissionBase * 0.85;
+        } else if (pax >= 50) {
+            discountPercent = 10;
+            discountLabel = 'Institutional Tier Concession (50+ Pax — 10% Off Core)';
+            missionBase = undiscountedMissionBase * 0.90;
+        } else if (pax >= 30) {
+            discountPercent = 5;
+            discountLabel = 'Volume Engagement Concession (30+ Pax — 5% Off Core)';
+            missionBase = undiscountedMissionBase * 0.95;
+        } else {
+            missionBase = undiscountedMissionBase;
         }
     }
 
     // Medic Standby Risk Multiplier
     if (isMedic) {
         missionBase *= EVENT_TYPE_RISK[eventType].multiplier;
+        undiscountedMissionBase *= EVENT_TYPE_RISK[eventType].multiplier;
     }
 
     // 2. Logistics
@@ -162,11 +192,17 @@ const Calculator: React.FC<{ initialData?: BookingContextData | null }> = ({ ini
     }, 0);
 
     const subtotal = missionBase + logisticsBase + addonsBase;
+    const undiscountedSubtotal = undiscountedMissionBase + logisticsBase + addonsBase;
+    const totalSavings = Math.max(0, undiscountedSubtotal - subtotal);
 
     return { 
         subtotal, 
         deposit: subtotal * 0.5, 
         missionBase,
+        undiscountedMissionBase,
+        discountPercent,
+        discountLabel,
+        totalSavings,
         logisticsBase,
         addonsBase,
         days,
@@ -188,22 +224,76 @@ const Calculator: React.FC<{ initialData?: BookingContextData | null }> = ({ ini
       .filter(Boolean)
       .join(', ');
 
+    const concessionLine = results.totalSavings > 0 
+      ? `\nVOLUME CONCESSION: -${formatKES(results.totalSavings)} (${results.discountLabel})`
+      : '';
+
+    const etimsWhatsAppText = clientInfo.needEtims ? `
+--------------------------------
+*eTIMS TAX INVOICE REQUESTED*
+Company: ${clientInfo.companyName || clientInfo.organization || 'Not Specified'}
+KRA PIN: ${clientInfo.kraPin || 'Pending Provision'}
+Accounts Email: ${clientInfo.etimsEmail || clientInfo.leadEmail || 'Not Specified'}
+Accounts Phone: ${clientInfo.etimsPhone || clientInfo.leadPhone || 'Not Specified'}` : '';
+
     const message = `*CROSS CONNECT AFRICA*
-*STRATEGIC PROPOSAL REQUEST*
+*STRATEGIC PROPOSAL & INVOICE REQUEST*
 ID: ${quoteId}
 MISSION: ${selectedProgram.title}
 PAX: ${pax}
 DEPLOYMENT: ${formattedDate}
-ADD-ONS: ${activeAddonsText || 'None Selected'}
+ADD-ONS: ${activeAddonsText || 'None Selected'}${concessionLine}
 TOTAL INVESTMENT: ${formatKES(results.subtotal)}
 --------------------------------
-Organization: ${clientInfo.company || 'Not Specified'}
-Contact: ${clientInfo.contact || 'Not Specified'}`;
+LEAD CONTACT: ${clientInfo.leadContact || 'Not Specified'}
+EMAIL: ${clientInfo.leadEmail || 'Not Specified'}
+PHONE: ${clientInfo.leadPhone || 'Not Specified'}
+ORGANIZATION: ${clientInfo.organization || clientInfo.companyName || 'Not Specified'}${etimsWhatsAppText}`;
     window.open(`https://wa.me/254710974670?text=${encodeURIComponent(message)}`, '_blank');
   };
 
   const handlePrint = () => {
     window.print();
+  };
+
+  const handleCopyQuote = () => {
+    const activeAddonsText = chosenAddons.map(id => STRATEGIC_ADDONS.find(a => a.id === id)?.label).filter(Boolean).join(', ');
+    const concessionInfo = results.totalSavings > 0 
+      ? `\nVolume Concession Applied: -${formatKES(results.totalSavings)} (${results.discountLabel})`
+      : '';
+
+    const etimsCopyText = clientInfo.needEtims ? `
+eTIMS Tax Invoice: REQUESTED (KRA Compliant)
+Company Name: ${clientInfo.companyName || clientInfo.organization || 'Not Specified'}
+Client KRA PIN: ${clientInfo.kraPin || 'Pending'}
+Invoicing Email: ${clientInfo.etimsEmail || clientInfo.leadEmail || 'Not Specified'}
+Invoicing Phone: ${clientInfo.etimsPhone || clientInfo.leadPhone || 'Not Specified'}
+` : 'eTIMS Tax Invoice: Standard Proforma (eTIMS available upon request)\n';
+
+    const summary = `CROSS CONNECT AFRICA — OFFICIAL PROFORMA & INVOICE
+Reference: ${quoteId}
+Date: ${new Date().toLocaleDateString('en-KE')}
+Lead Contact: ${clientInfo.leadContact || 'Lead Representative'}
+Lead Email: ${clientInfo.leadEmail || 'Not Specified'}
+Lead Phone: ${clientInfo.leadPhone || 'Not Specified'}
+Organization: ${clientInfo.organization || clientInfo.companyName || 'Prospective Partner'}
+${etimsCopyText}
+Mission: ${selectedProgram?.title || 'Custom Engagement'}
+Scale: ${pax} Participants
+Deployment Date: ${new Date(missionDate).toLocaleDateString('en-KE')}
+Strategic Addons: ${activeAddonsText || 'None'}${concessionInfo}
+Total Investment: ${formatKES(results.subtotal)}
+50% Mobilization Deposit: ${formatKES(results.deposit)}
+--------------------------------
+Cross Connect Africa Ltd | Valley View Office Park, Nairobi
+Email: missions@crossconnect.africa | Phone: +254 710 974 670
+Bank: Absa Bank Kenya Plc | Paybill: 303030 | Account: 2043432128
+M-Pesa: +254710974670`;
+
+    navigator.clipboard.writeText(summary).then(() => {
+      setCopiedQuote(true);
+      setTimeout(() => setCopiedQuote(false), 2500);
+    });
   };
 
   const filteredAddons = useMemo(() => {
@@ -218,41 +308,130 @@ Contact: ${clientInfo.contact || 'Not Specified'}`;
       <div className="hidden print:block fixed inset-0 bg-white z-[9999] p-0 text-brand-green font-serif">
         <div className="max-w-[800px] mx-auto p-12 bg-white min-h-screen flex flex-col">
           {/* Letterhead */}
-          <div className="flex justify-between items-start border-b-4 border-brand-green pb-8 mb-10">
+          <div className="flex justify-between items-start border-b-4 border-brand-green pb-6 mb-6">
             <div className="flex items-center gap-4">
-              <Logo className="w-16 h-16" />
+              <div className="p-2 bg-brand-green/5 border border-brand-green/20 rounded flex items-center justify-center">
+                <Logo className="w-14 h-14" />
+              </div>
               <div>
-                <h1 className="text-3xl font-bold tracking-tight uppercase leading-none">Cross Connect</h1>
-                <span className="text-brand-gold text-[10px] tracking-[0.4em] font-bold uppercase block">Africa</span>
+                <h1 className="text-3xl font-serif font-black tracking-tight text-brand-green uppercase leading-none">
+                  CROSS CONNECT
+                </h1>
+                <span className="text-brand-gold text-xs tracking-[0.45em] font-bold uppercase block mt-1">
+                  AFRICA
+                </span>
+                <span className="text-[8px] text-gray-500 font-sans tracking-widest uppercase block mt-0.5">
+                  Wilderness Leadership & Experiential Operations
+                </span>
               </div>
             </div>
             <div className="text-right">
-              <h2 className="text-2xl font-bold italic text-brand-gold mb-1">Strategic Mission Proposal</h2>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Reference: {quoteId}</p>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Date: {new Date().toLocaleDateString('en-KE')}</p>
+              <span className={`inline-block px-3 py-1 text-[9px] font-bold uppercase tracking-widest mb-1 ${
+                clientInfo.needEtims 
+                  ? 'bg-brand-green text-brand-gold ring-1 ring-brand-gold' 
+                  : 'bg-brand-green text-brand-gold'
+              }`}>
+                {clientInfo.needEtims ? 'Official eTIMS Tax Invoice' : 'Official Proforma Quotation'}
+              </span>
+              <h2 className="text-xl font-bold italic text-brand-green mb-0.5">Strategic Engagement Estimate</h2>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500">Ref: {quoteId}</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500">Issued: {new Date().toLocaleDateString('en-KE', { dateStyle: 'long' })}</p>
+            </div>
+          </div>
+
+          {/* Company & Treasury Details */}
+          <div className="grid grid-cols-2 gap-6 p-4 bg-gray-50 border border-gray-200 text-[10px] mb-6 font-sans">
+            <div>
+              <p className="font-bold text-brand-green uppercase tracking-wider mb-0.5">Cross Connect Africa Ltd</p>
+              <p className="text-gray-600">Location: <strong>Valley View Office Park, B1 Office 1, Nairobi</strong></p>
+              <p className="text-gray-600">Email: <strong>missions@crossconnect.africa</strong></p>
+              <p className="text-gray-600">Phone: <strong>+254 710 974 670</strong></p>
+            </div>
+            <div className="text-right">
+              <p className="font-bold text-brand-green uppercase tracking-wider mb-0.5">Treasury & Remittance Details</p>
+              <p className="text-gray-600">Bank: <strong>Absa Bank Kenya Plc</strong></p>
+              <p className="text-gray-600">Paybill: <strong>303030</strong></p>
+              <p className="text-gray-600">Account Number: <strong>2043432128</strong></p>
+              <p className="text-gray-600">M-Pesa Number: <strong>+254710974670</strong></p>
             </div>
           </div>
 
           {/* Client & Deployment Summary */}
-          <div className="grid grid-cols-2 gap-12 mb-10">
-            <div className="space-y-4">
-              <h3 className="text-[10px] font-bold uppercase tracking-[0.3em] text-brand-gold border-b border-gray-100 pb-2">Mission Recipient</h3>
-              <div className="space-y-1">
-                <p className="text-lg font-bold italic">{clientInfo.company || 'Prospective Partner'}</p>
-                <p className="text-sm">Attn: {clientInfo.contact || 'Lead Representative'}</p>
-                <p className="text-sm opacity-60 break-words">{clientInfo.email || 'missions@crossconnect.africa'}</p>
+          <div className="grid grid-cols-2 gap-10 mb-6 font-sans">
+            <div className="space-y-3">
+              <h3 className="text-[10px] font-bold uppercase tracking-[0.3em] text-brand-gold border-b border-gray-100 pb-2 font-serif">
+                Client & Invoicing Details
+              </h3>
+              <div className="space-y-2 text-xs">
+                <div>
+                  <span className="text-[8px] font-bold uppercase tracking-wider text-gray-400 block">Lead Contact Name</span>
+                  <p className="font-serif font-bold text-base text-brand-green italic">{clientInfo.leadContact || 'Lead Contact Representative'}</p>
+                </div>
+                <div>
+                  <span className="text-[8px] font-bold uppercase tracking-wider text-gray-400 block">Lead Contact Email</span>
+                  <p className="text-gray-800 break-words">{clientInfo.leadEmail || 'email@organization.com'}</p>
+                </div>
+                {clientInfo.leadPhone && (
+                  <div>
+                    <span className="text-[8px] font-bold uppercase tracking-wider text-gray-400 block">Lead Contact Phone</span>
+                    <p className="text-gray-800">{clientInfo.leadPhone}</p>
+                  </div>
+                )}
+                <div>
+                  <span className="text-[8px] font-bold uppercase tracking-wider text-gray-400 block">Organization</span>
+                  <p className="text-gray-800 font-semibold">{clientInfo.organization || clientInfo.companyName || 'Not Specified'}</p>
+                </div>
               </div>
             </div>
-            <div className="space-y-4">
-              <h3 className="text-[10px] font-bold uppercase tracking-[0.3em] text-brand-gold border-b border-gray-100 pb-2">Operational Scope</h3>
-              <div className="space-y-1">
-                <p className="text-sm"><span className="font-bold">Mission:</span> {selectedProgram?.title}</p>
-                <p className="text-sm"><span className="font-bold">Scale:</span> {pax} Participants</p>
-                <p className="text-sm"><span className="font-bold">Deployment:</span> {new Date(missionDate).toLocaleDateString('en-KE', { dateStyle: 'full' })}</p>
-                <p className="text-sm"><span className="font-bold">Duration:</span> {results.days} Day(s)</p>
+
+            <div className="space-y-3">
+              <h3 className="text-[10px] font-bold uppercase tracking-[0.3em] text-brand-gold border-b border-gray-100 pb-2 font-serif">
+                Operational Scope
+              </h3>
+              <div className="space-y-1.5 text-xs">
+                <p><span className="font-bold text-gray-600">Mission:</span> <span className="font-serif italic text-brand-green font-bold">{selectedProgram?.title}</span></p>
+                <p><span className="font-bold text-gray-600">Scale:</span> {pax} Participants</p>
+                <p><span className="font-bold text-gray-600">Deployment Date:</span> {new Date(missionDate).toLocaleDateString('en-KE', { dateStyle: 'full' })}</p>
+                <p><span className="font-bold text-gray-600">Duration:</span> {results.days} Day(s)</p>
+                <p><span className="font-bold text-gray-600">Pillar:</span> {selectedProgram?.category.replace('_', ' ').toUpperCase()}</p>
               </div>
             </div>
           </div>
+
+          {/* Dedicated eTIMS Tax Invoice Details (If eTIMS is selected) */}
+          {clientInfo.needEtims && (
+            <div className="mb-6 p-4 bg-emerald-50/70 border-2 border-brand-green/30 text-xs font-sans">
+              <div className="flex justify-between items-center border-b border-brand-green/20 pb-2 mb-3">
+                <div className="flex items-center gap-2">
+                  <span className="px-2 py-0.5 bg-brand-green text-brand-gold text-[8px] font-bold uppercase tracking-widest">
+                    KRA eTIMS Tax Invoice Details
+                  </span>
+                  <span className="text-[10px] font-bold text-emerald-800">
+                    Statutory Deductibility & VAT Ready
+                  </span>
+                </div>
+                <span className="text-[9px] text-gray-500 font-mono">CCA-eTIMS/SYS-2024</span>
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-[10px]">
+                <div>
+                  <span className="text-gray-500 uppercase tracking-wider block text-[8px]">Name of Company</span>
+                  <strong className="text-brand-green text-xs block">{clientInfo.companyName || clientInfo.organization || 'Not Specified'}</strong>
+                </div>
+                <div>
+                  <span className="text-gray-500 uppercase tracking-wider block text-[8px]">KRA PIN</span>
+                  <strong className="font-mono text-xs text-brand-green block tracking-wider">{clientInfo.kraPin || 'Pending Provision'}</strong>
+                </div>
+                <div>
+                  <span className="text-gray-500 uppercase tracking-wider block text-[8px]">Finance Email</span>
+                  <span className="text-gray-800 block truncate">{clientInfo.etimsEmail || clientInfo.leadEmail || 'Not Specified'}</span>
+                </div>
+                <div>
+                  <span className="text-gray-500 uppercase tracking-wider block text-[8px]">Finance Phone</span>
+                  <span className="text-gray-800 block">{clientInfo.etimsPhone || clientInfo.leadPhone || 'Not Specified'}</span>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Itemized Investment Table */}
           <div className="flex-grow">
@@ -269,9 +448,32 @@ Contact: ${clientInfo.contact || 'Not Specified'}`;
                   <td className="py-4 px-4 border-b border-gray-100 font-bold italic">
                     01 Core Pillar: {selectedProgram?.title}
                     <p className="text-[9px] font-normal text-gray-500 uppercase tracking-wider not-italic mt-1">Service category: {selectedProgram?.category.replace('_', ' ')}</p>
+                    {results.discountPercent > 0 && (
+                      <span className="inline-block mt-1 text-[8px] uppercase tracking-wider font-bold bg-brand-sand px-2 py-0.5 text-brand-green border border-brand-green/20">
+                        {results.discountLabel}
+                      </span>
+                    )}
                   </td>
-                  <td className="py-4 px-4 border-b border-gray-100 text-right font-bold">{formatKES(results.missionBase)}</td>
+                  <td className="py-4 px-4 border-b border-gray-100 text-right font-bold">
+                    {results.discountPercent > 0 && (
+                      <span className="line-through text-xs text-gray-400 block font-normal">
+                        {formatKES(results.undiscountedMissionBase)}
+                      </span>
+                    )}
+                    {formatKES(results.missionBase)}
+                  </td>
                 </tr>
+                {/* 01b: Concession Itemization (if applied) */}
+                {results.totalSavings > 0 && (
+                  <tr className="bg-emerald-50/50">
+                    <td className="py-3 px-4 border-b border-gray-100 font-serif italic text-emerald-800 text-xs">
+                      • Negotiated Volume Concession applied to core engagement scale ({pax} PAX)
+                    </td>
+                    <td className="py-3 px-4 border-b border-gray-100 text-right font-bold text-emerald-700 text-sm">
+                      -{formatKES(results.totalSavings)}
+                    </td>
+                  </tr>
+                )}
                 {/* 02: Logistics */}
                 {results.logisticsBase > 0 && (
                   <tr>
@@ -317,10 +519,11 @@ Contact: ${clientInfo.contact || 'Not Specified'}`;
           {/* Terms & Commitment */}
           <div className="mt-12 bg-brand-sand p-8 grid grid-cols-2 gap-8 items-end">
             <div className="space-y-4">
-              <h3 className="text-[10px] font-bold uppercase tracking-[0.3em] text-brand-gold">Commitment Structure</h3>
+              <h3 className="text-[10px] font-bold uppercase tracking-[0.3em] text-brand-gold">Commitment Structure & Commercial Terms</h3>
               <ul className="text-[10px] space-y-2 opacity-70 leading-relaxed font-sans">
                 <li>• 50% Non-refundable deposit required for mission slot reservation.</li>
                 <li>• Remaining 50% payable upon completion of mission.</li>
+                <li>• Preferential volume concessions apply for high participant scales (30+ pax) or multi-session service frameworks as agreed in the procurement schedule.</li>
                 <li>• Quote valid for 30 days from date of issue.</li>
                 <li>• All deployments are subject to CCA safety protocols.</li>
               </ul>
@@ -365,43 +568,168 @@ Contact: ${clientInfo.contact || 'Not Specified'}`;
           <div className="lg:col-span-7 space-y-6">
             <div className="bg-white p-6 md:p-8 rounded-none shadow-xl border border-brand-green/5 space-y-10">
               
-              {/* 01: MISSION LEAD IDENTITY */}
+              {/* 01: MISSION LEAD & INVOICING SPECIFICATION */}
               <section className="space-y-6">
                  <div className="flex items-center gap-3 border-b border-gray-100 pb-3">
                     <div className="w-8 h-8 bg-brand-green text-brand-gold flex items-center justify-center font-bold font-serif text-xs">01</div>
-                    <h3 className="text-sm font-serif font-bold text-brand-green uppercase tracking-wider">Mission Lead</h3>
+                    <div>
+                      <h3 className="text-sm font-serif font-bold text-brand-green uppercase tracking-wider">Mission Lead & Invoicing</h3>
+                      <p className="text-[9px] text-gray-400 font-sans">Contact identity for invoice issuance and mission briefing.</p>
+                    </div>
                  </div>
-                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+                 {/* Primary Lead Identity (Included in all invoices) */}
+                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                     <div className="space-y-2">
-                       <label className="text-[9px] font-bold text-brand-gold uppercase tracking-[0.4em] flex items-center gap-2"><Building2 size={10}/> Organization</label>
+                       <label className="text-[9px] font-bold text-brand-gold uppercase tracking-[0.3em] flex items-center gap-1.5">
+                         <User size={11}/> Lead Contact Name <span className="text-rose-500 font-bold">*</span>
+                       </label>
                        <input 
                          type="text" 
-                         value={clientInfo.company} 
-                         onChange={(e) => setClientInfo({...clientInfo, company: e.target.value})} 
-                         placeholder="Group Name" 
-                         className="w-full p-3 bg-gray-50 border-none text-[10px] font-bold focus:ring-1 focus:ring-brand-green outline-none" 
+                         value={clientInfo.leadContact} 
+                         onChange={(e) => setClientInfo({...clientInfo, leadContact: e.target.value})} 
+                         placeholder="e.g. Kevin Wachira" 
+                         className="w-full p-3 bg-gray-50 border border-transparent focus:border-brand-green text-xs font-bold focus:ring-0 outline-none transition-colors" 
                        />
                     </div>
                     <div className="space-y-2">
-                       <label className="text-[9px] font-bold text-brand-gold uppercase tracking-[0.4em] flex items-center gap-2"><User size={10}/> Lead Contact</label>
-                       <input 
-                         type="text" 
-                         value={clientInfo.contact} 
-                         onChange={(e) => setClientInfo({...clientInfo, contact: e.target.value})} 
-                         placeholder="Lead Name" 
-                         className="w-full p-3 bg-gray-50 border-none text-[10px] font-bold focus:ring-1 focus:ring-brand-green outline-none" 
-                       />
-                    </div>
-                    <div className="space-y-2">
-                       <label className="text-[9px] font-bold text-brand-gold uppercase tracking-[0.4em] flex items-center gap-2"><Mail size={10}/> Email</label>
+                       <label className="text-[9px] font-bold text-brand-gold uppercase tracking-[0.3em] flex items-center gap-1.5">
+                         <Mail size={11}/> Lead Contact Email <span className="text-rose-500 font-bold">*</span>
+                       </label>
                        <input 
                          type="email" 
-                         value={clientInfo.email} 
-                         onChange={(e) => setClientInfo({...clientInfo, email: e.target.value})} 
-                         placeholder="email@address.com" 
-                         className="w-full p-3 bg-gray-50 border-none text-[10px] font-bold focus:ring-1 focus:ring-brand-green outline-none" 
+                         value={clientInfo.leadEmail} 
+                         onChange={(e) => setClientInfo({...clientInfo, leadEmail: e.target.value})} 
+                         placeholder="lead@organization.com" 
+                         className="w-full p-3 bg-gray-50 border border-transparent focus:border-brand-green text-xs font-bold focus:ring-0 outline-none transition-colors" 
                        />
                     </div>
+                    <div className="space-y-2">
+                       <label className="text-[9px] font-bold text-brand-gold uppercase tracking-[0.3em] flex items-center gap-1.5">
+                         <Phone size={11}/> Lead Phone Number
+                       </label>
+                       <input 
+                         type="tel" 
+                         value={clientInfo.leadPhone} 
+                         onChange={(e) => setClientInfo({...clientInfo, leadPhone: e.target.value})} 
+                         placeholder="+254 7XX XXX XXX" 
+                         className="w-full p-3 bg-gray-50 border border-transparent focus:border-brand-green text-xs font-bold focus:ring-0 outline-none transition-colors" 
+                       />
+                    </div>
+                    <div className="space-y-2">
+                       <label className="text-[9px] font-bold text-brand-gold uppercase tracking-[0.3em] flex items-center gap-1.5">
+                         <Building2 size={11}/> Organization / Group
+                       </label>
+                       <input 
+                         type="text" 
+                         value={clientInfo.organization} 
+                         onChange={(e) => setClientInfo({...clientInfo, organization: e.target.value})} 
+                         placeholder="e.g. CITAM / Kadolta / NGO" 
+                         className="w-full p-3 bg-gray-50 border border-transparent focus:border-brand-green text-xs font-bold focus:ring-0 outline-none transition-colors" 
+                       />
+                    </div>
+                 </div>
+
+                 {/* eTIMS Selection Checkbox Card */}
+                 <div className="p-4 bg-brand-sand/40 border border-brand-green/20 rounded-none transition-all">
+                    <label className="flex items-start gap-3 cursor-pointer select-none">
+                       <input 
+                         type="checkbox" 
+                         checked={clientInfo.needEtims} 
+                         onChange={(e) => setClientInfo(prev => ({
+                           ...prev, 
+                           needEtims: e.target.checked,
+                           companyName: prev.companyName || prev.organization,
+                           etimsEmail: prev.etimsEmail || prev.leadEmail,
+                           etimsPhone: prev.etimsPhone || prev.leadPhone
+                         }))}
+                         className="w-5 h-5 mt-0.5 rounded-none border-gray-300 text-brand-green focus:ring-brand-green accent-brand-green cursor-pointer" 
+                       />
+                       <div className="space-y-1">
+                          <div className="flex flex-wrap items-center gap-2">
+                             <span className="text-xs font-bold uppercase tracking-wider text-brand-green">
+                                Do you require an eTIMS Tax Invoice?
+                             </span>
+                             <span className="text-[8px] font-bold uppercase bg-brand-green text-brand-gold px-2 py-0.5">
+                                KRA Compliant
+                             </span>
+                          </div>
+                          <p className="text-[10px] text-gray-500 font-sans leading-relaxed">
+                            Check this box if your corporate finance or procurement department requires an official electronic tax invoice with KRA PIN verification for VAT and withholding tax filings.
+                          </p>
+                       </div>
+                    </label>
+
+                    {/* Conditional eTIMS Details Form when checked */}
+                    {clientInfo.needEtims && (
+                       <div className="mt-5 pt-4 border-t border-brand-green/15 space-y-4 animate-fade-in-up">
+                          <div className="flex items-center gap-2 text-brand-green">
+                            <FileText size={14} className="text-brand-gold" />
+                            <span className="text-[10px] font-bold uppercase tracking-widest">
+                              eTIMS Tax Registration Credentials (Required for KRA Register)
+                            </span>
+                          </div>
+
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                             <div className="space-y-1.5">
+                                <label className="text-[9px] font-bold text-brand-gold uppercase tracking-[0.3em] flex items-center gap-1.5">
+                                   <Building2 size={11} /> Name of Company <span className="text-rose-500 font-bold">*</span>
+                                </label>
+                                <input 
+                                   type="text" 
+                                   value={clientInfo.companyName} 
+                                   onChange={(e) => setClientInfo({ ...clientInfo, companyName: e.target.value })} 
+                                   placeholder="Registered Legal Business / Company Name" 
+                                   className="w-full p-3 bg-white border border-gray-200 text-xs font-semibold text-brand-green focus:ring-1 focus:ring-brand-green outline-none"
+                                />
+                             </div>
+
+                             <div className="space-y-1.5">
+                                <label className="text-[9px] font-bold text-brand-gold uppercase tracking-[0.3em] flex items-center gap-1.5">
+                                   <FileText size={11} /> KRA PIN <span className="text-rose-500 font-bold">*</span>
+                                </label>
+                                <input 
+                                   type="text" 
+                                   value={clientInfo.kraPin} 
+                                   onChange={(e) => setClientInfo({ ...clientInfo, kraPin: e.target.value.toUpperCase() })} 
+                                   placeholder="e.g. P051234567X / A012345678Z" 
+                                   className="w-full p-3 bg-white border border-gray-200 text-xs font-mono font-bold tracking-widest text-brand-green focus:ring-1 focus:ring-brand-green outline-none uppercase"
+                                />
+                             </div>
+
+                             <div className="space-y-1.5">
+                                <label className="text-[9px] font-bold text-brand-gold uppercase tracking-[0.3em] flex items-center gap-1.5">
+                                   <Mail size={11} /> Finance / Accounts Email <span className="text-rose-500 font-bold">*</span>
+                                </label>
+                                <input 
+                                   type="email" 
+                                   value={clientInfo.etimsEmail} 
+                                   onChange={(e) => setClientInfo({ ...clientInfo, etimsEmail: e.target.value })} 
+                                   placeholder="accounts@company.co.ke" 
+                                   className="w-full p-3 bg-white border border-gray-200 text-xs font-semibold text-brand-green focus:ring-1 focus:ring-brand-green outline-none"
+                                />
+                             </div>
+
+                             <div className="space-y-1.5">
+                                <label className="text-[9px] font-bold text-brand-gold uppercase tracking-[0.3em] flex items-center gap-1.5">
+                                   <Phone size={11} /> Finance Phone Number <span className="text-rose-500 font-bold">*</span>
+                                </label>
+                                <input 
+                                   type="tel" 
+                                   value={clientInfo.etimsPhone} 
+                                   onChange={(e) => setClientInfo({ ...clientInfo, etimsPhone: e.target.value })} 
+                                   placeholder="+254 7XX XXX XXX" 
+                                   className="w-full p-3 bg-white border border-gray-200 text-xs font-semibold text-brand-green focus:ring-1 focus:ring-brand-green outline-none"
+                                />
+                             </div>
+                          </div>
+
+                          <div className="text-[9px] text-emerald-800 bg-white p-2.5 border border-emerald-200 flex items-center gap-2">
+                             <CheckCircle2 size={13} className="text-emerald-600 flex-shrink-0" />
+                             <span>Official eTIMS invoice with validated KRA credentials will be generated under Cross Connect Africa Ltd (KRA PIN: <strong>P052198744M</strong>).</span>
+                          </div>
+                       </div>
+                    )}
                  </div>
               </section>
 
@@ -494,13 +822,23 @@ Contact: ${clientInfo.contact || 'Not Specified'}`;
                     </div>
 
                     <div className="space-y-3">
-                       <label className="text-[9px] font-bold text-brand-gold uppercase tracking-[0.6em] block">Participant Scale (Pax)</label>
+                       <div className="flex justify-between items-center">
+                         <label className="text-[9px] font-bold text-brand-gold uppercase tracking-[0.6em] block">Participant Scale (Pax)</label>
+                         {results.discountPercent > 0 && (
+                           <span className="text-[8px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-1.5 py-0.5 border border-emerald-200">
+                             {results.discountPercent}% Off Core
+                           </span>
+                         )}
+                       </div>
                        <input 
                           type="number" 
                           value={pax} 
                           onChange={(e) => setPax(Math.max(0, parseInt(e.target.value) || 0))}
                           className="w-full p-3.5 bg-gray-50 border-none rounded-none font-serif font-bold text-xl text-brand-green focus:ring-1 focus:ring-brand-green outline-none" 
                        />
+                       <p className="text-[8px] text-gray-500 font-sans leading-tight">
+                         Preferential institutional concessions apply from 30+ pax (30+ @ 5%, 50+ @ 10%, 100+ @ 15%).
+                       </p>
                     </div>
                  </div>
 
@@ -628,15 +966,71 @@ Contact: ${clientInfo.contact || 'Not Specified'}`;
           <div className="lg:col-span-5 print:hidden">
              <div id="quote-doc" className="bg-white p-8 md:p-10 shadow-2xl paper-texture sticky top-32 border border-gray-100">
                 <header className="border-b-[6px] border-brand-green pb-6 mb-8">
-                   <div className="flex justify-between items-start mb-4">
-                      <Logo className="w-12 h-12" />
-                      <div className="text-right">
+                   <div className="flex justify-between items-start mb-4 gap-3">
+                      <div className="flex items-center gap-3">
+                         <div className="p-1.5 bg-brand-green/5 border border-brand-green/20 rounded">
+                            <Logo className="w-10 h-10 flex-shrink-0" />
+                         </div>
+                         <div>
+                            <h3 className="font-serif font-black text-xl text-brand-green tracking-tight leading-none uppercase">
+                               Cross Connect
+                            </h3>
+                            <span className="text-brand-gold text-[9px] tracking-[0.4em] font-bold uppercase block mt-0.5">
+                               Africa
+                            </span>
+                         </div>
+                      </div>
+                      <div className="text-right flex-shrink-0">
                          <div className="text-[8px] font-bold uppercase text-gray-400 tracking-widest">{quoteId}</div>
-                         <div className="text-[9px] font-bold uppercase text-brand-gold tracking-[0.4em]">Strategy Record</div>
+                         <div className="text-[9px] font-bold uppercase text-brand-gold tracking-[0.3em]">
+                           {clientInfo.needEtims ? 'eTIMS Invoice' : 'Strategy Record'}
+                         </div>
                       </div>
                    </div>
-                   <h2 className="text-2xl font-serif font-bold text-brand-green italic truncate leading-none mb-2">{clientInfo.company || 'Prospective Partner'}</h2>
-                   <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{new Date(missionDate).toLocaleDateString('en-KE')} — {pax} PAX</p>
+
+                   <div className="space-y-1.5 mb-2">
+                      <h2 className="text-2xl font-serif font-bold text-brand-green italic truncate leading-tight">
+                        {clientInfo.needEtims 
+                          ? (clientInfo.companyName || clientInfo.organization || 'Prospective Partner') 
+                          : (clientInfo.organization || clientInfo.leadContact || 'Prospective Partner')}
+                      </h2>
+                      
+                      <div className="space-y-0.5 text-xs text-gray-600 font-sans">
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-[9px] uppercase tracking-wider font-bold text-brand-gold">Lead Contact:</span>
+                          <span className="font-serif font-bold text-brand-green italic text-sm">{clientInfo.leadContact || 'Not Specified'}</span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-[9px] uppercase tracking-wider font-bold text-gray-400">Email:</span>
+                          <span className="text-gray-700">{clientInfo.leadEmail || 'Not Specified'}</span>
+                        </div>
+                        {clientInfo.leadPhone && (
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-[9px] uppercase tracking-wider font-bold text-gray-400">Phone:</span>
+                            <span className="text-gray-700">{clientInfo.leadPhone}</span>
+                          </div>
+                        )}
+                      </div>
+
+                      {clientInfo.needEtims && (
+                        <div className="p-2.5 bg-emerald-50 border border-emerald-200 text-[9px] space-y-1 mt-2">
+                          <div className="flex items-center gap-1.5 text-emerald-800 font-bold uppercase tracking-wider">
+                            <CheckCircle2 size={11} className="text-emerald-600" />
+                            <span>eTIMS Tax Invoice Requested</span>
+                          </div>
+                          <div className="text-gray-700">
+                            Company: <strong>{clientInfo.companyName || clientInfo.organization || 'Not Specified'}</strong>
+                          </div>
+                          <div className="text-gray-700 font-mono">
+                            KRA PIN: <strong>{clientInfo.kraPin || 'Pending Provision'}</strong>
+                          </div>
+                        </div>
+                      )}
+                   </div>
+
+                   <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest pt-1 border-t border-gray-100">
+                     {new Date(missionDate).toLocaleDateString('en-KE')} — {pax} PAX
+                   </p>
                 </header>
 
                 <div className="space-y-5">
@@ -682,34 +1076,348 @@ Contact: ${clientInfo.contact || 'Not Specified'}`;
                    )}
 
                    <section className="bg-brand-green text-white p-6 mt-8 space-y-3 shadow-xl">
-                      <span className="text-brand-gold text-[9px] font-bold uppercase tracking-[0.5em] block">Total Investment</span>
+                      <div className="flex justify-between items-center">
+                         <span className="text-brand-gold text-[9px] font-bold uppercase tracking-[0.5em] block">Total Investment</span>
+                         {results.discountPercent > 0 && (
+                           <span className="text-[8px] uppercase tracking-wider font-bold bg-brand-gold text-brand-green px-2 py-0.5">
+                             {results.discountPercent}% Volume Concession
+                           </span>
+                         )}
+                      </div>
+                      
+                      {results.totalSavings > 0 && (
+                        <div className="flex items-baseline justify-between text-xs text-white/60">
+                           <span>Standard Scale Rate:</span>
+                           <span className="line-through">{formatKES(results.subtotal + results.totalSavings)}</span>
+                        </div>
+                      )}
+
                       <div className="text-2xl md:text-4xl font-serif font-bold text-brand-gold tracking-tighter leading-none">{formatKES(results.subtotal)}</div>
+                      
+                      {results.totalSavings > 0 && (
+                        <div className="text-[9px] text-emerald-300 font-sans flex items-center gap-1.5 pt-1">
+                           <Tag size={11} /> You save {formatKES(results.totalSavings)} with volume tier pricing
+                        </div>
+                      )}
+
                       <div className="pt-3 border-t border-white/10 flex justify-between items-center">
                          <span className="text-[8px] uppercase font-bold tracking-[0.3em] opacity-60">Security Deposit (50%)</span>
                          <span className="text-lg font-serif font-bold text-brand-gold">{formatKES(results.deposit)}</span>
                       </div>
                    </section>
 
+                   {/* Professional Volume Policy Note */}
+                   <div className="p-3 bg-brand-sand/60 border border-brand-green/10 text-[9px] text-brand-green/90 leading-relaxed font-sans">
+                     <div className="font-bold uppercase tracking-wider text-[8px] text-brand-gold mb-0.5">Volume & Commercial Agreements:</div>
+                     Preferential concessions are available for large cohorts (30+ pax) or customized institutional frameworks as agreed upon with our engagement directors.
+                   </div>
+
                    <div className="pt-6 flex flex-col gap-3">
                       <button 
                         onClick={handleWhatsApp} 
                         disabled={!selectedProgram || (pax === 0 && selectedProgram.priceType !== 'flat_rate' && selectedProgram.category !== 'hosting' && selectedProgram.id !== 'medic_standby')}
-                        className="w-full py-4 bg-[#25D366] text-white font-bold uppercase tracking-[0.4em] text-[9px] shadow-lg flex items-center justify-center gap-3 disabled:opacity-50 active:scale-[0.98] transition-all hover:brightness-105"
+                        className="w-full py-4 bg-[#25D366] text-white font-bold uppercase tracking-[0.3em] text-[9px] shadow-lg flex items-center justify-center gap-3 disabled:opacity-50 active:scale-[0.98] transition-all hover:brightness-105"
                       >
-                         <MessageCircle size={18} /> Request Proposal
+                         <MessageCircle size={18} /> Request Proposal via WhatsApp
                       </button>
+
+                      <button 
+                        onClick={() => setShowInvoiceModal(true)} 
+                        className="w-full py-3.5 bg-brand-sand border border-brand-green/30 text-brand-green font-bold text-[9px] uppercase tracking-[0.2em] flex items-center justify-center gap-2 hover:bg-brand-sand/80 transition-all shadow-sm active:scale-[0.98]"
+                      >
+                        <Eye size={16} className="text-brand-gold" /> Preview Official Invoice
+                      </button>
+
                       <button 
                         onClick={handlePrint} 
-                        className="w-full py-3.5 border border-brand-green text-brand-green font-bold text-[8px] uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-brand-green hover:text-white transition-colors active:scale-[0.98]"
+                        className="w-full py-4 bg-brand-green text-white font-bold text-[9px] uppercase tracking-[0.25em] flex items-center justify-center gap-2.5 hover:bg-brand-green/90 transition-all shadow-md active:scale-[0.98]"
                       >
-                        <Printer size={14} /> Generate Strategy PDF
+                        <FileDown size={17} className="text-brand-gold" /> Export Official Invoice / Quote (PDF)
                       </button>
+
+                      <button 
+                        onClick={handleCopyQuote} 
+                        className="w-full py-3 border border-brand-green/30 text-brand-green font-bold text-[8px] uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-brand-cream transition-colors active:scale-[0.98]"
+                      >
+                        {copiedQuote ? (
+                          <>
+                            <Check size={14} className="text-emerald-600" /> Quotation Copied to Clipboard
+                          </>
+                        ) : (
+                          <>
+                            <Copy size={14} /> Copy Proforma Summary
+                          </>
+                        )}
+                      </button>
+
+                      <div className="pt-2 text-[9px] text-gray-400 text-center font-sans leading-tight">
+                        Includes Bank Remittance Details (Absa Bank, Paybill: 303030) ready for Procurement & Finance approval.
+                      </div>
                    </div>
                 </div>
              </div>
           </div>
         </div>
       </div>
+
+      {/* 3. INTERACTIVE ON-SCREEN INVOICE MODAL */}
+      {showInvoiceModal && (
+        <div className="fixed inset-0 z-[1000] bg-brand-green/80 backdrop-blur-md flex items-center justify-center p-3 md:p-6 overflow-y-auto">
+          <div className="bg-white max-w-4xl w-full my-auto shadow-2xl border border-brand-green/20 overflow-hidden flex flex-col max-h-[92vh]">
+            
+            {/* Modal Control Bar */}
+            <div className="bg-brand-green text-white p-4 flex justify-between items-center border-b border-brand-gold/30 shrink-0">
+              <div className="flex items-center gap-3">
+                <FileText size={18} className="text-brand-gold" />
+                <div>
+                  <span className="font-serif font-bold text-sm tracking-wide block">
+                    {clientInfo.needEtims ? 'Official eTIMS Tax Invoice & Proforma' : 'Official Proforma Invoice'}
+                  </span>
+                  <span className="text-[9px] text-brand-gold uppercase tracking-widest">
+                    Ref: {quoteId}
+                  </span>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <button 
+                  onClick={handlePrint}
+                  className="px-4 py-2 bg-brand-gold text-brand-green font-bold text-[9px] uppercase tracking-widest flex items-center gap-1.5 hover:brightness-110 active:scale-95 transition-all"
+                >
+                  <Printer size={13} /> Print / Export PDF
+                </button>
+                <button 
+                  onClick={() => setShowInvoiceModal(false)}
+                  className="p-2 text-white/80 hover:text-white hover:bg-white/10 rounded transition-colors"
+                  aria-label="Close invoice preview"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+            </div>
+
+            {/* Modal Document Body */}
+            <div className="p-6 md:p-10 overflow-y-auto font-serif text-brand-green bg-brand-cream/30 space-y-6">
+              
+              {/* Letterhead */}
+              <div className="flex flex-col sm:flex-row justify-between items-start border-b-4 border-brand-green pb-6 gap-4">
+                <div className="flex items-center gap-4">
+                  <div className="p-2 bg-brand-green/5 border border-brand-green/20 rounded flex items-center justify-center">
+                    <Logo className="w-14 h-14" />
+                  </div>
+                  <div>
+                    <h1 className="text-2xl md:text-3xl font-serif font-black tracking-tight text-brand-green uppercase leading-none">
+                      CROSS CONNECT
+                    </h1>
+                    <span className="text-brand-gold text-xs tracking-[0.45em] font-bold uppercase block mt-1">
+                      AFRICA
+                    </span>
+                    <span className="text-[8px] text-gray-500 font-sans tracking-widest uppercase block mt-0.5">
+                      Wilderness Leadership & Experiential Operations • Nairobi, Kenya
+                    </span>
+                  </div>
+                </div>
+                <div className="sm:text-right">
+                  <span className={`inline-block px-3 py-1 text-[9px] font-bold uppercase tracking-widest mb-1 ${
+                    clientInfo.needEtims 
+                      ? 'bg-brand-green text-brand-gold ring-1 ring-brand-gold' 
+                      : 'bg-brand-green text-brand-gold'
+                  }`}>
+                    {clientInfo.needEtims ? 'Official eTIMS Tax Invoice' : 'Official Proforma Quotation'}
+                  </span>
+                  <h2 className="text-lg font-bold italic text-brand-green mb-0.5">Strategic Engagement Estimate</h2>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500">Ref: {quoteId}</p>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500">Issued: {new Date().toLocaleDateString('en-KE', { dateStyle: 'long' })}</p>
+                </div>
+              </div>
+
+              {/* Company & Treasury Details */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-white border border-gray-200 text-[10px] font-sans">
+                <div>
+                  <p className="font-bold text-brand-green uppercase tracking-wider mb-0.5">Cross Connect Africa Ltd</p>
+                  <p className="text-gray-600">Location: <strong>Valley View Office Park, B1 Office 1, Nairobi</strong></p>
+                  <p className="text-gray-600">Email: <strong>missions@crossconnect.africa</strong></p>
+                  <p className="text-gray-600">Phone: <strong>+254 710 974 670</strong></p>
+                </div>
+                <div className="md:text-right">
+                  <p className="font-bold text-brand-green uppercase tracking-wider mb-0.5">Treasury & Remittance Details</p>
+                  <p className="text-gray-600">Bank: <strong>Absa Bank Kenya Plc</strong></p>
+                  <p className="text-gray-600">Paybill: <strong>303030</strong></p>
+                  <p className="text-gray-600">Account Number: <strong>2043432128</strong></p>
+                  <p className="text-gray-600">M-Pesa Number: <strong>+254710974670</strong></p>
+                </div>
+              </div>
+
+              {/* Client & Deployment Summary */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 font-sans">
+                <div className="space-y-3 bg-white p-4 border border-gray-100">
+                  <h3 className="text-[10px] font-bold uppercase tracking-[0.3em] text-brand-gold border-b border-gray-100 pb-2 font-serif">
+                    Client & Invoicing Details
+                  </h3>
+                  <div className="space-y-2 text-xs">
+                    <div>
+                      <span className="text-[8px] font-bold uppercase tracking-wider text-gray-400 block">Lead Contact Name</span>
+                      <p className="font-serif font-bold text-base text-brand-green italic">{clientInfo.leadContact || 'Lead Contact Representative'}</p>
+                    </div>
+                    <div>
+                      <span className="text-[8px] font-bold uppercase tracking-wider text-gray-400 block">Lead Contact Email</span>
+                      <p className="text-gray-800 break-words">{clientInfo.leadEmail || 'email@organization.com'}</p>
+                    </div>
+                    {clientInfo.leadPhone && (
+                      <div>
+                        <span className="text-[8px] font-bold uppercase tracking-wider text-gray-400 block">Lead Contact Phone</span>
+                        <p className="text-gray-800">{clientInfo.leadPhone}</p>
+                      </div>
+                    )}
+                    <div>
+                      <span className="text-[8px] font-bold uppercase tracking-wider text-gray-400 block">Organization</span>
+                      <p className="text-gray-800 font-semibold">{clientInfo.organization || clientInfo.companyName || 'Not Specified'}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-3 bg-white p-4 border border-gray-100">
+                  <h3 className="text-[10px] font-bold uppercase tracking-[0.3em] text-brand-gold border-b border-gray-100 pb-2 font-serif">
+                    Operational Scope
+                  </h3>
+                  <div className="space-y-1.5 text-xs">
+                    <p><span className="font-bold text-gray-600">Mission:</span> <span className="font-serif italic text-brand-green font-bold">{selectedProgram?.title}</span></p>
+                    <p><span className="font-bold text-gray-600">Scale:</span> {pax} Participants</p>
+                    <p><span className="font-bold text-gray-600">Deployment Date:</span> {new Date(missionDate).toLocaleDateString('en-KE', { dateStyle: 'full' })}</p>
+                    <p><span className="font-bold text-gray-600">Duration:</span> {results.days} Day(s)</p>
+                    <p><span className="font-bold text-gray-600">Pillar:</span> {selectedProgram?.category.replace('_', ' ').toUpperCase()}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Dedicated eTIMS Tax Invoice Details (If eTIMS is selected) */}
+              {clientInfo.needEtims && (
+                <div className="p-4 bg-emerald-50/80 border-2 border-brand-green/30 text-xs font-sans">
+                  <div className="flex justify-between items-center border-b border-brand-green/20 pb-2 mb-3">
+                    <div className="flex items-center gap-2">
+                      <span className="px-2 py-0.5 bg-brand-green text-brand-gold text-[8px] font-bold uppercase tracking-widest">
+                        KRA eTIMS Tax Invoice Details
+                      </span>
+                      <span className="text-[10px] font-bold text-emerald-800">
+                        Statutory Deductibility & VAT Ready
+                      </span>
+                    </div>
+                    <span className="text-[9px] text-gray-500 font-mono">CCA-eTIMS/SYS-2024</span>
+                  </div>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-[10px]">
+                    <div>
+                      <span className="text-gray-500 uppercase tracking-wider block text-[8px]">Name of Company</span>
+                      <strong className="text-brand-green text-xs block">{clientInfo.companyName || clientInfo.organization || 'Not Specified'}</strong>
+                    </div>
+                    <div>
+                      <span className="text-gray-500 uppercase tracking-wider block text-[8px]">KRA PIN</span>
+                      <strong className="font-mono text-xs text-brand-green block tracking-wider">{clientInfo.kraPin || 'Pending Provision'}</strong>
+                    </div>
+                    <div>
+                      <span className="text-gray-500 uppercase tracking-wider block text-[8px]">Finance Email</span>
+                      <span className="text-gray-800 block truncate">{clientInfo.etimsEmail || clientInfo.leadEmail || 'Not Specified'}</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-500 uppercase tracking-wider block text-[8px]">Finance Phone</span>
+                      <span className="text-gray-800 block">{clientInfo.etimsPhone || clientInfo.leadPhone || 'Not Specified'}</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Itemized Investment Table */}
+              <div className="bg-white border border-gray-200">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="bg-brand-sand text-[10px] font-bold uppercase tracking-widest">
+                      <th className="py-3 px-4 border-b-2 border-brand-green">Description of Engagement</th>
+                      <th className="py-3 px-4 border-b-2 border-brand-green text-right">Investment (KES)</th>
+                    </tr>
+                  </thead>
+                  <tbody className="text-sm">
+                    <tr>
+                      <td className="py-3 px-4 border-b border-gray-100 font-bold italic">
+                        01 Core Pillar: {selectedProgram?.title}
+                        {results.discountPercent > 0 && (
+                          <span className="inline-block mt-1 text-[8px] uppercase tracking-wider font-bold bg-brand-sand px-2 py-0.5 text-brand-green border border-brand-green/20 block w-fit">
+                            {results.discountLabel}
+                          </span>
+                        )}
+                      </td>
+                      <td className="py-3 px-4 border-b border-gray-100 text-right font-bold">
+                        {results.discountPercent > 0 && (
+                          <span className="line-through text-xs text-gray-400 block font-normal">
+                            {formatKES(results.undiscountedMissionBase)}
+                          </span>
+                        )}
+                        {formatKES(results.missionBase)}
+                      </td>
+                    </tr>
+                    {results.totalSavings > 0 && (
+                      <tr className="bg-emerald-50/50">
+                        <td className="py-2 px-4 border-b border-gray-100 font-serif italic text-emerald-800 text-xs">
+                          • Negotiated Volume Concession applied to core engagement scale ({pax} PAX)
+                        </td>
+                        <td className="py-2 px-4 border-b border-gray-100 text-right font-bold text-emerald-700 text-sm">
+                          -{formatKES(results.totalSavings)}
+                        </td>
+                      </tr>
+                    )}
+                    {results.logisticsBase > 0 && (
+                      <tr>
+                        <td className="py-3 px-4 border-b border-gray-100 font-bold italic">
+                          02 Field Logistics & Hospitality
+                        </td>
+                        <td className="py-3 px-4 border-b border-gray-100 text-right font-bold">{formatKES(results.logisticsBase)}</td>
+                      </tr>
+                    )}
+                    {chosenAddons.length > 0 && chosenAddons.map((id) => {
+                      const addon = STRATEGIC_ADDONS.find(a => a.id === id);
+                      if (!addon) return null;
+                      const price = addon.type === 'pp' ? addon.price * (pax > 0 ? pax : 1) : addon.price;
+                      return (
+                        <tr key={id}>
+                          <td className="py-2 px-4 border-b border-gray-100 font-bold italic text-xs">
+                            • {addon.label}
+                          </td>
+                          <td className="py-2 px-4 border-b border-gray-100 text-right font-bold text-xs">{formatKES(price)}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                  <tfoot>
+                    <tr className="bg-brand-sand/50">
+                      <td className="py-4 px-4 text-right text-xs font-bold uppercase tracking-widest text-gray-500">Total Strategic Investment</td>
+                      <td className="py-4 px-4 text-right text-xl font-bold text-brand-green border-b-2 border-brand-green">{formatKES(results.subtotal)}</td>
+                    </tr>
+                    <tr>
+                      <td className="py-2 px-4 text-right text-[10px] uppercase font-bold tracking-wider text-gray-400">50% Mobilization Deposit</td>
+                      <td className="py-2 px-4 text-right text-sm font-bold text-brand-gold">{formatKES(results.deposit)}</td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+
+              {/* Terms & Authorized Signature */}
+              <div className="bg-white p-4 border border-gray-200 grid grid-cols-1 md:grid-cols-2 gap-6 items-end text-[10px]">
+                <div className="space-y-1 opacity-75 font-sans">
+                  <p className="font-bold text-brand-green uppercase tracking-wider mb-1">Commercial & Legal Terms</p>
+                  <p>• 50% Mobilization deposit secures deployment date.</p>
+                  <p>• Quote valid for 30 days from date of issue.</p>
+                  <p>• eTIMS Electronic Tax Register receipt issued upon payment clearance.</p>
+                </div>
+                <div className="text-right">
+                  <div className="text-xs uppercase font-bold text-brand-green font-serif">
+                    Kevin Muhoro, Founder
+                  </div>
+                  <div className="text-[9px] font-bold text-brand-gold uppercase tracking-widest">
+                    Cross Connect Africa Ltd
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       <style>{`
         .custom-scrollbar::-webkit-scrollbar { width: 3px; }

@@ -13,7 +13,7 @@ import Contact from './pages/Contact';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsOfService from './pages/TermsOfService';
 import LiabilityWaiver from './pages/LiabilityWaiver';
-import MissionConsultant from './components/MissionConsultant';
+import WhatsAppQuickChat from './components/WhatsAppQuickChat';
 import { ViewState, GeneratedItinerary } from './types';
 
 export interface BookingContextData {
@@ -24,6 +24,17 @@ export interface BookingContextData {
   addons?: string[];
   itinerary?: GeneratedItinerary | null;
   durationIndex?: number;
+  clientInfo?: {
+    company?: string;
+    contact?: string;
+    email?: string;
+    phone?: string;
+    needEtims?: boolean;
+    companyName?: string;
+    kraPin?: string;
+    etimsEmail?: string;
+    etimsPhone?: string;
+  };
 }
 
 const App: React.FC = () => {
@@ -45,7 +56,7 @@ const App: React.FC = () => {
       case ViewState.HOME:
         return <Home setView={setCurrentView} />;
       case ViewState.ABOUT:
-        return <About />;
+        return <About setView={setCurrentView} />;
       case ViewState.GALLERY:
       case ViewState.ADVENTURE_BUILDER:
         return <Gallery setView={setCurrentView} onNavigateToBooking={handleNavigateToBooking} />;
@@ -76,7 +87,7 @@ const App: React.FC = () => {
         {renderView()}
       </main>
 
-      <MissionConsultant />
+      <WhatsAppQuickChat />
       <Footer setView={setCurrentView} />
     </div>
   );

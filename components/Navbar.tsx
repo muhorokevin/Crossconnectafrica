@@ -68,6 +68,10 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, setView }) => {
             Gallery
             <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-brand-gold transition-all duration-300 group-hover:w-full"></span>
           </button>
+          <button onClick={() => setView(ViewState.ADVENTURE_BUILDER)} className={linkClass(ViewState.ADVENTURE_BUILDER)}>
+            Builder
+            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-brand-gold transition-all duration-300 group-hover:w-full"></span>
+          </button>
           <button onClick={() => setView(ViewState.EVENTS)} className={linkClass(ViewState.EVENTS)}>
             Events
             <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-brand-gold transition-all duration-300 group-hover:w-full"></span>
@@ -105,6 +109,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, setView }) => {
           <button onClick={() => { setView(ViewState.HOME); setIsMobileMenuOpen(false); }} className="text-brand-cream text-lg font-serif">Home</button>
           <button onClick={() => { setView(ViewState.ABOUT); setIsMobileMenuOpen(false); }} className="text-brand-cream text-lg font-serif">About Us</button>
           <button onClick={() => { setView(ViewState.GALLERY); setIsMobileMenuOpen(false); }} className="text-brand-cream text-lg font-serif">Gallery</button>
+          <button onClick={() => { setView(ViewState.ADVENTURE_BUILDER); setIsMobileMenuOpen(false); }} className="text-brand-cream text-lg font-serif">Mission Builder</button>
           <button onClick={() => { setView(ViewState.EVENTS); setIsMobileMenuOpen(false); }} className="text-brand-cream text-lg font-serif">Events</button>
           <button onClick={() => { setView(ViewState.SHOP); setIsMobileMenuOpen(false); }} className="text-brand-cream text-lg font-serif flex items-center gap-2"><ShoppingBag size={18}/> Shop Gear</button>
           <button onClick={() => { setView(ViewState.CONTACT); setIsMobileMenuOpen(false); }} className="text-brand-cream text-lg font-serif">Contact Us</button>

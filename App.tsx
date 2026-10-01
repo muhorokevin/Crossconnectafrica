@@ -58,8 +58,9 @@ const App: React.FC = () => {
       case ViewState.ABOUT:
         return <About setView={setCurrentView} />;
       case ViewState.GALLERY:
-      case ViewState.ADVENTURE_BUILDER:
         return <Gallery setView={setCurrentView} onNavigateToBooking={handleNavigateToBooking} />;
+      case ViewState.ADVENTURE_BUILDER:
+        return <AdventureBuilder onNavigateToBooking={handleNavigateToBooking} />;
       case ViewState.CALCULATOR:
         return <Calculator initialData={bookingContext} />;
       case ViewState.EVENTS:

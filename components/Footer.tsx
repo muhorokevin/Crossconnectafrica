@@ -101,7 +101,7 @@ const Footer: React.FC<FooterProps> = ({ setView }) => {
                 </li>
                  <li className="flex items-start gap-3">
                     <Mail size={18} className="text-brand-gold shrink-0 mt-1" />
-                    <span className="text-sm break-words">crossconnectmissions@protonmail.com</span>
+                    <a href="mailto:crossconnectmissions@protonmail.com" className="text-sm break-words hover:text-brand-gold transition-colors">crossconnectmissions@protonmail.com</a>
                 </li>
             </ul>
           </div>

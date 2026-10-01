@@ -75,6 +75,18 @@ const STRATEGIC_ADDONS = [
   { id: 'log_driver_allowance', label: 'Overnight Driver Allow', price: 2000, type: 'flat', category: 'all' }
 ];
 
+// Official Statutory & Remittance Credentials for Proforma Invoices
+export const OFFICIAL_PROFORMA_REMITTANCE = {
+  companyName: 'Cross Connect Africa Ltd',
+  location: 'Valley View Office Park, B1 Office 1, Nairobi',
+  email: 'crossconnectmissions@protonmail.com',
+  phone: '+254 710 974 670',
+  bank: 'Absa Bank Kenya Plc',
+  paybill: '303030',
+  accountNumber: '2043432128',
+  mpesaNumber: '+254710974670'
+};
+
 const Calculator: React.FC<{ initialData?: BookingContextData | null }> = ({ initialData }) => {
   const [clientInfo, setClientInfo] = useState({
     leadContact: initialData?.clientInfo?.contact || '',
@@ -133,13 +145,26 @@ const Calculator: React.FC<{ initialData?: BookingContextData | null }> = ({ ini
     let discountPercent = 0;
     let discountLabel = '';
 
+    // Check if the program uses pre-discounted volume tiers in its price schedule (e.g. First Aid & Fire Safety)
+    const hasBuiltInTierPricing = selectedProgram.id === 'first_aid' || selectedProgram.id === 'fire_safety_training';
+
     if (variant?.isGroup || selectedProgram.priceType === 'flat_rate') {
         undiscountedMissionBase = variant?.price || selectedProgram.basePrice;
         missionBase = undiscountedMissionBase;
+    } else if (hasBuiltInTierPricing) {
+        // First Aid & Fire Safety tiers already have volume concessions baked into their price list.
+        // Prevent stacked discounts by not applying the general 30/50/100 pax percentage discounts on top.
+        undiscountedMissionBase = selectedProgram.basePrice * pax;
+        missionBase = (variant?.price || selectedProgram.basePrice) * pax;
+        if (variant && variant.price < selectedProgram.basePrice) {
+            const savingsPerPax = selectedProgram.basePrice - variant.price;
+            discountPercent = Math.round((savingsPerPax / selectedProgram.basePrice) * 100);
+            discountLabel = `${variant.label.split('(')[0].trim()} (Pre-Discounted Tier Rate)`;
+        }
     } else {
         undiscountedMissionBase = (variant?.price || selectedProgram.basePrice) * pax;
         
-        // Tiered Volume Concession Protocol
+        // Tiered Volume Concession Protocol for standard programs
         if (pax >= 100) {
             discountPercent = 15;
             discountLabel = 'Enterprise Scale Concession (100+ Pax — 15% Off Core)';
@@ -285,10 +310,10 @@ Strategic Addons: ${activeAddonsText || 'None'}${concessionInfo}
 Total Investment: ${formatKES(results.subtotal)}
 50% Mobilization Deposit: ${formatKES(results.deposit)}
 --------------------------------
-Cross Connect Africa Ltd | Valley View Office Park, Nairobi
-Email: missions@crossconnect.africa | Phone: +254 710 974 670
-Bank: Absa Bank Kenya Plc | Paybill: 303030 | Account: 2043432128
-M-Pesa: +254710974670`;
+${OFFICIAL_PROFORMA_REMITTANCE.companyName} | ${OFFICIAL_PROFORMA_REMITTANCE.location}
+Email: ${OFFICIAL_PROFORMA_REMITTANCE.email} | Phone: ${OFFICIAL_PROFORMA_REMITTANCE.phone}
+Bank: ${OFFICIAL_PROFORMA_REMITTANCE.bank} | Paybill: ${OFFICIAL_PROFORMA_REMITTANCE.paybill} | Account: ${OFFICIAL_PROFORMA_REMITTANCE.accountNumber}
+M-Pesa: ${OFFICIAL_PROFORMA_REMITTANCE.mpesaNumber}`;
 
     navigator.clipboard.writeText(summary).then(() => {
       setCopiedQuote(true);
@@ -342,17 +367,17 @@ M-Pesa: +254710974670`;
           {/* Company & Treasury Details */}
           <div className="grid grid-cols-2 gap-6 p-4 bg-gray-50 border border-gray-200 text-[10px] mb-6 font-sans">
             <div>
-              <p className="font-bold text-brand-green uppercase tracking-wider mb-0.5">Cross Connect Africa Ltd</p>
-              <p className="text-gray-600">Location: <strong>Valley View Office Park, B1 Office 1, Nairobi</strong></p>
-              <p className="text-gray-600">Email: <strong>missions@crossconnect.africa</strong></p>
-              <p className="text-gray-600">Phone: <strong>+254 710 974 670</strong></p>
+              <p className="font-bold text-brand-green uppercase tracking-wider mb-0.5">{OFFICIAL_PROFORMA_REMITTANCE.companyName}</p>
+              <p className="text-gray-600">Location: <strong>{OFFICIAL_PROFORMA_REMITTANCE.location}</strong></p>
+              <p className="text-gray-600">Email: <strong>{OFFICIAL_PROFORMA_REMITTANCE.email}</strong></p>
+              <p className="text-gray-600">Phone: <strong>{OFFICIAL_PROFORMA_REMITTANCE.phone}</strong></p>
             </div>
             <div className="text-right">
               <p className="font-bold text-brand-green uppercase tracking-wider mb-0.5">Treasury & Remittance Details</p>
-              <p className="text-gray-600">Bank: <strong>Absa Bank Kenya Plc</strong></p>
-              <p className="text-gray-600">Paybill: <strong>303030</strong></p>
-              <p className="text-gray-600">Account Number: <strong>2043432128</strong></p>
-              <p className="text-gray-600">M-Pesa Number: <strong>+254710974670</strong></p>
+              <p className="text-gray-600">Bank: <strong>{OFFICIAL_PROFORMA_REMITTANCE.bank}</strong></p>
+              <p className="text-gray-600">Paybill: <strong>{OFFICIAL_PROFORMA_REMITTANCE.paybill}</strong></p>
+              <p className="text-gray-600">Account Number: <strong>{OFFICIAL_PROFORMA_REMITTANCE.accountNumber}</strong></p>
+              <p className="text-gray-600">M-Pesa Number: <strong>{OFFICIAL_PROFORMA_REMITTANCE.mpesaNumber}</strong></p>
             </div>
           </div>
 
@@ -542,7 +567,7 @@ M-Pesa: +254710974670`;
 
           {/* Footer Contact */}
           <div className="mt-auto pt-8 border-t border-gray-100 flex justify-between items-center text-[8px] font-bold uppercase tracking-[0.3em] text-gray-400">
-            <span>missions@crossconnect.africa • +254 710 974 670</span>
+            <span>crossconnectmissions@protonmail.com • +254 710 974 670</span>
             <span>Valley View Office Park, Nairobi</span>
           </div>
         </div>
@@ -1233,17 +1258,17 @@ M-Pesa: +254710974670`;
               {/* Company & Treasury Details */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-white border border-gray-200 text-[10px] font-sans">
                 <div>
-                  <p className="font-bold text-brand-green uppercase tracking-wider mb-0.5">Cross Connect Africa Ltd</p>
-                  <p className="text-gray-600">Location: <strong>Valley View Office Park, B1 Office 1, Nairobi</strong></p>
-                  <p className="text-gray-600">Email: <strong>missions@crossconnect.africa</strong></p>
-                  <p className="text-gray-600">Phone: <strong>+254 710 974 670</strong></p>
+                  <p className="font-bold text-brand-green uppercase tracking-wider mb-0.5">{OFFICIAL_PROFORMA_REMITTANCE.companyName}</p>
+                  <p className="text-gray-600">Location: <strong>{OFFICIAL_PROFORMA_REMITTANCE.location}</strong></p>
+                  <p className="text-gray-600">Email: <strong>{OFFICIAL_PROFORMA_REMITTANCE.email}</strong></p>
+                  <p className="text-gray-600">Phone: <strong>{OFFICIAL_PROFORMA_REMITTANCE.phone}</strong></p>
                 </div>
                 <div className="md:text-right">
                   <p className="font-bold text-brand-green uppercase tracking-wider mb-0.5">Treasury & Remittance Details</p>
-                  <p className="text-gray-600">Bank: <strong>Absa Bank Kenya Plc</strong></p>
-                  <p className="text-gray-600">Paybill: <strong>303030</strong></p>
-                  <p className="text-gray-600">Account Number: <strong>2043432128</strong></p>
-                  <p className="text-gray-600">M-Pesa Number: <strong>+254710974670</strong></p>
+                  <p className="text-gray-600">Bank: <strong>{OFFICIAL_PROFORMA_REMITTANCE.bank}</strong></p>
+                  <p className="text-gray-600">Paybill: <strong>{OFFICIAL_PROFORMA_REMITTANCE.paybill}</strong></p>
+                  <p className="text-gray-600">Account Number: <strong>{OFFICIAL_PROFORMA_REMITTANCE.accountNumber}</strong></p>
+                  <p className="text-gray-600">M-Pesa Number: <strong>{OFFICIAL_PROFORMA_REMITTANCE.mpesaNumber}</strong></p>
                 </div>
               </div>
 

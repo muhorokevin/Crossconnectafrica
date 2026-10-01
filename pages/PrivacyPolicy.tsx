@@ -9,7 +9,7 @@ const PrivacyPolicy: React.FC = () => {
             <Shield className="text-brand-green" size={32} />
             <h1 className="text-3xl md:text-4xl font-serif text-brand-green font-bold">Privacy Policy</h1>
         </div>
-        <p className="text-gray-500 mb-8 italic text-sm">Effective Date: October 2023</p>
+        <p className="text-gray-500 mb-8 italic text-sm">Effective Date: 2025</p>
 
         <div className="space-y-8 text-gray-700 leading-relaxed text-sm md:text-base">
           <section>

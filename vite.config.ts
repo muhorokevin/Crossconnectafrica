@@ -8,8 +8,6 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [react()],
     define: {
-      // Define specific keys rather than the whole object
-      'process.env.API_KEY': JSON.stringify(env.API_KEY || ""),
       'process.env.NODE_ENV': JSON.stringify(mode),
       'process.browser': true,
     },

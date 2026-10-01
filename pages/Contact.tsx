@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { 
   Mail, Phone, MapPin, MessageCircle, Send, Star, Clock, 
-  ShieldCheck, CheckCircle2, Calendar, Users, ExternalLink 
+  ShieldCheck, CheckCircle2, Calendar, Users, ExternalLink, Building2
 } from 'lucide-react';
 
 const VENUES = [
@@ -117,8 +117,8 @@ ${form.message || 'Kindly share package options, itinerary and official quote.'}
                       <Mail size={20} className="text-brand-gold" />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="font-bold text-sm sm:text-base break-words">crossconnectmissions@protonmail.com</p>
-                      <p className="text-white/60 text-xs mt-0.5">Fast corporate RFP turnaround</p>
+                      <a href="mailto:crossconnectmissions@protonmail.com" className="font-bold text-sm sm:text-base break-words hover:text-brand-gold transition-colors block">crossconnectmissions@protonmail.com</a>
+                      <p className="text-white/60 text-xs mt-0.5">Fast corporate RFP & quotation turnaround</p>
                     </div>
                   </div>
                   
@@ -144,33 +144,28 @@ ${form.message || 'Kindly share package options, itinerary and official quote.'}
               </div>
             </div>
 
-            {/* Google Verified Review & Credibility Card */}
+            {/* Corporate & Institutional Credibility Card */}
             <div className="p-6 bg-white rounded-3xl border border-brand-green/10 shadow-md">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-base">
-                    G
+                  <div className="w-8 h-8 rounded-lg bg-brand-green/10 text-brand-green flex items-center justify-center font-bold text-base">
+                    <Building2 size={18} />
                   </div>
                   <div>
-                    <h4 className="text-xs font-bold text-brand-green">Google Business Reviews</h4>
-                    <div className="flex items-center gap-1 mt-0.5">
-                      {[...Array(5)].map((_, i) => (
-                        <Star key={i} size={12} fill="#d97706" className="text-brand-gold" />
-                      ))}
-                      <span className="text-xs font-bold text-brand-green ml-1">4.9 / 5.0</span>
-                    </div>
+                    <h4 className="text-xs font-bold text-brand-green">Trusted Across Kenya</h4>
+                    <p className="text-[10px] text-gray-500 font-sans">Corporate, Church & NGO Partners</p>
                   </div>
                 </div>
                 <span className="px-2.5 py-1 bg-emerald-50 text-emerald-700 text-[10px] font-bold rounded-full">
-                  Verified Ratings
+                  Verified Cohorts
                 </span>
               </div>
               <p className="text-xs text-gray-600 font-serif italic leading-relaxed mb-3">
-                "Top-rated corporate team building facilitators and certified workplace safety training specialists in Nairobi and across Kenya."
+                "Consistently trusted for impactful corporate team retreats, accredited workplace safety drills, and high-altitude wilderness expeditions across Kenya."
               </p>
-              <div className="text-[10px] text-gray-400 font-sans flex items-center justify-between pt-2 border-t border-gray-100">
-                <span>Based on 42+ corporate & institutional reviews</span>
-                <span className="text-brand-gold font-bold">100% Recommended</span>
+              <div className="text-[10px] text-gray-500 font-sans flex items-center justify-between pt-2 border-t border-gray-100">
+                <span>Partners: CITAM • Kadolta Resort • Biblica</span>
+                <span className="text-brand-green font-bold">DOSHS & EMT Aligned</span>
               </div>
             </div>
 
@@ -260,7 +255,7 @@ ${form.message || 'Kindly share package options, itinerary and official quote.'}
                     value={form.phone}
                     onChange={(e) => setForm({...form, phone: e.target.value})}
                     className="w-full p-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:border-brand-green focus:bg-white transition-colors outline-none text-xs font-medium"
-                    placeholder="e.g. 0722 000 000"
+                    placeholder="e.g. 0710 974 670"
                     required
                   />
                 </div>

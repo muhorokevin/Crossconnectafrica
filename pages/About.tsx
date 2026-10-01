@@ -12,9 +12,9 @@ interface AboutProps {
 }
 
 const IMPACT_METRICS = [
-  { value: '5,000+', label: 'Participants Facilitated', sub: 'Across Corporate, NGO & Community Cohorts' },
+  { value: 'Proven', label: 'Cohort Deployments', sub: 'Corporate Retreats, Safety Drills & Youth Camps' },
   { value: '120+', label: 'Successful Missions', sub: 'Indoor Retreats & Wilderness Deployments' },
-  { value: '100%', label: 'Safety Track Record', sub: 'Zero Major Incidents with EMT Protocol' },
+  { value: 'DOSHS', label: 'Safety Compliance', sub: 'Directorate-Aligned Standards & EMT Protocols' },
   { value: '40+', label: 'Expedition Routes', sub: 'Mount Kenya, Aberdares, Rift Valley & Coastal Trails' }
 ];
 
@@ -74,8 +74,8 @@ const COMPLIANCE_LIST = [
     desc: 'Directorate of Occupational Safety & Health Services standards for training and physical deployments.'
   },
   {
-    title: 'Red Cross Certified EMT & First Aid',
-    desc: 'Wilderness First Responder protocols with fully stocked trauma response gear on every mission.'
+    title: 'Accredited First Aid & Emergency EMT',
+    desc: 'Facilitators trained to emergency first responder standards with fully stocked trauma response gear on every mission.'
   },
   {
     title: 'Certified Professional Facilitators (CPF)',
@@ -109,9 +109,9 @@ const About: React.FC<AboutProps> = ({ setView }) => {
           </p>
 
           <div className="flex flex-wrap items-center justify-center gap-3 text-xs font-bold text-brand-green">
-            <span className="px-3 py-1.5 bg-white border border-brand-green/15 shadow-sm">100% Certified Safety Record</span>
-            <span className="px-3 py-1.5 bg-white border border-brand-green/15 shadow-sm">DOSHS & EMT Compliant</span>
-            <span className="px-3 py-1.5 bg-white border border-brand-green/15 shadow-sm">5,000+ Participants Facilitated</span>
+            <span className="px-3 py-1.5 bg-white border border-brand-green/15 shadow-sm">DOSHS Safety Compliance</span>
+            <span className="px-3 py-1.5 bg-white border border-brand-green/15 shadow-sm">Accredited EMT Standby</span>
+            <span className="px-3 py-1.5 bg-white border border-brand-green/15 shadow-sm">Corporate, Church & NGO Cohorts</span>
             <span className="px-3 py-1.5 bg-white border border-brand-green/15 shadow-sm">Pan-African Outdoor Expertise</span>
           </div>
         </div>
@@ -419,7 +419,7 @@ const About: React.FC<AboutProps> = ({ setView }) => {
               <ShieldCheck size={20} className="text-brand-gold" /> DOSHS COMPLIANT
             </div>
             <div className="flex items-center gap-2 font-serif font-bold text-brand-green text-sm tracking-wider">
-              <Award size={20} className="text-brand-gold" /> RED CROSS EMT
+              <Award size={20} className="text-brand-gold" /> FIRST AID & EMT STANDARDS
             </div>
             <div className="flex items-center gap-2 font-serif font-bold text-brand-green text-sm tracking-wider">
               <Compass size={20} className="text-brand-gold" /> ECO-KENYA GUIDING
@@ -466,7 +466,7 @@ const About: React.FC<AboutProps> = ({ setView }) => {
               )}
 
               <a
-                href="https://wa.me/254716164223?text=Hello%20Cross%20Connect%20Africa,%20I%20would%20like%20to%20inquire%20about%20booking%20a%20facilitation%20mission."
+                href="https://wa.me/254710974670?text=Hello%20Cross%20Connect%20Africa,%20I%20would%20like%20to%20inquire%20about%20booking%20a%20facilitation%20mission."
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full sm:w-auto px-7 py-4 bg-emerald-700 text-white font-bold text-xs uppercase tracking-widest hover:bg-emerald-800 transition-all flex items-center justify-center gap-2"

@@ -62,7 +62,7 @@ export enum ViewState {
   HOME = 'HOME',
   ABOUT = 'ABOUT',
   GALLERY = 'GALLERY',
-  ADVENTURE_BUILDER = 'GALLERY', // Map builder to gallery for compatibility
+  ADVENTURE_BUILDER = 'ADVENTURE_BUILDER',
   CALCULATOR = 'CALCULATOR',
   EVENTS = 'EVENTS',
   SHOP = 'SHOP',

@@ -178,13 +178,13 @@ const Home: React.FC<HomeProps> = ({ setView }) => {
 
               <div className="pt-4 flex items-center gap-8 border-t border-brand-green/10">
                 <div>
-                  <div className="text-3xl font-serif font-bold text-brand-green">100%</div>
-                  <div className="text-[9px] text-gray-500 font-bold uppercase tracking-wider mt-0.5">Safety & Protocol</div>
+                  <div className="text-2xl sm:text-3xl font-serif font-bold text-brand-green">DOSHS</div>
+                  <div className="text-[9px] text-gray-500 font-bold uppercase tracking-wider mt-0.5">Safety Standards</div>
                 </div>
                 <div className="h-8 w-px bg-brand-green/10"></div>
                 <div>
-                  <div className="text-3xl font-serif font-bold text-brand-green">4.9 / 5.0</div>
-                  <div className="text-[9px] text-gray-500 font-bold uppercase tracking-wider mt-0.5">Client Satisfaction</div>
+                  <div className="text-2xl sm:text-3xl font-serif font-bold text-brand-green">EMT</div>
+                  <div className="text-[9px] text-gray-500 font-bold uppercase tracking-wider mt-0.5">Emergency Readiness</div>
                 </div>
               </div>
             </div>

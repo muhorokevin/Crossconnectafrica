@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Maximize2, X, ChevronLeft, ChevronRight, Share2, ArrowRight,
   Play, Film, Image as ImageIcon, Grid, Check
@@ -14,7 +14,7 @@ export interface GalleryItem {
 }
 
 const GALLERY_ITEMS: GalleryItem[] = [
-  // Featured Videos
+  // Featured Action Videos
   { 
     id: 'cca-vid-1', 
     type: 'video', 
@@ -61,6 +61,14 @@ const GALLERY_ITEMS: GalleryItem[] = [
   { id: 'cca-28', type: 'photo', url: 'https://i.imgur.com/pArhD8O.jpg' },
   { id: 'cca-29', type: 'photo', url: 'https://i.imgur.com/tuHGYnC.jpg' },
   { id: 'cca-30', type: 'photo', url: 'https://i.imgur.com/E6vTiKp.jpg' },
+
+  // Batch 3 Photos
+  { id: 'cca-31', type: 'photo', url: 'https://i.imgur.com/l1c14PS.jpg' },
+  { id: 'cca-32', type: 'photo', url: 'https://i.imgur.com/NFsaILu.jpg' },
+  { id: 'cca-33', type: 'photo', url: 'https://i.imgur.com/j5Usq90.jpg' },
+  { id: 'cca-34', type: 'photo', url: 'https://i.imgur.com/Ygy5Wmn.jpg' },
+  { id: 'cca-35', type: 'photo', url: 'https://i.imgur.com/aYcMKUG.jpg' },
+  { id: 'cca-36', type: 'photo', url: 'https://i.imgur.com/H7y7KfG.jpg' }
 ];
 
 interface GalleryProps {
@@ -72,6 +80,7 @@ const Gallery: React.FC<GalleryProps> = ({ setView, onNavigateToBooking }) => {
   const [activeFilter, setActiveFilter] = useState<'all' | 'photo' | 'video'>('all');
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [copiedLink, setCopiedLink] = useState(false);
+  const filmstripRef = useRef<HTMLDivElement>(null);
 
   const filteredItems = GALLERY_ITEMS.filter(
     item => activeFilter === 'all' || item.type === activeFilter
@@ -85,8 +94,8 @@ const Gallery: React.FC<GalleryProps> = ({ setView, onNavigateToBooking }) => {
     setLightboxIndex(null);
   };
 
-  const handlePrev = (e: React.MouseEvent) => {
-    e.stopPropagation();
+  const handlePrev = (e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
     if (lightboxIndex !== null) {
       setLightboxIndex((lightboxIndex - 1 + filteredItems.length) % filteredItems.length);
     }
@@ -98,6 +107,16 @@ const Gallery: React.FC<GalleryProps> = ({ setView, onNavigateToBooking }) => {
       setLightboxIndex((lightboxIndex + 1) % filteredItems.length);
     }
   };
+
+  // Scroll active thumbnail into center view
+  useEffect(() => {
+    if (lightboxIndex !== null && filmstripRef.current) {
+      const activeThumb = filmstripRef.current.children[lightboxIndex] as HTMLElement;
+      if (activeThumb) {
+        activeThumb.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      }
+    }
+  }, [lightboxIndex]);
 
   // Keyboard navigation for lightbox
   useEffect(() => {
@@ -186,13 +205,13 @@ const Gallery: React.FC<GalleryProps> = ({ setView, onNavigateToBooking }) => {
           </button>
         </div>
 
-        {/* Pure Grid (No Names / Titles) */}
+        {/* Pure Picture Grid (Just Pictures Without Descriptions) */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
           {filteredItems.map((item, index) => (
             <div
               key={item.id}
               onClick={() => openLightbox(index)}
-              className="group relative aspect-[4/3] rounded-2xl overflow-hidden bg-black shadow-sm hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:-translate-y-1"
+              className="group relative aspect-[4/3] rounded-2xl overflow-hidden bg-black shadow-sm hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:-translate-y-1 border border-brand-green/10 hover:border-brand-gold/60"
             >
               {item.type === 'video' ? (
                 <div className="w-full h-full relative">
@@ -207,14 +226,14 @@ const Gallery: React.FC<GalleryProps> = ({ setView, onNavigateToBooking }) => {
                     onMouseOut={(e) => (e.target as HTMLVideoElement).pause()}
                   />
                   
-                  {/* Video Play Badge Indicator */}
+                  {/* Center Video Play Indicator */}
                   <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors flex items-center justify-center">
                     <span className="p-4 rounded-full bg-brand-gold/90 text-brand-green shadow-xl transform group-hover:scale-110 transition-transform flex items-center justify-center">
                       <Play size={24} className="fill-current ml-0.5" />
                     </span>
                   </div>
 
-                  {/* Video Label Chip */}
+                  {/* Clean Corner Video Badge */}
                   <span className="absolute top-3 left-3 bg-black/60 backdrop-blur-md text-white text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full border border-white/20 flex items-center gap-1">
                     <Film size={12} className="text-brand-gold" /> Video
                   </span>
@@ -223,13 +242,13 @@ const Gallery: React.FC<GalleryProps> = ({ setView, onNavigateToBooking }) => {
                 <div className="w-full h-full relative">
                   <img
                     src={item.url}
-                    alt="Cross Connect Africa Gallery"
+                    alt="Cross Connect Africa"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                     loading="lazy"
                   />
                   
-                  {/* Subtle Dark Hover Overlay with Zoom Icon */}
-                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                  {/* Subtle Dark Hover Overlay with Zoom Icon (No text description) */}
+                  <div className="absolute inset-0 bg-black/35 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
                     <span className="p-3.5 rounded-full bg-white/20 backdrop-blur-md text-white border border-white/30 transform scale-90 group-hover:scale-100 transition-transform shadow-lg">
                       <Maximize2 size={22} />
                     </span>
@@ -249,76 +268,24 @@ const Gallery: React.FC<GalleryProps> = ({ setView, onNavigateToBooking }) => {
           role="dialog"
           aria-modal="true"
           aria-label="Media Lightbox"
-          className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex items-center justify-center p-4 md:p-8 animate-fade-in"
+          className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex flex-col justify-between p-4 md:p-6 animate-fade-in"
         >
           {/* Top Control Bar */}
-          <div className="absolute top-4 left-4 md:top-6 md:left-6 z-20 hidden sm:flex items-center gap-2">
-            <span className="text-white/60 text-[11px] font-mono uppercase tracking-wider bg-white/10 px-3 py-1.5 rounded-full border border-white/10">
-              ⌨️ ESC to close • ← → to browse
-            </span>
-          </div>
-
-          <div className="absolute top-4 right-4 md:top-6 md:right-6 z-20 flex items-center gap-3">
-            <span className="text-white/70 text-xs font-mono uppercase tracking-widest bg-white/10 px-3 py-1.5 rounded-full border border-white/10">
-              {lightboxIndex + 1} / {filteredItems.length}
-            </span>
-            <button
-              onClick={closeLightbox}
-              aria-label="Close Lightbox"
-              className="p-3 rounded-full bg-white/10 text-white hover:bg-brand-gold hover:text-brand-green transition-all"
-            >
-              <X size={22} />
-            </button>
-          </div>
-
-          {/* Left Arrow */}
-          <button
-            onClick={handlePrev}
-            className="absolute left-3 md:left-6 top-1/2 -translate-y-1/2 z-20 p-3 md:p-4 rounded-full bg-black/50 text-white hover:bg-brand-gold hover:text-brand-green transition-all border border-white/10"
-          >
-            <ChevronLeft size={26} />
-          </button>
-
-          {/* Right Arrow */}
-          <button
-            onClick={handleNext}
-            className="absolute right-3 md:right-6 top-1/2 -translate-y-1/2 z-20 p-3 md:p-4 rounded-full bg-black/50 text-white hover:bg-brand-gold hover:text-brand-green transition-all border border-white/10"
-          >
-            <ChevronRight size={26} />
-          </button>
-
-          {/* Media Player Container */}
           <div 
             onClick={e => e.stopPropagation()} 
-            className="relative max-w-5xl max-h-[85vh] flex flex-col items-center justify-center w-full"
+            className="w-full flex items-center justify-between text-white pb-3 border-b border-white/10"
           >
-            {filteredItems[lightboxIndex].type === 'video' ? (
-              <div className="w-full max-w-4xl rounded-2xl overflow-hidden bg-black shadow-2xl border border-white/10">
-                <video
-                  src={filteredItems[lightboxIndex].url}
-                  controls
-                  autoPlay
-                  playsInline
-                  controlsList="nodownload"
-                  className="w-full max-h-[75vh] object-contain mx-auto"
-                />
-              </div>
-            ) : (
-              <img
-                src={filteredItems[lightboxIndex].url}
-                alt="Cross Connect Africa Gallery"
-                className="max-w-full max-h-[78vh] object-contain rounded-2xl shadow-2xl border border-white/10"
-              />
-            )}
+            <div className="flex items-center gap-3">
+              <span className="text-white/70 text-xs font-mono uppercase tracking-widest bg-white/10 px-3 py-1.5 rounded-full border border-white/10">
+                {lightboxIndex + 1} / {filteredItems.length}
+              </span>
+            </div>
 
-            {/* Bottom Actions Bar */}
-            <div className="mt-4 flex flex-wrap gap-3 justify-center items-center">
-              <button
-                onClick={handleQuoteClick}
-                className="px-6 py-2.5 bg-brand-gold text-brand-green rounded-full font-bold text-xs uppercase tracking-widest hover:bg-white transition-all shadow-lg flex items-center gap-2"
-              >
-                Book a Service <ArrowRight size={14} />
-              </button>
+            <div className="flex items-center gap-2">
+              <span className="hidden sm:inline text-white/50 text-[11px] font-mono mr-2">
+                ESC to close • ← → to browse
+              </span>
+
               <button
                 onClick={() => {
                   const url = filteredItems[lightboxIndex].url;
@@ -330,10 +297,11 @@ const Gallery: React.FC<GalleryProps> = ({ setView, onNavigateToBooking }) => {
                   } else {
                     navigator.clipboard.writeText(url);
                     setCopiedLink(true);
-                    setTimeout(() => setCopiedLink(false), 2500);
+                    setTimeout(() => setCopiedLink(false), 2200);
                   }
                 }}
-                className="px-5 py-2.5 bg-white/10 text-white rounded-full font-bold text-xs uppercase tracking-widest hover:bg-white/20 transition-all border border-white/10 flex items-center gap-2"
+                className="px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors border border-white/10"
+                title="Share link"
               >
                 {copiedLink ? (
                   <>
@@ -341,11 +309,108 @@ const Gallery: React.FC<GalleryProps> = ({ setView, onNavigateToBooking }) => {
                   </>
                 ) : (
                   <>
-                    <Share2 size={14} /> Share Link
+                    <Share2 size={14} /> Share
                   </>
                 )}
               </button>
+
+              <button
+                onClick={closeLightbox}
+                aria-label="Close Lightbox"
+                className="p-2.5 rounded-full bg-white/10 text-white hover:bg-brand-gold hover:text-brand-green transition-all border border-white/10"
+              >
+                <X size={20} />
+              </button>
             </div>
+          </div>
+
+          {/* Central Media Stage */}
+          <div 
+            onClick={e => e.stopPropagation()} 
+            className="relative flex-1 flex items-center justify-center py-2 px-2 sm:px-12 w-full max-h-[75vh]"
+          >
+            {/* Left Arrow */}
+            <button
+              onClick={handlePrev}
+              aria-label="Previous Media"
+              className="absolute left-2 sm:left-4 z-20 p-3 md:p-4 rounded-full bg-black/60 text-white hover:bg-brand-gold hover:text-brand-green transition-all border border-white/10"
+            >
+              <ChevronLeft size={24} />
+            </button>
+
+            {/* Right Arrow */}
+            <button
+              onClick={handleNext}
+              aria-label="Next Media"
+              className="absolute right-2 sm:right-4 z-20 p-3 md:p-4 rounded-full bg-black/60 text-white hover:bg-brand-gold hover:text-brand-green transition-all border border-white/10"
+            >
+              <ChevronRight size={24} />
+            </button>
+
+            {/* Media Player Container */}
+            {filteredItems[lightboxIndex].type === 'video' ? (
+              <div className="w-full max-w-4xl max-h-full rounded-2xl overflow-hidden bg-black shadow-2xl border border-white/10 flex items-center justify-center">
+                <video
+                  src={filteredItems[lightboxIndex].url}
+                  controls
+                  autoPlay
+                  playsInline
+                  controlsList="nodownload"
+                  className="max-h-[72vh] w-auto max-w-full object-contain mx-auto"
+                />
+              </div>
+            ) : (
+              <img
+                src={filteredItems[lightboxIndex].url}
+                alt="Cross Connect Africa Gallery"
+                className="max-w-full max-h-[72vh] object-contain rounded-2xl shadow-2xl border border-white/10 select-none"
+              />
+            )}
+          </div>
+
+          {/* Bottom Actions & Thumbnail Filmstrip */}
+          <div 
+            onClick={e => e.stopPropagation()} 
+            className="w-full pt-3 border-t border-white/10 flex flex-col items-center gap-3"
+          >
+            <div className="flex items-center gap-3">
+              <button
+                onClick={handleQuoteClick}
+                className="px-6 py-2 bg-brand-gold text-brand-green rounded-full font-bold text-xs uppercase tracking-widest hover:bg-white transition-all shadow-lg flex items-center gap-2"
+              >
+                Book a Service <ArrowRight size={14} />
+              </button>
+            </div>
+
+            {/* Thumbnail Carousel Scrub Strip */}
+            <div 
+              ref={filmstripRef}
+              className="w-full max-w-3xl flex items-center gap-2 overflow-x-auto py-1 scrollbar-none"
+            >
+              {filteredItems.map((item, idx) => (
+                <button
+                  key={item.id}
+                  onClick={() => setLightboxIndex(idx)}
+                  className={`relative shrink-0 w-12 h-10 rounded-md overflow-hidden transition-all border ${
+                    idx === lightboxIndex 
+                      ? 'border-brand-gold ring-2 ring-brand-gold/60 scale-105' 
+                      : 'border-white/20 opacity-50 hover:opacity-90'
+                  }`}
+                >
+                  <img 
+                    src={item.type === 'video' ? (item.posterUrl || item.url) : item.url} 
+                    alt="Thumbnail"
+                    className="w-full h-full object-cover" 
+                  />
+                  {item.type === 'video' && (
+                    <span className="absolute inset-0 bg-black/40 flex items-center justify-center text-white">
+                      <Play size={10} className="fill-current text-brand-gold" />
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
+
           </div>
 
         </div>

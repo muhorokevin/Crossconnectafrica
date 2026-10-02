@@ -29,13 +29,13 @@ const CORE_SERVICES = [
     icon: <Briefcase size={24} />, 
     title: 'Corporate Team Building', 
     desc: 'High-impact indoor & outdoor team facilitation designed for collaboration and trust.',
-    img: 'https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=1000'
+    img: 'https://i.imgur.com/H7y7KfG.jpg'
   },
   { 
     icon: <Shield size={24} />, 
     title: 'First Aid & Fire Safety', 
     desc: 'DOSHS-compliant staff training, live fire extinguisher drills, and CPR certification.',
-    img: 'https://i.imgur.com/77asrRI.jpg'
+    img: 'https://i.imgur.com/NLpqywt.jpg'
   },
   { 
     icon: <Zap size={24} />, 
@@ -296,7 +296,7 @@ const Home: React.FC<HomeProps> = ({ setView }) => {
           </blockquote>
           
           <p className="text-xs text-brand-gold font-bold uppercase tracking-widest mb-10">
-            Faith Mwangi • Head of People & Culture, Nairobi
+            Collins Moses • Silax Data Kenya
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">

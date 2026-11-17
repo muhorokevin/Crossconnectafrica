@@ -58,8 +58,8 @@ const MissionConsultant: React.FC = () => {
             <div className="relative">
               <div className="w-10 h-10 rounded-full bg-brand-gold/20 overflow-hidden border border-brand-gold/40 flex items-center justify-center">
                 <img 
-                  src="https://i.imgur.com/pADVOmg.jpeg" 
-                  alt="Kevin Muhoro" 
+                  src="https://i.imgur.com/02SKGgD.jpg" 
+                  alt="Kevin Muhoro"  
                   className="w-full h-full object-cover"
                 />
               </div>

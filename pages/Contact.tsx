@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { 
   Mail, Phone, MapPin, MessageCircle, Send, Star, Clock, 
-  ShieldCheck, CheckCircle2, Calendar, Users, ExternalLink, Building2
+  ShieldCheck, CheckCircle2, Calendar, Users, ExternalLink, Building2, Download
 } from 'lucide-react';
 
 const VENUES = [
@@ -166,6 +166,33 @@ ${form.message || 'Kindly share package options, itinerary and official quote.'}
               <div className="text-[10px] text-gray-500 font-sans flex items-center justify-between pt-2 border-t border-gray-100">
                 <span>Partners: CITAM • Kadolta Resort • Biblica</span>
                 <span className="text-brand-green font-bold">DOSHS & EMT Aligned</span>
+              </div>
+            </div>
+
+            {/* Official 2026 Company Profile & Rate Card Download Card */}
+            <div className="p-6 bg-brand-sand/60 rounded-3xl border border-brand-gold/30 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div>
+                <span className="text-[9px] font-bold uppercase tracking-widest text-brand-gold block">Official 2026 Documents</span>
+                <h4 className="text-sm font-serif font-bold text-brand-green">Company Profile & Rate Card</h4>
+                <p className="text-[11px] text-gray-600 mt-0.5">Authoritative pricing, safety standards & service scope.</p>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <a
+                  href="/assets/aistudio/Cross_Connect_Africa_Company_Profile_2026__2__0bc0b926.pdf"
+                  download="Cross_Connect_Africa_Company_Profile_2026.pdf"
+                  className="px-3.5 py-2 bg-brand-green text-brand-gold rounded-xl font-bold text-[10px] uppercase tracking-wider hover:bg-brand-gold hover:text-brand-green transition-all shadow-sm flex items-center gap-1.5"
+                >
+                  <Download size={13} />
+                  <span>Profile</span>
+                </a>
+                <a
+                  href="/assets/aistudio/Cross_Connect_Africa_Rate_Card_2026_v6_c1ebbe23.pdf"
+                  download="Cross_Connect_Africa_Rate_Card_2026.pdf"
+                  className="px-3.5 py-2 bg-white text-brand-green border border-brand-green/20 rounded-xl font-bold text-[10px] uppercase tracking-wider hover:bg-brand-sand transition-all shadow-sm flex items-center gap-1.5"
+                >
+                  <Download size={13} />
+                  <span>Rate Card</span>
+                </a>
               </div>
             </div>
 

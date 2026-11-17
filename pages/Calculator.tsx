@@ -1,90 +1,150 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { 
-  MessageCircle, User, Mail, Building2, Map, Truck, Home, Calendar as CalendarIcon, 
-  AlertTriangle, Utensils, Zap, ShieldAlert, Award, FileText, Activity, Tent, 
-  Camera, Mic2, Star, Heart, ShieldCheck, Flame, Users2, Mountain, School, 
-  Pocket, HardHat, Info, Plus, CheckCircle2, Ruler, ChevronDown, ChevronUp, Printer, ChevronRight,
-  Download, FileDown, Check, Copy, Tag, Phone, Eye, X
+  MessageCircle, User, Mail, Building2, Map, Truck, 
+  AlertTriangle, Utensils, FileText, 
+  Heart, ShieldCheck, CheckCircle2, Printer,
+  Download, FileDown, Check, Copy, Phone, Eye, X, Sparkles, Globe, Users, Clock, Volume2
 } from 'lucide-react';
-import { CATEGORIES, Program, Category } from './AdventureBuilder';
+import { CATEGORIES, Program, Category, GroupType } from '../data/programs';
 import { BookingContextData } from '../App';
 import Logo from '../components/Logo';
 import CustomCalendar from '../components/CustomCalendar';
 
+export const RATE_CARD_PDF_URL = '/assets/aistudio/Cross_Connect_Africa_Rate_Card_2026_v6_c1ebbe23.pdf';
+export const COMPANY_PROFILE_PDF_URL = '/assets/aistudio/Cross_Connect_Africa_Company_Profile_2026__2__0bc0b926.pdf';
+export const PRICING_MODEL_PDF_URL = '/assets/aistudio/CCA_Pricing_Model_2026_15ddde78.pdf';
+
 const VENUE_TYPES = {
-  none: { id: 'none', label: 'Venue Provided / Not Required', price: 0 },
-  public: { id: 'public', label: 'Public Grounds / Parks', price: 5000 },
-  private: { id: 'private', label: 'Private Training Grounds', price: 15000 },
-  school: { id: 'school', label: 'School Grounds (Weekend)', price: 10000 },
-  resort: { id: 'resort', label: 'Resorts / Hotels (Day Use)', price: 35000 }
+  none: { id: 'none', label: 'Venue Provided by Client / Not Required', price: 0 },
+  public: { id: 'public', label: 'Public Grounds / Scenic Parks', price: 5000 },
+  private: { id: 'private', label: 'Private Training Grounds / Campsite', price: 15000 },
+  school: { id: 'school', label: 'School Grounds (Weekend Access)', price: 10000 },
+  resort: { id: 'resort', label: 'Resorts / Hotels (Day Facilitation Grounds)', price: 35000 }
 };
 
 const FLEET_SOLUTIONS = {
-  none: { id: 'none', label: 'Self Drive', price: 0, capacity: 0 },
-  prado: { id: 'prado', label: 'Land Rover / Prado (4x4)', price: 10000, capacity: 6 },
-  van: { id: 'van', label: 'Tour Van', price: 12000, capacity: 14 },
+  none: { id: 'none', label: 'Client / Self Organized Transport', price: 0, capacity: 0 },
+  prado: { id: 'prado', label: 'Land Rover / Prado 4x4 (6 pax)', price: 10000, capacity: 6 },
+  van: { id: 'van', label: 'Safari Tour Van (14 pax)', price: 12000, capacity: 14 },
   minibus: { id: 'minibus', label: 'Mini Bus (18-25 pax)', price: 18000, capacity: 25 },
   coaster: { id: 'coaster', label: 'Coaster (28-33 pax)', price: 25000, capacity: 33 },
-  bus45: { id: 'bus45', label: 'Bus (37-45 pax)', price: 35000, capacity: 45 },
-  bus55: { id: 'bus55', label: 'Bus (50-55 pax)', price: 45000, capacity: 55 }
+  bus45: { id: 'bus45', label: 'Standard Bus (37-45 pax)', price: 35000, capacity: 45 },
+  bus55: { id: 'bus55', label: 'Executive Coach (50-55 pax)', price: 45000, capacity: 55 }
 };
 
-const EVENT_TYPE_RISK = {
-  corporate: { id: 'corporate', label: 'Corporate / Conference', multiplier: 1.0 },
-  wedding: { id: 'wedding', label: 'Wedding', multiplier: 1.1 },
-  sports: { id: 'sports', label: 'Sports Event', multiplier: 1.25 },
-  concert: { id: 'concert', label: 'Concert / Festival', multiplier: 1.3 },
-  rally: { id: 'rally', label: 'Political Rally', multiplier: 1.4 },
-  marathon: { id: 'marathon', label: 'Marathon / Hike', multiplier: 1.4 },
-  night: { id: 'night', label: 'Night Event (> 10pm)', multiplier: 1.2 }
+// Rate Card 2026 v6: Travel outside Nairobi ~KES 132/km from Nairobi (return trip included)
+export const TRAVEL_ZONES = {
+  nairobi: { 
+    id: 'nairobi', 
+    label: 'Within Nairobi Metro (Included)', 
+    surcharge: 0, 
+    examples: 'Nairobi, Westlands, Karen, Industrial Area', 
+    note: 'Included in base programme fee'
+  },
+  near: { 
+    id: 'near', 
+    label: 'Approx. 50 km from Nairobi (~KES 6,600 @ KES 132/km)', 
+    surcharge: 6600, 
+    examples: 'Limuru, Ngong, Thika, Kitengela, Tigoni', 
+    note: 'Estimated at KES 132/km (return trip included)'
+  },
+  mid: { 
+    id: 'mid', 
+    label: 'Approx. 90–110 km from Nairobi (~KES 13,200 @ KES 132/km)', 
+    surcharge: 13200, 
+    examples: 'Naivasha, Sagana, Machakos', 
+    note: 'Estimated at KES 132/km (return trip included)'
+  },
+  far: { 
+    id: 'far', 
+    label: 'Approx. 160–180 km from Nairobi (~KES 22,500 @ KES 132/km)', 
+    surcharge: 22500, 
+    examples: 'Nakuru, Nyeri, Embu, Nanyuki', 
+    note: 'Estimated at KES 132/km (return trip included)'
+  },
+  custom: {
+    id: 'custom',
+    label: 'Custom Distance Outside Nairobi (KES 132 / km)',
+    surcharge: 0,
+    examples: 'Anywhere in Kenya',
+    note: 'Exact distance × KES 132/km (return trip included)'
+  }
 };
 
+// Event Medics & Ambulance Risk Tiers (Rate Card 2026 v6 Page 15)
+const MEDIC_RISK_TIERS = {
+  low: {
+    id: 'low',
+    label: 'Low Risk — Meetings, conferences, church services, weddings (Rate × 1.00)',
+    multiplier: 1.0,
+    paxPerMedic: 150,
+    ambulanceAdvisedFrom: 300
+  },
+  medium: {
+    id: 'medium',
+    label: 'Medium Risk — School sports, concerts, festivals, team building (Rate × 1.15)',
+    multiplier: 1.15,
+    paxPerMedic: 100,
+    ambulanceAdvisedFrom: 200
+  },
+  high: {
+    id: 'high',
+    label: 'High Risk — Marathons, hikes, motorsport, large crowds, rough terrain (Rate × 1.35)',
+    multiplier: 1.35,
+    paxPerMedic: 60,
+    ambulanceAdvisedFrom: 100
+  }
+};
+
+// Full-Chain Assessment Sizes for 10% Bundle (Rate Card 2026 v6 Pages 6-7)
+const ASSESSMENT_SITES = {
+  none: { id: 'none', label: 'Training Only (No Site Assessments Bundled)', site: 0, pre: 0, post: 0 },
+  small: { id: 'small', label: 'Small Site (≤500 m²) — Site KES 23k + Pre KES 8.5k + Post KES 15.5k (-10% Bundle)', site: 23000, pre: 8500, post: 15500 },
+  medium: { id: 'medium', label: 'Medium Site (≤2,000 m²) — Site KES 34k + Pre KES 13k + Post KES 22k (-10% Bundle)', site: 34000, pre: 13000, post: 22000 },
+  large: { id: 'large', label: 'Large Site (≤5,000 m²) — Site KES 50k + Pre KES 16.5k + Post KES 29.5k (-10% Bundle)', site: 50000, pre: 16500, post: 29500 },
+  multi: { id: 'multi', label: 'Multi-Site (>5,000 m²) — Site KES 75k + Pre KES 24.5k + Post KES 44.5k (-10% Bundle)', site: 75000, pre: 24500, post: 44500 }
+};
+
+// Optional Add-ons (Exact Rate Card 2026 v6 Figures)
 const STRATEGIC_ADDONS = [
-  { id: 'fa_cert_branded', label: 'Branded Certificates', price: 200, type: 'pp', category: 'safety_training' },
-  { id: 'fa_manuals', label: 'Training Manuals', price: 400, type: 'pp', category: 'safety_training' },
-  { id: 'fa_manikins', label: 'CPR Manikins & AED Sim', price: 8000, type: 'flat', category: 'safety_training' },
-  { id: 'fa_amb_standby', label: 'Ambulance Standby (Day)', price: 18000, type: 'flat', category: 'safety_training' },
-  { id: 'fa_refresher', label: 'Refresher (6 Months)', price: 10000, type: 'flat', category: 'safety_training' },
-  { id: 'fs_live_practice', label: 'Extinguisher Live Practice', price: 8000, type: 'flat', category: 'safety_training' },
-  { id: 'fs_truck_demo', label: 'Fire Truck (Demo & Water)', price: 45000, type: 'flat', category: 'safety_training' },
-  { id: 'fs_evac_drill', label: 'Evacuation Drill Simulation', price: 15000, type: 'flat', category: 'safety_training' },
-  { id: 'fs_compliance', label: 'Fire Compliance Report', price: 8000, type: 'flat', category: 'safety_training' },
-  { id: 'med_extra', label: 'Additional Medic', price: 5000, type: 'flat', category: 'safety_training' },
-  { id: 'med_tent', label: 'Medical Treatment Area', price: 6000, type: 'flat', category: 'safety_training' },
-  { id: 'med_trauma_up', label: 'Oxygen & Trauma Kit Up', price: 3000, type: 'flat', category: 'safety_training' },
-  { id: 'med_amb_bls', label: 'Ambulance (BLS)', price: 20000, type: 'flat', category: 'safety_training' },
-  { id: 'med_amb_als', label: 'Ambulance (ALS Upgrade)', price: 45000, type: 'flat', category: 'safety_training' },
-  { id: 'tb_extra_facil', label: 'Extra Professional Facil', price: 12000, type: 'flat', category: 'team_building' },
-  { id: 'tb_props', label: 'Team Props & Games Kit', price: 8000, type: 'flat', category: 'team_building' },
-  { id: 'tb_sound', label: 'Sound System & Mics', price: 10000, type: 'flat', category: 'team_building' },
-  { id: 'tb_tshirts', label: 'Branded T-Shirts', price: 700, type: 'pp', category: 'team_building' },
-  { id: 'tb_photo_video', label: 'Photography & Video', price: 18000, type: 'flat', category: 'team_building' },
-  { id: 'tb_mc_energizer', label: 'MC & Energizer Host', price: 15000, type: 'flat', category: 'team_building' },
-  { id: 'ac_extra_student', label: 'Extra Student Surcharge', price: 1500, type: 'pp', category: 'school_clubs' },
-  { id: 'ac_gear_rental', label: 'Camping Gear Rental', price: 1000, type: 'pp', category: 'school_clubs' },
-  { id: 'ac_medic_amb', label: 'Medic & Amb per Activity', price: 20000, type: 'flat', category: 'school_clubs' },
-  { id: 'ac_badges', label: 'Badges & Certificates', price: 250, type: 'pp', category: 'school_clubs' },
-  { id: 'mc_extra_hr', label: 'Extra Hour Surcharge', price: 5000, type: 'flat', category: 'hosting' },
-  { id: 'mc_script', label: 'Script Writing & Planning', price: 8000, type: 'flat', category: 'hosting' },
-  { id: 'mc_engagement', label: 'Crowd Engagement Kit', price: 6000, type: 'flat', category: 'hosting' },
-  { id: 'mc_tb_combo', label: 'Team Building MC Combo', price: 20000, type: 'flat', category: 'hosting' },
-  { id: 'hi_snacks', label: 'Snacks & Hydration', price: 500, type: 'pp', category: 'expeditions' },
-  { id: 'hi_merch', label: 'Branded Hike Merch', price: 1000, type: 'pp', category: 'expeditions' },
-  { id: 'hi_photo', label: 'Pro Photographer', price: 10000, type: 'flat', category: 'expeditions' },
-  { id: 'log_long_dist', label: 'Equipment Trailer', price: 5000, type: 'flat', category: 'all' },
-  { id: 'log_driver_allowance', label: 'Overnight Driver Allow', price: 2000, type: 'flat', category: 'all' }
+  // Team Building Optional Extras (Page 5)
+  { id: 'tb_extra_fac', label: 'Extra Professional Facilitator', price: 12000, type: 'flat', category: 'team_building' },
+  { id: 'tb_photo_video', label: 'Photography & Video Coverage', price: 18000, type: 'flat', category: 'team_building' },
+  { id: 'tb_mc_host', label: 'MC and Energizer Host', price: 15000, type: 'flat', category: 'team_building' },
+  { id: 'tb_tshirts', label: 'Branded T-Shirts', price: 2000, type: 'pp', category: 'team_building' },
+
+  // Emergency Services for Drills (Page 9: Billed at cost + 10% handling)
+  { id: 'drill_amb', label: 'Ambulance on Standby (up to 8 hrs, est.)', price: 22000, type: 'flat', category: 'fire_drill_only' },
+  { id: 'drill_fire_eng', label: 'Fire Engine on Standby (est.)', price: 38500, type: 'flat', category: 'fire_drill_only' },
+  { id: 'drill_police', label: 'Police Liaison & Traffic Marshals (est.)', price: 5500, type: 'flat', category: 'fire_drill_only' },
+
+  // Safety & Medics Extras
+  { id: 'fa_manuals', label: 'Extra Printed Safety Handbooks', price: 400, type: 'pp', category: 'safety_training' },
+  { id: 'hi_hydration_pack', label: 'Trail Snacks & Electrolyte Pack', price: 500, type: 'pp', category: 'expeditions' },
+  { id: 'hi_photographer', label: 'Expedition Trail Photographer', price: 10000, type: 'flat', category: 'expeditions' },
+  { id: 'ac_badges', label: 'Adventure Club Badges & Awards', price: 250, type: 'pp', category: 'school_clubs' }
 ];
+
+// PA System pricing by group size (Page 4)
+const getPaPriceForPax = (paxCount: number): { price: number; tierLabel: string } => {
+  if (paxCount <= 100) return { price: 10000, tierLabel: '61 to 100 people (KES 10,000)' };
+  if (paxCount <= 200) return { price: 15000, tierLabel: '101 to 200 people (KES 15,000)' };
+  if (paxCount <= 300) return { price: 20000, tierLabel: '201 to 300 people (KES 20,000)' };
+  return { price: 30000, tierLabel: '301 to 500 people (KES 30,000)' };
+};
 
 // Official Statutory & Remittance Credentials for Proforma Invoices
 export const OFFICIAL_PROFORMA_REMITTANCE = {
   companyName: 'Cross Connect Africa Ltd',
   location: 'Valley View Office Park, B1 Office 1, Nairobi',
+  postal: 'P.O. Box 18923-00100, Nairobi, Kenya',
   email: 'crossconnectmissions@protonmail.com',
   phone: '+254 710 974 670',
   bank: 'Absa Bank Kenya Plc',
   paybill: '303030',
   accountNumber: '2043432128',
-  mpesaNumber: '+254710974670'
+  mpesaNumber: '+254710974670',
+  kraPin: 'P052198744M'
 };
 
 const Calculator: React.FC<{ initialData?: BookingContextData | null }> = ({ initialData }) => {
@@ -100,6 +160,7 @@ const Calculator: React.FC<{ initialData?: BookingContextData | null }> = ({ ini
     etimsPhone: initialData?.clientInfo?.etimsPhone || initialData?.clientInfo?.phone || ''
   });
   const [showInvoiceModal, setShowInvoiceModal] = useState(false);
+  const [showPdfModal, setShowPdfModal] = useState<string | null>(null);
 
   const [activeCategory, setActiveCategory] = useState<Category>(() => {
     if (initialData?.program) {
@@ -113,129 +174,280 @@ const Calculator: React.FC<{ initialData?: BookingContextData | null }> = ({ ini
     initialData?.program || CATEGORIES[0].programs[0]
   ); 
   const [durationIdx, setDurationIdx] = useState(initialData?.durationIndex || 0);
-  const [pax, setPax] = useState(initialData?.pax || 0);
+  const [pax, setPax] = useState(initialData?.pax || 30);
   const [missionDate, setMissionDate] = useState(new Date().toISOString().split('T')[0]);
   
+  // Team Building v6 Controls (Group Type + PA System)
+  const [groupType, setGroupType] = useState<GroupType>('corporate');
+  const [includePaSystem, setIncludePaSystem] = useState(false);
+
+  // Safety Training v6 Controls (Full Chain 10% Bundle & Yearly Refresher 15%)
+  const [assessmentBundleSite, setAssessmentBundleSite] = useState<keyof typeof ASSESSMENT_SITES>('none');
+  const [isYearlyRefresher, setIsYearlyRefresher] = useState(false);
+
+  // Event Medics & Ambulance v6 Controls (Page 15)
+  const [medicRisk, setMedicRisk] = useState<keyof typeof MEDIC_RISK_TIERS>('low');
+  const [medicHours, setMedicHours] = useState(4);
+  const [useAutoMedics, setUseAutoMedics] = useState(true);
+  const [manualMedics, setManualMedics] = useState(1);
+  const [includeAmbulance, setIncludeAmbulance] = useState(false);
+  const [includeMedicalPlan, setIncludeMedicalPlan] = useState(false);
+
+  // MC Services v6 Controls (Page 14)
+  const [mcExtraHours, setMcExtraHours] = useState(0);
+
+  // Travel outside Nairobi
+  const [travelZone, setTravelZone] = useState<keyof typeof TRAVEL_ZONES>('nairobi');
+  const [customKm, setCustomKm] = useState(60);
+  const [clientCoversTravel, setClientCoversTravel] = useState(false);
+
+  // Field Logistics
   const [venueType, setVenueType] = useState<keyof typeof VENUE_TYPES>('none');
   const [fleetType, setFleetType] = useState<keyof typeof FLEET_SOLUTIONS>('none');
-  const [offroadSurcharge, setOffroadSurcharge] = useState(false);
   const [selectedMeals, setSelectedMeals] = useState<string[]>([]);
-  const [eventType, setEventType] = useState<keyof typeof EVENT_TYPE_RISK>('corporate');
   const [chosenAddons, setChosenAddons] = useState<string[]>(initialData?.addons || []);
   const [copiedQuote, setCopiedQuote] = useState(false);
 
   const [quoteId] = useState(`CCA-Q-${new Date().toISOString().slice(0,10).replace(/-/g,'')}-${Math.floor(1000 + Math.random() * 9000)}`);
 
-  const formatKES = (n: number) => `KES ${n.toLocaleString()}`;
+  const formatKES = (n: number) => `KES ${Math.round(n).toLocaleString()}`;
 
+  // Recommended medics count for current pax and risk tier
+  const recommendedMedics = useMemo(() => {
+    const tier = MEDIC_RISK_TIERS[medicRisk];
+    return Math.max(1, Math.ceil((pax > 0 ? pax : 1) / tier.paxPerMedic));
+  }, [pax, medicRisk]);
+
+  const effectiveMedicsCount = useAutoMedics ? recommendedMedics : Math.max(1, manualMedics);
+
+  // Keep MC duration extra hours reset if switching variants
+  useEffect(() => {
+    setMcExtraHours(0);
+    setAssessmentBundleSite('none');
+    setIsYearlyRefresher(false);
+  }, [selectedProgram?.id, durationIdx]);
+
+  // ========================================================
+  // RATE CARD 2026 (v6) EXACT PRICING ENGINE
+  // ========================================================
   const results = useMemo(() => {
-    const isHosting = selectedProgram?.category === 'hosting';
-    const isMedic = selectedProgram?.id === 'medic_standby';
-    
-    if (!selectedProgram || (pax <= 0 && !isHosting && !isMedic && selectedProgram.priceType !== 'flat_rate')) {
-      return { subtotal: 0, deposit: 0, missionBase: 0, logisticsBase: 0, addonsBase: 0, days: 0, venuePrice: 0, transportPrice: 0, mealsPrice: 0 };
+    const isHosting = selectedProgram?.priceType === 'mc_v6';
+    const isMedic = selectedProgram?.priceType === 'medic_v6';
+    const isFlat = selectedProgram?.priceType === 'flat_rate';
+
+    if (!selectedProgram || (pax <= 0 && !isHosting && !isMedic && !isFlat)) {
+      return { 
+        subtotal: 0, deposit: 0, missionBase: 0, undiscountedMissionBase: 0, 
+        paPrice: 0, bundleAssessmentsPrice: 0, ambulancePrice: 0, medicalPlanPrice: 0,
+        medicKitsPrice: 0, logisticsBase: 0, addonsBase: 0, travelSurcharge: 0, days: 0, 
+        venuePrice: 0, transportPrice: 0, mealsPrice: 0, discountPercent: 0, 
+        discountLabel: '', totalSavings: 0, effectivePerHead: 0, minFeeApplied: false
+      };
     }
 
-    const variant = selectedProgram.durations ? selectedProgram.durations[durationIdx] : { price: selectedProgram.basePrice, days: 1, isGroup: false };
+    const variant = selectedProgram.durations ? selectedProgram.durations[durationIdx] : undefined;
     const days = Math.ceil(variant?.days || 1);
     
-    // 1. Mission Core
     let undiscountedMissionBase = 0;
     let missionBase = 0;
     let discountPercent = 0;
     let discountLabel = '';
+    let minFeeApplied = false;
+    let paPrice = 0;
+    let bundleAssessmentsPrice = 0;
+    let ambulancePrice = 0;
+    let medicalPlanPrice = 0;
+    let medicKitsPrice = 0;
 
-    // Check if the program uses pre-discounted volume tiers in its price schedule (e.g. First Aid & Fire Safety)
-    const hasBuiltInTierPricing = selectedProgram.id === 'first_aid' || selectedProgram.id === 'fire_safety_training';
+    // 1. SERVICE FEE BY RATE CARD v6 STRUCTURE
+    if (selectedProgram.priceType === 'team_building_v6' && selectedProgram.teamBuildingRates) {
+      // Rate Card 2026 v6 (Pages 3-5): Per-head rate × pax, less volume discount (5%/10%/15%/20%), floored at group minimum session fee
+      const groupConfig = selectedProgram.teamBuildingRates[groupType];
+      const safePax = Math.max(1, pax);
+      const rawPerHeadTotal = safePax * groupConfig.perHead;
 
-    if (variant?.isGroup || selectedProgram.priceType === 'flat_rate') {
-        undiscountedMissionBase = variant?.price || selectedProgram.basePrice;
-        missionBase = undiscountedMissionBase;
-    } else if (hasBuiltInTierPricing) {
-        // First Aid & Fire Safety tiers already have volume concessions baked into their price list.
-        // Prevent stacked discounts by not applying the general 30/50/100 pax percentage discounts on top.
-        undiscountedMissionBase = selectedProgram.basePrice * pax;
-        missionBase = (variant?.price || selectedProgram.basePrice) * pax;
-        if (variant && variant.price < selectedProgram.basePrice) {
-            const savingsPerPax = selectedProgram.basePrice - variant.price;
-            discountPercent = Math.round((savingsPerPax / selectedProgram.basePrice) * 100);
-            discountLabel = `${variant.label.split('(')[0].trim()} (Pre-Discounted Tier Rate)`;
+      if (safePax >= 200) discountPercent = 20;
+      else if (safePax >= 100) discountPercent = 15;
+      else if (safePax >= 50) discountPercent = 10;
+      else if (safePax >= 30) discountPercent = 5;
+      else discountPercent = 0;
+
+      const discountedTotal = rawPerHeadTotal * (1 - discountPercent / 100);
+
+      if (discountedTotal < groupConfig.minFee) {
+        missionBase = groupConfig.minFee;
+        undiscountedMissionBase = groupConfig.minFee;
+        minFeeApplied = true;
+        discountPercent = 0;
+        discountLabel = `Minimum Session Fee Applied (${groupConfig.label})`;
+      } else {
+        undiscountedMissionBase = rawPerHeadTotal;
+        missionBase = discountedTotal;
+        if (discountPercent > 0) {
+          discountLabel = `Volume Rate (${discountPercent}% Off for ${safePax} Pax)`;
         }
+      }
+
+      // PA System (Groups over 60 or selected)
+      if (includePaSystem) {
+        paPrice = getPaPriceForPax(safePax).price;
+      }
+
+    } else if (selectedProgram.priceType === 'two_part') {
+      // Fire & First Aid Training + Schools Safety (Pages 6-8): Programme Fee + (Per Person × Pax)
+      const progFee = variant?.programFee ?? selectedProgram.programFee ?? 18000;
+      const perPaxFee = variant?.perPersonFee ?? selectedProgram.perPersonFee ?? 640;
+      const rawCourseTotal = progFee + (perPaxFee * (pax > 0 ? pax : 0));
+      const minFee = selectedProgram.minSessionFee || 0;
+      const baseCourse = Math.max(minFee, rawCourseTotal);
+
+      // Full Chain 10% Bundle or 15% Yearly Refresher
+      if (selectedProgram.supportsFullChainBundle && assessmentBundleSite !== 'none') {
+        const siteObj = ASSESSMENT_SITES[assessmentBundleSite];
+        bundleAssessmentsPrice = siteObj.site + siteObj.pre + siteObj.post;
+        const fourItemTotal = baseCourse + bundleAssessmentsPrice;
+        undiscountedMissionBase = fourItemTotal;
+        missionBase = fourItemTotal * 0.9; // 10% bundle saving on the four
+        discountPercent = 10;
+        discountLabel = `Full Chain Bundle Saving (10% Off Site, Pre, Training & Post Assessments)`;
+      } else if (selectedProgram.supportsRefresher && isYearlyRefresher) {
+        undiscountedMissionBase = baseCourse;
+        missionBase = baseCourse * 0.85; // 15% off course fee
+        discountPercent = 15;
+        discountLabel = `Yearly Refresher Concession (15% Off Course Fee within 12 months)`;
+      } else {
+        undiscountedMissionBase = baseCourse;
+        missionBase = baseCourse;
+      }
+
+    } else if (selectedProgram.priceType === 'medic_v6') {
+      // Event Medics & Ambulance (Page 15):
+      // KES 2,400 × medicCount × hours (min 4) × riskMultiplier + KES 3,500 per 2 medics (kit) + optional Ambulance + optional Medical Plan
+      const hours = Math.max(4, medicHours);
+      const tier = MEDIC_RISK_TIERS[medicRisk];
+      const hourlyMedicFee = Math.round(2400 * tier.multiplier);
+      const medicsLabor = effectiveMedicsCount * hours * hourlyMedicFee;
+      medicKitsPrice = Math.ceil(effectiveMedicsCount / 2) * 3500;
+
+      if (includeAmbulance) {
+        const extraAmbHours = Math.max(0, hours - 8);
+        ambulancePrice = 28000 + (extraAmbHours * 3000);
+      }
+      if (includeMedicalPlan) {
+        medicalPlanPrice = 5000;
+      }
+
+      undiscountedMissionBase = medicsLabor + medicKitsPrice + ambulancePrice + medicalPlanPrice;
+      missionBase = undiscountedMissionBase;
+
+    } else if (selectedProgram.priceType === 'mc_v6') {
+      // MC Services (Page 14): Base Occasion Fee + (Extra Hours × Extra Hour Rate) + optional PA
+      const baseFee = variant?.price ?? selectedProgram.basePrice;
+      const extraRate = variant?.extraHourRate ?? 3000;
+      const extraTotal = Math.max(0, mcExtraHours) * extraRate;
+      undiscountedMissionBase = baseFee + extraTotal;
+      missionBase = undiscountedMissionBase;
+
+      if (includePaSystem) {
+        paPrice = getPaPriceForPax(pax).price;
+      }
+
+    } else if (variant?.isGroup || selectedProgram.priceType === 'flat_rate') {
+      // Occupational courses, Assessments, Fire & Emergency Drills, Annual Adventure Clubs
+      const flatBase = variant?.price || selectedProgram.basePrice;
+      if (selectedProgram.supportsRefresher && isYearlyRefresher) {
+        undiscountedMissionBase = flatBase;
+        missionBase = flatBase * 0.85;
+        discountPercent = 15;
+        discountLabel = 'Yearly Refresher Concession (15% Off within 12 months)';
+      } else {
+        undiscountedMissionBase = flatBase;
+        missionBase = flatBase;
+      }
+
     } else {
-        undiscountedMissionBase = (variant?.price || selectedProgram.basePrice) * pax;
-        
-        // Tiered Volume Concession Protocol for standard programs
-        if (pax >= 100) {
-            discountPercent = 15;
-            discountLabel = 'Enterprise Scale Concession (100+ Pax — 15% Off Core)';
-            missionBase = undiscountedMissionBase * 0.85;
-        } else if (pax >= 50) {
-            discountPercent = 10;
-            discountLabel = 'Institutional Tier Concession (50+ Pax — 10% Off Core)';
-            missionBase = undiscountedMissionBase * 0.90;
-        } else if (pax >= 30) {
-            discountPercent = 5;
-            discountLabel = 'Volume Engagement Concession (30+ Pax — 5% Off Core)';
-            missionBase = undiscountedMissionBase * 0.95;
-        } else {
-            missionBase = undiscountedMissionBase;
-        }
+      // Per person services (Guided Hikes & Expeditions)
+      undiscountedMissionBase = (variant?.price || selectedProgram.basePrice) * (pax > 0 ? pax : 1);
+      missionBase = undiscountedMissionBase;
     }
 
-    // Medic Standby Risk Multiplier
-    if (isMedic) {
-        missionBase *= EVENT_TYPE_RISK[eventType].multiplier;
-        undiscountedMissionBase *= EVENT_TYPE_RISK[eventType].multiplier;
+    // 2. TRAVEL OUTSIDE NAIROBI (~KES 132/km from Nairobi, return trip included)
+    let travelSurcharge = 0;
+    if (!clientCoversTravel) {
+      if (travelZone === 'custom') {
+        travelSurcharge = Math.max(0, customKm) * 132;
+      } else {
+        travelSurcharge = TRAVEL_ZONES[travelZone]?.surcharge || 0;
+      }
+      // Ambulance outside Nairobi add-on: KES 100/km one-way estimate if ambulance active & outside Nairobi
+      if (isMedic && includeAmbulance && travelZone !== 'nairobi') {
+        const approxKm = travelZone === 'custom' ? customKm : (travelZone === 'near' ? 50 : travelZone === 'mid' ? 100 : 170);
+        travelSurcharge += approxKm * 100;
+      }
     }
 
-    // 2. Logistics
-    const venuePrice = VENUE_TYPES[venueType].price * days;
+    // 3. FIELD LOGISTICS (Venue, Fleet, Meals)
+    const venuePrice = (VENUE_TYPES[venueType]?.price || 0) * days;
     const fleet = FLEET_SOLUTIONS[fleetType];
     let transportPrice = 0;
-    if (fleet.capacity > 0) {
-        const vehicles = Math.ceil((pax > 0 ? pax : 1) / fleet.capacity);
-        transportPrice = vehicles * fleet.price * days;
-        if (offroadSurcharge) transportPrice *= 1.4;
+    if (fleet && fleet.capacity > 0) {
+      const vehicles = Math.ceil((pax > 0 ? pax : 1) / fleet.capacity);
+      transportPrice = vehicles * fleet.price * days;
     }
     const mealsPrice = selectedMeals.reduce((sum, id) => {
-        const m = [
-          { id: 'breakfast', price: 400 },
-          { id: 'lunch', price: 800 },
-          { id: 'dinner', price: 1200 },
-          { id: 'tea', price: 250 }
-        ].find(x => x.id === id);
-        return sum + (m?.price || 0) * (pax > 0 ? pax : 1) * days;
+      const m = [
+        { id: 'breakfast', price: 400 },
+        { id: 'lunch', price: 800 },
+        { id: 'dinner', price: 1200 },
+        { id: 'tea', price: 250 }
+      ].find(x => x.id === id);
+      return sum + (m?.price || 0) * (pax > 0 ? pax : 1) * days;
     }, 0);
 
-    const logisticsBase = venuePrice + transportPrice + mealsPrice;
+    const logisticsBase = venuePrice + transportPrice + mealsPrice + travelSurcharge;
 
-    // 3. Strategic Add-ons
-    const addonsBase = chosenAddons.reduce((sum, id) => {
-        const a = STRATEGIC_ADDONS.find(x => x.id === id);
-        if (!a) return sum;
-        return sum + (a.type === 'pp' ? a.price * (pax > 0 ? pax : 1) : a.price);
+    // 4. STRATEGIC ADD-ONS (Plus PA System if added)
+    const chosenAddonsSum = chosenAddons.reduce((sum, id) => {
+      const a = STRATEGIC_ADDONS.find(x => x.id === id);
+      if (!a) return sum;
+      return sum + (a.type === 'pp' ? a.price * (pax > 0 ? pax : 1) : a.price);
     }, 0);
 
+    const addonsBase = chosenAddonsSum + paPrice;
     const subtotal = missionBase + logisticsBase + addonsBase;
     const undiscountedSubtotal = undiscountedMissionBase + logisticsBase + addonsBase;
     const totalSavings = Math.max(0, undiscountedSubtotal - subtotal);
+    const effectivePerHead = pax > 0 ? Math.round(subtotal / pax) : subtotal;
 
     return { 
-        subtotal, 
-        deposit: subtotal * 0.5, 
-        missionBase,
-        undiscountedMissionBase,
-        discountPercent,
-        discountLabel,
-        totalSavings,
-        logisticsBase,
-        addonsBase,
-        days,
-        venuePrice,
-        transportPrice,
-        mealsPrice
+      subtotal, 
+      deposit: subtotal * 0.5, 
+      missionBase,
+      undiscountedMissionBase,
+      paPrice,
+      bundleAssessmentsPrice,
+      ambulancePrice,
+      medicalPlanPrice,
+      medicKitsPrice,
+      discountPercent,
+      discountLabel,
+      totalSavings,
+      logisticsBase,
+      travelSurcharge,
+      addonsBase,
+      days,
+      venuePrice,
+      transportPrice,
+      mealsPrice,
+      effectivePerHead,
+      minFeeApplied
     };
-  }, [selectedProgram, durationIdx, pax, venueType, fleetType, offroadSurcharge, selectedMeals, eventType, chosenAddons]);
+  }, [
+    selectedProgram, durationIdx, pax, groupType, includePaSystem, 
+    assessmentBundleSite, isYearlyRefresher, medicRisk, medicHours, 
+    effectiveMedicsCount, includeAmbulance, includeMedicalPlan, mcExtraHours,
+    venueType, fleetType, selectedMeals, chosenAddons, travelZone, customKm, clientCoversTravel
+  ]);
 
   const toggleAddon = (id: string) => {
     setChosenAddons(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
@@ -250,30 +462,36 @@ const Calculator: React.FC<{ initialData?: BookingContextData | null }> = ({ ini
       .join(', ');
 
     const concessionLine = results.totalSavings > 0 
-      ? `\nVOLUME CONCESSION: -${formatKES(results.totalSavings)} (${results.discountLabel})`
+      ? `\nDISCOUNT / BUNDLE SAVING: -${formatKES(results.totalSavings)} (${results.discountLabel})`
       : '';
+
+    const travelLine = results.travelSurcharge > 0 
+      ? `\nTRAVEL OUTSIDE NAIROBI: ${formatKES(results.travelSurcharge)} (${travelZone === 'custom' ? `${customKm} km @ KES 132/km` : TRAVEL_ZONES[travelZone].label})`
+      : clientCoversTravel ? '\nTRAVEL: Client providing crew transport & accommodation directly' : '';
+
+    const paLine = results.paPrice > 0 ? `\nPA SYSTEM WITH TECHNICIAN: ${formatKES(results.paPrice)}` : '';
 
     const etimsWhatsAppText = clientInfo.needEtims ? `
 --------------------------------
 *eTIMS TAX INVOICE REQUESTED*
 Company: ${clientInfo.companyName || clientInfo.organization || 'Not Specified'}
 KRA PIN: ${clientInfo.kraPin || 'Pending Provision'}
-Accounts Email: ${clientInfo.etimsEmail || clientInfo.leadEmail || 'Not Specified'}
-Accounts Phone: ${clientInfo.etimsPhone || clientInfo.leadPhone || 'Not Specified'}` : '';
+Accounts Email: ${clientInfo.etimsEmail || clientInfo.leadEmail || 'Not Specified'}` : '';
 
-    const message = `*CROSS CONNECT AFRICA*
-*STRATEGIC PROPOSAL & INVOICE REQUEST*
+    const message = `*CROSS CONNECT AFRICA — 2026 RATE CARD PROPOSAL*
 ID: ${quoteId}
-MISSION: ${selectedProgram.title}
-PAX: ${pax}
-DEPLOYMENT: ${formattedDate}
+SERVICE: ${selectedProgram.title}${selectedProgram.durations && selectedProgram.durations.length > 1 ? ` (${selectedProgram.durations[durationIdx]?.label})` : ''}
+AUDIENCE SCALE: ${pax} Participants (approx. ${formatKES(results.effectivePerHead)} per head)
+DEPLOYMENT DATE: ${formattedDate}${travelLine}${paLine}
 ADD-ONS: ${activeAddonsText || 'None Selected'}${concessionLine}
 TOTAL INVESTMENT: ${formatKES(results.subtotal)}
+50% CONFIRMATION DEPOSIT: ${formatKES(results.deposit)}
 --------------------------------
+CLIENT / ORGANIZATION: ${clientInfo.organization || clientInfo.companyName || 'Not Specified'}
 LEAD CONTACT: ${clientInfo.leadContact || 'Not Specified'}
-EMAIL: ${clientInfo.leadEmail || 'Not Specified'}
 PHONE: ${clientInfo.leadPhone || 'Not Specified'}
-ORGANIZATION: ${clientInfo.organization || clientInfo.companyName || 'Not Specified'}${etimsWhatsAppText}`;
+EMAIL: ${clientInfo.leadEmail || 'Not Specified'}${etimsWhatsAppText}`;
+
     window.open(`https://wa.me/254710974670?text=${encodeURIComponent(message)}`, '_blank');
   };
 
@@ -284,36 +502,37 @@ ORGANIZATION: ${clientInfo.organization || clientInfo.companyName || 'Not Specif
   const handleCopyQuote = () => {
     const activeAddonsText = chosenAddons.map(id => STRATEGIC_ADDONS.find(a => a.id === id)?.label).filter(Boolean).join(', ');
     const concessionInfo = results.totalSavings > 0 
-      ? `\nVolume Concession Applied: -${formatKES(results.totalSavings)} (${results.discountLabel})`
+      ? `\nSavings Applied: -${formatKES(results.totalSavings)} (${results.discountLabel})`
       : '';
+    const travelInfo = results.travelSurcharge > 0
+      ? `\nTravel Outside Nairobi: ${formatKES(results.travelSurcharge)}`
+      : clientCoversTravel ? '\nTravel: Client covers crew logistics directly (Zero Surcharge)' : '';
 
     const etimsCopyText = clientInfo.needEtims ? `
-eTIMS Tax Invoice: REQUESTED (KRA Compliant)
-Company Name: ${clientInfo.companyName || clientInfo.organization || 'Not Specified'}
-Client KRA PIN: ${clientInfo.kraPin || 'Pending'}
-Invoicing Email: ${clientInfo.etimsEmail || clientInfo.leadEmail || 'Not Specified'}
-Invoicing Phone: ${clientInfo.etimsPhone || clientInfo.leadPhone || 'Not Specified'}
-` : 'eTIMS Tax Invoice: Standard Proforma (eTIMS available upon request)\n';
+eTIMS Tax Invoice: REQUESTED (KRA PIN: ${OFFICIAL_PROFORMA_REMITTANCE.kraPin})
+Company: ${clientInfo.companyName || clientInfo.organization || 'Not Specified'}
+KRA PIN: ${clientInfo.kraPin || 'Pending Provision'}
+` : '';
 
-    const summary = `CROSS CONNECT AFRICA — OFFICIAL PROFORMA & INVOICE
-Reference: ${quoteId}
+    const summary = `CROSS CONNECT AFRICA — 2026 PROFORMA QUOTATION (RATE CARD v6)
+Quotation Ref: ${quoteId}
 Date: ${new Date().toLocaleDateString('en-KE')}
-Lead Contact: ${clientInfo.leadContact || 'Lead Representative'}
-Lead Email: ${clientInfo.leadEmail || 'Not Specified'}
-Lead Phone: ${clientInfo.leadPhone || 'Not Specified'}
-Organization: ${clientInfo.organization || clientInfo.companyName || 'Prospective Partner'}
+Client: ${clientInfo.organization || clientInfo.companyName || clientInfo.leadContact || 'Prospective Partner'}
+Contact: ${clientInfo.leadContact || 'Lead Facilitator'} | Phone: ${clientInfo.leadPhone || 'Not Specified'}
 ${etimsCopyText}
-Mission: ${selectedProgram?.title || 'Custom Engagement'}
-Scale: ${pax} Participants
-Deployment Date: ${new Date(missionDate).toLocaleDateString('en-KE')}
-Strategic Addons: ${activeAddonsText || 'None'}${concessionInfo}
-Total Investment: ${formatKES(results.subtotal)}
-50% Mobilization Deposit: ${formatKES(results.deposit)}
+Programme: ${selectedProgram?.title}
+Participant Scale: ${pax} Participants (${formatKES(results.effectivePerHead)} per person)
+Deployment: ${new Date(missionDate).toLocaleDateString('en-KE')}${travelInfo}
+Service Fee (incl. applicable bundle/volume rate): ${formatKES(results.missionBase)}
+${results.paPrice > 0 ? `PA System w/ Technician: ${formatKES(results.paPrice)}\n` : ''}Logistics & Field Setup: ${formatKES(results.logisticsBase)}
+Add-ons: ${activeAddonsText || 'None'}${concessionInfo}
+TOTAL ESTIMATE: ${formatKES(results.subtotal)}
+50% Confirmation Deposit: ${formatKES(results.deposit)}
 --------------------------------
+Valid 30 days. Excludes applicable taxes.
 ${OFFICIAL_PROFORMA_REMITTANCE.companyName} | ${OFFICIAL_PROFORMA_REMITTANCE.location}
 Email: ${OFFICIAL_PROFORMA_REMITTANCE.email} | Phone: ${OFFICIAL_PROFORMA_REMITTANCE.phone}
-Bank: ${OFFICIAL_PROFORMA_REMITTANCE.bank} | Paybill: ${OFFICIAL_PROFORMA_REMITTANCE.paybill} | Account: ${OFFICIAL_PROFORMA_REMITTANCE.accountNumber}
-M-Pesa: ${OFFICIAL_PROFORMA_REMITTANCE.mpesaNumber}`;
+Bank: ${OFFICIAL_PROFORMA_REMITTANCE.bank} | Paybill: ${OFFICIAL_PROFORMA_REMITTANCE.paybill} | Account: ${OFFICIAL_PROFORMA_REMITTANCE.accountNumber}`;
 
     navigator.clipboard.writeText(summary).then(() => {
       setCopiedQuote(true);
@@ -322,1120 +541,1247 @@ M-Pesa: ${OFFICIAL_PROFORMA_REMITTANCE.mpesaNumber}`;
   };
 
   const filteredAddons = useMemo(() => {
-    if (!selectedProgram) return STRATEGIC_ADDONS.filter(a => a.category === 'all');
-    return STRATEGIC_ADDONS.filter(a => a.category === 'all' || a.category === selectedProgram.category);
+    if (!selectedProgram) return [];
+    if (selectedProgram.id === 'fire_drill') {
+      return STRATEGIC_ADDONS.filter(a => a.category === 'fire_drill_only' || a.category === 'safety_training');
+    }
+    return STRATEGIC_ADDONS.filter(a => a.category === selectedProgram.category);
   }, [selectedProgram]);
 
   return (
-    <div className="min-h-screen bg-brand-cream pt-32 md:pt-40 pb-32 px-4 md:px-12">
+    <div className="min-h-screen bg-brand-cream pt-28 md:pt-36 pb-32 px-4 md:px-12 selection:bg-brand-gold selection:text-brand-green">
       
-      {/* 1. PRINT-ONLY COMPONENT (High Fidelity PDF Design) */}
+      {/* 1. PRINT-ONLY COMPONENT (High Fidelity 2026 Proforma PDF) */}
       <div className="hidden print:block fixed inset-0 bg-white z-[9999] p-0 text-brand-green font-serif">
-        <div className="max-w-[800px] mx-auto p-12 bg-white min-h-screen flex flex-col">
-          {/* Letterhead */}
-          <div className="flex justify-between items-start border-b-4 border-brand-green pb-6 mb-6">
-            <div className="flex items-center gap-4">
-              <div className="p-2 bg-brand-green/5 border border-brand-green/20 rounded flex items-center justify-center">
-                <Logo className="w-14 h-14" />
+        <div className="max-w-[800px] mx-auto p-12 bg-white min-h-screen flex flex-col justify-between">
+          
+          <div>
+            {/* Letterhead */}
+            <div className="flex justify-between items-start border-b-4 border-brand-green pb-6 mb-6">
+              <div className="flex items-center gap-4">
+                <div className="p-2 bg-brand-green/5 border border-brand-green/20 rounded flex items-center justify-center">
+                  <Logo className="w-14 h-14" />
+                </div>
+                <div>
+                  <h1 className="text-3xl font-serif font-black tracking-tight text-brand-green uppercase leading-none">
+                    CROSS CONNECT
+                  </h1>
+                  <span className="text-brand-gold text-xs tracking-[0.45em] font-bold uppercase block mt-1">
+                    AFRICA
+                  </span>
+                  <span className="text-[8px] text-gray-500 font-sans tracking-widest uppercase block mt-0.5">
+                    Connecting People. Building Resilience. Saving Lives.
+                  </span>
+                </div>
+              </div>
+
+              <div className="text-right">
+                <span className="inline-block px-3 py-1 bg-brand-green text-brand-gold text-[9px] font-bold uppercase tracking-widest mb-1">
+                  {clientInfo.needEtims ? 'Official eTIMS Tax Invoice' : 'Official Proforma Invoice'}
+                </span>
+                <p className="text-[9px] text-gray-400 font-mono font-bold">{quoteId}</p>
+                <p className="text-[9px] text-gray-500 font-sans mt-0.5">Date: {new Date().toLocaleDateString('en-KE')}</p>
+              </div>
+            </div>
+
+            {/* Bill To & Company Remittance */}
+            <div className="grid grid-cols-2 gap-8 text-xs font-sans pb-6 border-b border-gray-200 mb-6">
+              <div>
+                <p className="font-bold text-gray-400 uppercase text-[9px] tracking-wider mb-1">Client & Billing Entity</p>
+                <p className="font-bold text-brand-green text-base font-serif">
+                  {clientInfo.needEtims ? (clientInfo.companyName || clientInfo.organization || 'Client Organization') : (clientInfo.organization || clientInfo.leadContact || 'Client Organization')}
+                </p>
+                <p className="text-gray-600 mt-0.5">Attn: <strong>{clientInfo.leadContact || 'Lead Representative'}</strong></p>
+                {clientInfo.leadEmail && <p className="text-gray-600">Email: {clientInfo.leadEmail}</p>}
+                {clientInfo.leadPhone && <p className="text-gray-600">Phone: {clientInfo.leadPhone}</p>}
+                {clientInfo.needEtims && (
+                  <p className="text-emerald-800 font-mono mt-1 bg-emerald-50 p-1.5 border border-emerald-200 inline-block">
+                    Client KRA PIN: <strong>{clientInfo.kraPin || 'Pending'}</strong>
+                  </p>
+                )}
+              </div>
+
+              <div className="text-right">
+                <p className="font-bold text-brand-green uppercase tracking-wider mb-0.5">Cross Connect Africa Ltd</p>
+                <p className="text-gray-600">Valley View Office Park, B1 Office 1, Nairobi</p>
+                <p className="text-gray-600">{OFFICIAL_PROFORMA_REMITTANCE.postal}</p>
+                <p className="text-gray-600">Email: {OFFICIAL_PROFORMA_REMITTANCE.email}</p>
+                <p className="text-gray-600">Tel: {OFFICIAL_PROFORMA_REMITTANCE.phone}</p>
+                <p className="text-gray-600 font-mono text-[10px] mt-1">KRA PIN: <strong>{OFFICIAL_PROFORMA_REMITTANCE.kraPin}</strong></p>
+              </div>
+            </div>
+
+            {/* Engagement Details Strip */}
+            <div className="bg-brand-sand/40 p-4 border border-brand-green/10 mb-6 flex justify-between items-center text-xs font-sans">
+              <div>
+                <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest block">Selected Programme</span>
+                <span className="font-bold text-brand-green font-serif text-sm">{selectedProgram?.title}</span>
               </div>
               <div>
-                <h1 className="text-3xl font-serif font-black tracking-tight text-brand-green uppercase leading-none">
-                  CROSS CONNECT
-                </h1>
-                <span className="text-brand-gold text-xs tracking-[0.45em] font-bold uppercase block mt-1">
-                  AFRICA
-                </span>
-                <span className="text-[8px] text-gray-500 font-sans tracking-widest uppercase block mt-0.5">
-                  Wilderness Leadership & Experiential Operations
-                </span>
+                <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest block">Participant Scale</span>
+                <span className="font-bold text-brand-green font-mono">{pax} PAX ({formatKES(results.effectivePerHead)}/head)</span>
               </div>
-            </div>
-            <div className="text-right">
-              <span className={`inline-block px-3 py-1 text-[9px] font-bold uppercase tracking-widest mb-1 ${
-                clientInfo.needEtims 
-                  ? 'bg-brand-green text-brand-gold ring-1 ring-brand-gold' 
-                  : 'bg-brand-green text-brand-gold'
-              }`}>
-                {clientInfo.needEtims ? 'Official eTIMS Tax Invoice' : 'Official Proforma Quotation'}
-              </span>
-              <h2 className="text-xl font-bold italic text-brand-green mb-0.5">Strategic Engagement Estimate</h2>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500">Ref: {quoteId}</p>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500">Issued: {new Date().toLocaleDateString('en-KE', { dateStyle: 'long' })}</p>
-            </div>
-          </div>
-
-          {/* Company & Treasury Details */}
-          <div className="grid grid-cols-2 gap-6 p-4 bg-gray-50 border border-gray-200 text-[10px] mb-6 font-sans">
-            <div>
-              <p className="font-bold text-brand-green uppercase tracking-wider mb-0.5">{OFFICIAL_PROFORMA_REMITTANCE.companyName}</p>
-              <p className="text-gray-600">Location: <strong>{OFFICIAL_PROFORMA_REMITTANCE.location}</strong></p>
-              <p className="text-gray-600">Email: <strong>{OFFICIAL_PROFORMA_REMITTANCE.email}</strong></p>
-              <p className="text-gray-600">Phone: <strong>{OFFICIAL_PROFORMA_REMITTANCE.phone}</strong></p>
-            </div>
-            <div className="text-right">
-              <p className="font-bold text-brand-green uppercase tracking-wider mb-0.5">Treasury & Remittance Details</p>
-              <p className="text-gray-600">Bank: <strong>{OFFICIAL_PROFORMA_REMITTANCE.bank}</strong></p>
-              <p className="text-gray-600">Paybill: <strong>{OFFICIAL_PROFORMA_REMITTANCE.paybill}</strong></p>
-              <p className="text-gray-600">Account Number: <strong>{OFFICIAL_PROFORMA_REMITTANCE.accountNumber}</strong></p>
-              <p className="text-gray-600">M-Pesa Number: <strong>{OFFICIAL_PROFORMA_REMITTANCE.mpesaNumber}</strong></p>
-            </div>
-          </div>
-
-          {/* Client & Deployment Summary */}
-          <div className="grid grid-cols-2 gap-10 mb-6 font-sans">
-            <div className="space-y-3">
-              <h3 className="text-[10px] font-bold uppercase tracking-[0.3em] text-brand-gold border-b border-gray-100 pb-2 font-serif">
-                Client & Invoicing Details
-              </h3>
-              <div className="space-y-2 text-xs">
-                <div>
-                  <span className="text-[8px] font-bold uppercase tracking-wider text-gray-400 block">Lead Contact Name</span>
-                  <p className="font-serif font-bold text-base text-brand-green italic">{clientInfo.leadContact || 'Lead Contact Representative'}</p>
-                </div>
-                <div>
-                  <span className="text-[8px] font-bold uppercase tracking-wider text-gray-400 block">Lead Contact Email</span>
-                  <p className="text-gray-800 break-words">{clientInfo.leadEmail || 'email@organization.com'}</p>
-                </div>
-                {clientInfo.leadPhone && (
-                  <div>
-                    <span className="text-[8px] font-bold uppercase tracking-wider text-gray-400 block">Lead Contact Phone</span>
-                    <p className="text-gray-800">{clientInfo.leadPhone}</p>
-                  </div>
-                )}
-                <div>
-                  <span className="text-[8px] font-bold uppercase tracking-wider text-gray-400 block">Organization</span>
-                  <p className="text-gray-800 font-semibold">{clientInfo.organization || clientInfo.companyName || 'Not Specified'}</p>
-                </div>
+              <div>
+                <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest block">Deployment Date</span>
+                <span className="font-bold text-brand-green">{new Date(missionDate).toLocaleDateString('en-KE')}</span>
               </div>
             </div>
 
-            <div className="space-y-3">
-              <h3 className="text-[10px] font-bold uppercase tracking-[0.3em] text-brand-gold border-b border-gray-100 pb-2 font-serif">
-                Operational Scope
-              </h3>
-              <div className="space-y-1.5 text-xs">
-                <p><span className="font-bold text-gray-600">Mission:</span> <span className="font-serif italic text-brand-green font-bold">{selectedProgram?.title}</span></p>
-                <p><span className="font-bold text-gray-600">Scale:</span> {pax} Participants</p>
-                <p><span className="font-bold text-gray-600">Deployment Date:</span> {new Date(missionDate).toLocaleDateString('en-KE', { dateStyle: 'full' })}</p>
-                <p><span className="font-bold text-gray-600">Duration:</span> {results.days} Day(s)</p>
-                <p><span className="font-bold text-gray-600">Pillar:</span> {selectedProgram?.category.replace('_', ' ').toUpperCase()}</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Dedicated eTIMS Tax Invoice Details (If eTIMS is selected) */}
-          {clientInfo.needEtims && (
-            <div className="mb-6 p-4 bg-emerald-50/70 border-2 border-brand-green/30 text-xs font-sans">
-              <div className="flex justify-between items-center border-b border-brand-green/20 pb-2 mb-3">
-                <div className="flex items-center gap-2">
-                  <span className="px-2 py-0.5 bg-brand-green text-brand-gold text-[8px] font-bold uppercase tracking-widest">
-                    KRA eTIMS Tax Invoice Details
-                  </span>
-                  <span className="text-[10px] font-bold text-emerald-800">
-                    Statutory Deductibility & VAT Ready
-                  </span>
-                </div>
-                <span className="text-[9px] text-gray-500 font-mono">CCA-eTIMS/SYS-2024</span>
-              </div>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-[10px]">
-                <div>
-                  <span className="text-gray-500 uppercase tracking-wider block text-[8px]">Name of Company</span>
-                  <strong className="text-brand-green text-xs block">{clientInfo.companyName || clientInfo.organization || 'Not Specified'}</strong>
-                </div>
-                <div>
-                  <span className="text-gray-500 uppercase tracking-wider block text-[8px]">KRA PIN</span>
-                  <strong className="font-mono text-xs text-brand-green block tracking-wider">{clientInfo.kraPin || 'Pending Provision'}</strong>
-                </div>
-                <div>
-                  <span className="text-gray-500 uppercase tracking-wider block text-[8px]">Finance Email</span>
-                  <span className="text-gray-800 block truncate">{clientInfo.etimsEmail || clientInfo.leadEmail || 'Not Specified'}</span>
-                </div>
-                <div>
-                  <span className="text-gray-500 uppercase tracking-wider block text-[8px]">Finance Phone</span>
-                  <span className="text-gray-800 block">{clientInfo.etimsPhone || clientInfo.leadPhone || 'Not Specified'}</span>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Itemized Investment Table */}
-          <div className="flex-grow">
-            <table className="w-full text-left border-collapse">
+            {/* Itemized Table */}
+            <table className="w-full text-left text-xs font-sans mb-6">
               <thead>
-                <tr className="bg-brand-sand text-[10px] font-bold uppercase tracking-widest">
-                  <th className="py-4 px-4 border-b-2 border-brand-green">Description of Engagement</th>
-                  <th className="py-4 px-4 border-b-2 border-brand-green text-right">Investment (KES)</th>
+                <tr className="border-b-2 border-brand-green bg-brand-green/5 text-brand-green">
+                  <th className="py-2.5 px-3 font-bold uppercase text-[9px] tracking-wider">Item & Deliverable Description</th>
+                  <th className="py-2.5 px-3 font-bold uppercase text-[9px] tracking-wider text-center">Basis</th>
+                  <th className="py-2.5 px-3 font-bold uppercase text-[9px] tracking-wider text-right">Amount (KES)</th>
                 </tr>
               </thead>
-              <tbody className="text-sm">
-                {/* 01: Core Pillar */}
-                <tr className="group">
-                  <td className="py-4 px-4 border-b border-gray-100 font-bold italic">
-                    01 Core Pillar: {selectedProgram?.title}
-                    <p className="text-[9px] font-normal text-gray-500 uppercase tracking-wider not-italic mt-1">Service category: {selectedProgram?.category.replace('_', ' ')}</p>
-                    {results.discountPercent > 0 && (
-                      <span className="inline-block mt-1 text-[8px] uppercase tracking-wider font-bold bg-brand-sand px-2 py-0.5 text-brand-green border border-brand-green/20">
-                        {results.discountLabel}
-                      </span>
-                    )}
+              <tbody className="divide-y divide-gray-100">
+                <tr>
+                  <td className="py-3 px-3">
+                    <p className="font-bold text-brand-green font-serif">{selectedProgram?.title}</p>
+                    <p className="text-[10px] text-gray-500 font-serif italic">
+                      {selectedProgram?.durations?.[durationIdx]?.label || selectedProgram?.description}
+                    </p>
                   </td>
-                  <td className="py-4 px-4 border-b border-gray-100 text-right font-bold">
-                    {results.discountPercent > 0 && (
-                      <span className="line-through text-xs text-gray-400 block font-normal">
-                        {formatKES(results.undiscountedMissionBase)}
-                      </span>
-                    )}
-                    {formatKES(results.missionBase)}
-                  </td>
+                  <td className="py-3 px-3 text-center text-gray-600 font-mono">Service</td>
+                  <td className="py-3 px-3 text-right font-bold text-brand-green font-mono">{formatKES(results.missionBase)}</td>
                 </tr>
-                {/* 01b: Concession Itemization (if applied) */}
-                {results.totalSavings > 0 && (
-                  <tr className="bg-emerald-50/50">
-                    <td className="py-3 px-4 border-b border-gray-100 font-serif italic text-emerald-800 text-xs">
-                      • Negotiated Volume Concession applied to core engagement scale ({pax} PAX)
-                    </td>
-                    <td className="py-3 px-4 border-b border-gray-100 text-right font-bold text-emerald-700 text-sm">
-                      -{formatKES(results.totalSavings)}
-                    </td>
-                  </tr>
-                )}
-                {/* 02: Logistics */}
-                {results.logisticsBase > 0 && (
+
+                {results.paPrice > 0 && (
                   <tr>
-                    <td className="py-4 px-4 border-b border-gray-100 font-bold italic">
-                      02 Field Logistics & Hospitality
-                      <ul className="text-[9px] font-normal text-gray-500 uppercase tracking-wider not-italic mt-2 space-y-1">
-                        {results.venuePrice > 0 && <li>• Venue: {VENUE_TYPES[venueType].label}</li>}
-                        {results.transportPrice > 0 && <li>• Transport: {FLEET_SOLUTIONS[fleetType].label} {offroadSurcharge ? '(Off-road Enhanced)' : ''}</li>}
-                        {results.mealsPrice > 0 && <li>• Catering: {selectedMeals.join(', ')}</li>}
-                      </ul>
+                    <td className="py-2.5 px-3">
+                      <p className="font-semibold text-gray-800">Public Address System with Technician</p>
+                      <p className="text-[10px] text-gray-500">{getPaPriceForPax(pax).tierLabel}</p>
                     </td>
-                    <td className="py-4 px-4 border-b border-gray-100 text-right font-bold">{formatKES(results.logisticsBase)}</td>
+                    <td className="py-2.5 px-3 text-center text-gray-600 font-mono">PA System</td>
+                    <td className="py-2.5 px-3 text-right font-mono text-gray-800">{formatKES(results.paPrice)}</td>
                   </tr>
                 )}
-                {/* 03: Add-ons Itemized */}
-                {chosenAddons.length > 0 && chosenAddons.map((id, index) => {
-                  const addon = STRATEGIC_ADDONS.find(a => a.id === id);
-                  if (!addon) return null;
-                  const price = addon.type === 'pp' ? addon.price * (pax > 0 ? pax : 1) : addon.price;
+
+                {results.travelSurcharge > 0 && (
+                  <tr>
+                    <td className="py-2.5 px-3">
+                      <p className="font-semibold text-gray-800">Travel Outside Nairobi ({travelZone === 'custom' ? `${customKm} km` : TRAVEL_ZONES[travelZone].examples})</p>
+                      <p className="text-[10px] text-gray-500">Billed at ~KES 132/km from Nairobi (return trip included)</p>
+                    </td>
+                    <td className="py-2.5 px-3 text-center text-gray-600 font-mono">Travel</td>
+                    <td className="py-2.5 px-3 text-right font-mono text-gray-800">{formatKES(results.travelSurcharge)}</td>
+                  </tr>
+                )}
+
+                {results.venuePrice > 0 && (
+                  <tr>
+                    <td className="py-2 px-3 text-gray-700">Venue Coordination ({VENUE_TYPES[venueType].label})</td>
+                    <td className="py-2 px-3 text-center text-gray-500">Logistics</td>
+                    <td className="py-2 px-3 text-right font-mono">{formatKES(results.venuePrice)}</td>
+                  </tr>
+                )}
+
+                {results.transportPrice > 0 && (
+                  <tr>
+                    <td className="py-2 px-3 text-gray-700">Mission Fleet Transport ({FLEET_SOLUTIONS[fleetType].label})</td>
+                    <td className="py-2 px-3 text-center text-gray-500">Fleet</td>
+                    <td className="py-2 px-3 text-right font-mono">{formatKES(results.transportPrice)}</td>
+                  </tr>
+                )}
+
+                {results.mealsPrice > 0 && (
+                  <tr>
+                    <td className="py-2 px-3 text-gray-700">Field Catering ({selectedMeals.join(', ')})</td>
+                    <td className="py-2 px-3 text-center text-gray-500">{pax} Pax</td>
+                    <td className="py-2 px-3 text-right font-mono">{formatKES(results.mealsPrice)}</td>
+                  </tr>
+                )}
+
+                {chosenAddons.map(id => {
+                  const a = STRATEGIC_ADDONS.find(x => x.id === id);
+                  if (!a) return null;
+                  const amt = a.type === 'pp' ? a.price * (pax > 0 ? pax : 1) : a.price;
                   return (
                     <tr key={id}>
-                      <td className="py-4 px-4 border-b border-gray-100 font-bold italic">
-                        {index === 0 ? '03 Strategic Enhancements' : ''}
-                        <div className="text-[11px] font-normal text-brand-green not-italic flex items-center gap-2 mt-1">
-                           • {addon.label} 
-                           <span className="text-[8px] text-gray-400 uppercase">({addon.type === 'pp' ? 'Per Person' : 'Flat Rate'})</span>
-                        </div>
-                      </td>
-                      <td className="py-4 px-4 border-b border-gray-100 text-right font-bold">{formatKES(price)}</td>
+                      <td className="py-2 px-3 text-gray-700">{a.label}</td>
+                      <td className="py-2 px-3 text-center text-gray-500">{a.type === 'pp' ? 'Per Pax' : 'Fixed'}</td>
+                      <td className="py-2 px-3 text-right font-mono">{formatKES(amt)}</td>
                     </tr>
                   );
                 })}
+
+                {results.totalSavings > 0 && (
+                  <tr className="bg-emerald-50/60 text-emerald-900">
+                    <td className="py-2 px-3 font-semibold">{results.discountLabel}</td>
+                    <td className="py-2 px-3 text-center text-xs font-mono">Discount</td>
+                    <td className="py-2 px-3 text-right font-bold font-mono">-{formatKES(results.totalSavings)}</td>
+                  </tr>
+                )}
               </tbody>
-              <tfoot>
-                <tr>
-                  <td className="py-8 px-4 text-right text-lg font-bold uppercase tracking-widest text-gray-400">Total Strategic Investment</td>
-                  <td className="py-8 px-4 text-right text-2xl font-bold text-brand-green border-b-4 border-double border-brand-green">{formatKES(results.subtotal)}</td>
-                </tr>
-              </tfoot>
             </table>
-          </div>
 
-          {/* Terms & Commitment */}
-          <div className="mt-12 bg-brand-sand p-8 grid grid-cols-2 gap-8 items-end">
-            <div className="space-y-4">
-              <h3 className="text-[10px] font-bold uppercase tracking-[0.3em] text-brand-gold">Commitment Structure & Commercial Terms</h3>
-              <ul className="text-[10px] space-y-2 opacity-70 leading-relaxed font-sans">
-                <li>• 50% Non-refundable deposit required for mission slot reservation.</li>
-                <li>• Remaining 50% payable upon completion of mission.</li>
-                <li>• Preferential volume concessions apply for high participant scales (30+ pax) or multi-session service frameworks as agreed in the procurement schedule.</li>
-                <li>• Quote valid for 30 days from date of issue.</li>
-                <li>• All deployments are subject to CCA safety protocols.</li>
-              </ul>
-            </div>
-            <div className="space-y-6">
-              <div className="flex justify-between items-end border-b border-brand-green pb-2">
-                <span className="text-[10px] font-bold uppercase">Authorized Signature</span>
-                <img src="https://i.imgur.com/pADVOmg.jpeg" className="w-12 h-12 grayscale opacity-10 rounded-full mb-1" />
-              </div>
-              <div className="text-[10px] uppercase font-bold text-brand-green">
-                Kevin Muhoro, Founder <br/>
-                <span className="text-brand-gold">Cross Connect Africa</span>
+            {/* Totals Summary */}
+            <div className="flex justify-end mb-8">
+              <div className="w-72 bg-brand-sand/40 p-4 border border-brand-green/20 space-y-2 text-xs font-sans">
+                <div className="flex justify-between font-bold text-sm text-brand-green pt-1 border-t border-brand-green/30">
+                  <span>Total Investment:</span>
+                  <span className="font-mono text-base">{formatKES(results.subtotal)}</span>
+                </div>
+                <div className="flex justify-between text-brand-gold font-bold text-xs pt-1 border-t border-dashed border-gray-300">
+                  <span>50% Confirmation Deposit:</span>
+                  <span className="font-mono">{formatKES(results.deposit)}</span>
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Footer Contact */}
-          <div className="mt-auto pt-8 border-t border-gray-100 flex justify-between items-center text-[8px] font-bold uppercase tracking-[0.3em] text-gray-400">
-            <span>crossconnectmissions@protonmail.com • +254 710 974 670</span>
-            <span>Valley View Office Park, Nairobi</span>
+          {/* Remittance & Bank Settlement Footer */}
+          <div className="border-t-2 border-brand-green pt-4 text-xs font-sans text-gray-600 grid grid-cols-2 gap-4">
+            <div>
+              <p className="font-bold text-brand-green uppercase text-[9px] tracking-wider mb-1">Official Remittance Details</p>
+              <p>Bank: <strong>{OFFICIAL_PROFORMA_REMITTANCE.bank}</strong></p>
+              <p>Account No: <strong>{OFFICIAL_PROFORMA_REMITTANCE.accountNumber}</strong></p>
+              <p>M-Pesa Paybill: <strong>{OFFICIAL_PROFORMA_REMITTANCE.paybill}</strong> (Acc: {OFFICIAL_PROFORMA_REMITTANCE.accountNumber})</p>
+              <p>Direct M-Pesa: <strong>{OFFICIAL_PROFORMA_REMITTANCE.mpesaNumber}</strong></p>
+            </div>
+            <div className="text-right text-[10px] space-y-1">
+              <p className="font-serif italic text-brand-green">"Connecting People. Building Resilience. Saving Lives."</p>
+              <p>Prices in KES, exclude applicable taxes. Valid 30 days. 50% deposit confirms date.</p>
+              <p className="text-gray-400">Authorized by Kevin Muhoro • Cross Connect Africa Ltd</p>
+            </div>
           </div>
+
         </div>
       </div>
 
-      {/* 2. MAIN WEB UI */}
-      <div className="max-w-screen-2xl mx-auto print:hidden">
+      {/* 2. ON-SCREEN APPLICATION WORKFLOW */}
+      <div className="max-w-[1400px] mx-auto print:hidden">
         
-        {/* BUILDER-STYLE HERO HEADER */}
-        <header className="mb-12 text-center animate-fade-in-up">
-           <span className="text-brand-gold text-[9px] font-bold uppercase tracking-[0.8em] mb-3 block">Mission Strategy & Pricing</span>
-           <h1 className="text-3xl md:text-5xl font-serif text-brand-green font-bold tracking-tighter leading-tight mb-4 italic">
-             Architect Your <br/><span className="not-italic text-brand-gold">Custom Quote.</span>
-           </h1>
-           <p className="text-gray-500 max-w-xl mx-auto font-serif italic text-sm opacity-80">
-             "Select your service pillar, fine-tune field logistics, and customize strategic enhancements to generate an instant live proposal."
-           </p>
+        {/* HEADER & OFFICIAL RATE CARD LINK */}
+        <header className="mb-10 text-center max-w-4xl mx-auto space-y-3">
+          <div className="inline-flex items-center gap-2 bg-brand-green/10 border border-brand-green/20 px-4 py-1.5 rounded-full mb-1">
+            <Sparkles size={14} className="text-brand-gold" />
+            <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-brand-green">
+              2026 Rate Card • Team Building · Safety · Drills · Medics · MC
+            </span>
+          </div>
+          
+          <h1 className="text-4xl md:text-6xl font-serif text-brand-green font-bold tracking-tight leading-tight">
+            Quotation & <span className="text-brand-gold italic font-light">Proforma Architect.</span>
+          </h1>
+          
+          <p className="text-gray-600 text-sm md:text-base font-serif italic max-w-2xl mx-auto leading-relaxed">
+            Transparent pricing built on the 2026 Rate Card: service fees with automatic volume & bundle rates, chosen add-ons, and outside-Nairobi travel.
+          </p>
+
+          {/* Official PDF Downloads Bar */}
+          <div className="pt-2 flex flex-wrap justify-center items-center gap-3">
+            <a 
+              href={RATE_CARD_PDF_URL} 
+              download="Cross_Connect_Africa_Rate_Card_2026.pdf"
+              className="px-4 py-2 bg-brand-green text-brand-gold text-xs font-bold uppercase tracking-wider rounded-xl hover:bg-brand-green/90 transition-all flex items-center gap-2 shadow-xs"
+            >
+              <Download size={14} /> Download Rate Card 2026 (PDF)
+            </a>
+
+            <button
+              onClick={() => setShowPdfModal(RATE_CARD_PDF_URL)}
+              className="px-4 py-2 bg-white text-brand-green border border-brand-green/20 text-xs font-bold uppercase tracking-wider rounded-xl hover:bg-brand-sand transition-all flex items-center gap-1.5"
+            >
+              <Eye size={14} className="text-brand-gold" /> Preview Rate Card
+            </button>
+
+            <a 
+              href={COMPANY_PROFILE_PDF_URL} 
+              download="Cross_Connect_Africa_Company_Profile_2026.pdf"
+              className="px-4 py-2 bg-brand-sand text-brand-green border border-brand-green/20 text-xs font-bold uppercase tracking-wider rounded-xl hover:bg-brand-sand/80 transition-all flex items-center gap-1.5"
+            >
+              <FileText size={14} className="text-brand-gold" /> Company Profile (PDF)
+            </a>
+          </div>
         </header>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+        {/* MAIN CALCULATOR GRID */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
-          {/* INPUTS COLUMN (BUILDER OUTLOOK) */}
-          <div className="lg:col-span-7 space-y-6">
-            <div className="bg-white p-6 md:p-8 rounded-none shadow-xl border border-brand-green/5 space-y-10">
+          {/* CONFIGURATION COLUMN (LEFT SIDE) */}
+          <div className="lg:col-span-7 space-y-8">
+            <div className="bg-white p-6 md:p-10 rounded-3xl shadow-xl border border-brand-green/10 space-y-10">
               
-              {/* 01: MISSION LEAD & INVOICING SPECIFICATION */}
+              {/* 01: CLIENT & COMPLIANCE ENTITY */}
               <section className="space-y-6">
-                 <div className="flex items-center gap-3 border-b border-gray-100 pb-3">
-                    <div className="w-8 h-8 bg-brand-green text-brand-gold flex items-center justify-center font-bold font-serif text-xs">01</div>
-                    <div>
-                      <h3 className="text-sm font-serif font-bold text-brand-green uppercase tracking-wider">Mission Lead & Invoicing</h3>
-                      <p className="text-[9px] text-gray-400 font-sans">Contact identity for invoice issuance and mission briefing.</p>
-                    </div>
-                 </div>
+                <div className="flex items-center gap-3 border-b border-gray-100 pb-3">
+                  <div className="w-8 h-8 bg-brand-green text-brand-gold flex items-center justify-center font-bold font-serif text-xs rounded-lg">01</div>
+                  <h3 className="text-sm font-serif font-bold text-brand-green uppercase tracking-wider">Client & Entity Credentials</h3>
+                </div>
 
-                 {/* Primary Lead Identity (Included in all invoices) */}
-                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                    <div className="space-y-2">
-                       <label className="text-[9px] font-bold text-brand-gold uppercase tracking-[0.3em] flex items-center gap-1.5">
-                         <User size={11}/> Lead Contact Name <span className="text-rose-500 font-bold">*</span>
-                       </label>
-                       <input 
-                         type="text" 
-                         value={clientInfo.leadContact} 
-                         onChange={(e) => setClientInfo({...clientInfo, leadContact: e.target.value})} 
-                         placeholder="e.g. Kevin Wachira" 
-                         className="w-full p-3 bg-gray-50 border border-transparent focus:border-brand-green text-xs font-bold focus:ring-0 outline-none transition-colors" 
-                       />
-                    </div>
-                    <div className="space-y-2">
-                       <label className="text-[9px] font-bold text-brand-gold uppercase tracking-[0.3em] flex items-center gap-1.5">
-                         <Mail size={11}/> Lead Contact Email <span className="text-rose-500 font-bold">*</span>
-                       </label>
-                       <input 
-                         type="email" 
-                         value={clientInfo.leadEmail} 
-                         onChange={(e) => setClientInfo({...clientInfo, leadEmail: e.target.value})} 
-                         placeholder="lead@organization.com" 
-                         className="w-full p-3 bg-gray-50 border border-transparent focus:border-brand-green text-xs font-bold focus:ring-0 outline-none transition-colors" 
-                       />
-                    </div>
-                    <div className="space-y-2">
-                       <label className="text-[9px] font-bold text-brand-gold uppercase tracking-[0.3em] flex items-center gap-1.5">
-                         <Phone size={11}/> Lead Phone Number
-                       </label>
-                       <input 
-                         type="tel" 
-                         value={clientInfo.leadPhone} 
-                         onChange={(e) => setClientInfo({...clientInfo, leadPhone: e.target.value})} 
-                         placeholder="+254 7XX XXX XXX" 
-                         className="w-full p-3 bg-gray-50 border border-transparent focus:border-brand-green text-xs font-bold focus:ring-0 outline-none transition-colors" 
-                       />
-                    </div>
-                    <div className="space-y-2">
-                       <label className="text-[9px] font-bold text-brand-gold uppercase tracking-[0.3em] flex items-center gap-1.5">
-                         <Building2 size={11}/> Organization / Group
-                       </label>
-                       <input 
-                         type="text" 
-                         value={clientInfo.organization} 
-                         onChange={(e) => setClientInfo({...clientInfo, organization: e.target.value})} 
-                         placeholder="e.g. CITAM / Kadolta / NGO" 
-                         className="w-full p-3 bg-gray-50 border border-transparent focus:border-brand-green text-xs font-bold focus:ring-0 outline-none transition-colors" 
-                       />
-                    </div>
-                 </div>
-
-                 {/* eTIMS Selection Checkbox Card */}
-                 <div className="p-4 bg-brand-sand/40 border border-brand-green/20 rounded-none transition-all">
-                    <label className="flex items-start gap-3 cursor-pointer select-none">
-                       <input 
-                         type="checkbox" 
-                         checked={clientInfo.needEtims} 
-                         onChange={(e) => setClientInfo(prev => ({
-                           ...prev, 
-                           needEtims: e.target.checked,
-                           companyName: prev.companyName || prev.organization,
-                           etimsEmail: prev.etimsEmail || prev.leadEmail,
-                           etimsPhone: prev.etimsPhone || prev.leadPhone
-                         }))}
-                         className="w-5 h-5 mt-0.5 rounded-none border-gray-300 text-brand-green focus:ring-brand-green accent-brand-green cursor-pointer" 
-                       />
-                       <div className="space-y-1">
-                          <div className="flex flex-wrap items-center gap-2">
-                             <span className="text-xs font-bold uppercase tracking-wider text-brand-green">
-                                Do you require an eTIMS Tax Invoice?
-                             </span>
-                             <span className="text-[8px] font-bold uppercase bg-brand-green text-brand-gold px-2 py-0.5">
-                                KRA Compliant
-                             </span>
-                          </div>
-                          <p className="text-[10px] text-gray-500 font-sans leading-relaxed">
-                            Check this box if your corporate finance or procurement department requires an official electronic tax invoice with KRA PIN verification for VAT and withholding tax filings.
-                          </p>
-                       </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1.5">
+                      <User size={12} className="text-brand-gold" /> Lead Contact Person *
                     </label>
+                    <input 
+                      type="text" 
+                      placeholder="e.g. Bishop Muhoro / HR Director"
+                      value={clientInfo.leadContact}
+                      onChange={(e) => setClientInfo(prev => ({ ...prev, leadContact: e.target.value }))}
+                      className="w-full p-3 bg-brand-cream/40 border border-brand-green/15 rounded-xl text-xs text-brand-green font-medium focus:outline-none focus:border-brand-gold"
+                    />
+                  </div>
 
-                    {/* Conditional eTIMS Details Form when checked */}
-                    {clientInfo.needEtims && (
-                       <div className="mt-5 pt-4 border-t border-brand-green/15 space-y-4 animate-fade-in-up">
-                          <div className="flex items-center gap-2 text-brand-green">
-                            <FileText size={14} className="text-brand-gold" />
-                            <span className="text-[10px] font-bold uppercase tracking-widest">
-                              eTIMS Tax Registration Credentials (Required for KRA Register)
-                            </span>
-                          </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1.5">
+                      <Building2 size={12} className="text-brand-gold" /> Organization / Business Name
+                    </label>
+                    <input 
+                      type="text" 
+                      placeholder="e.g. CITAM Parklands / Safaricom / KCB"
+                      value={clientInfo.organization}
+                      onChange={(e) => setClientInfo(prev => ({ ...prev, organization: e.target.value }))}
+                      className="w-full p-3 bg-brand-cream/40 border border-brand-green/15 rounded-xl text-xs text-brand-green font-medium focus:outline-none focus:border-brand-gold"
+                    />
+                  </div>
 
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                             <div className="space-y-1.5">
-                                <label className="text-[9px] font-bold text-brand-gold uppercase tracking-[0.3em] flex items-center gap-1.5">
-                                   <Building2 size={11} /> Name of Company <span className="text-rose-500 font-bold">*</span>
-                                </label>
-                                <input 
-                                   type="text" 
-                                   value={clientInfo.companyName} 
-                                   onChange={(e) => setClientInfo({ ...clientInfo, companyName: e.target.value })} 
-                                   placeholder="Registered Legal Business / Company Name" 
-                                   className="w-full p-3 bg-white border border-gray-200 text-xs font-semibold text-brand-green focus:ring-1 focus:ring-brand-green outline-none"
-                                />
-                             </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1.5">
+                      <Phone size={12} className="text-brand-gold" /> WhatsApp / Phone Number *
+                    </label>
+                    <input 
+                      type="tel" 
+                      placeholder="+254 7XX XXX XXX"
+                      value={clientInfo.leadPhone}
+                      onChange={(e) => setClientInfo(prev => ({ ...prev, leadPhone: e.target.value }))}
+                      className="w-full p-3 bg-brand-cream/40 border border-brand-green/15 rounded-xl text-xs text-brand-green font-medium focus:outline-none focus:border-brand-gold"
+                    />
+                  </div>
 
-                             <div className="space-y-1.5">
-                                <label className="text-[9px] font-bold text-brand-gold uppercase tracking-[0.3em] flex items-center gap-1.5">
-                                   <FileText size={11} /> KRA PIN <span className="text-rose-500 font-bold">*</span>
-                                </label>
-                                <input 
-                                   type="text" 
-                                   value={clientInfo.kraPin} 
-                                   onChange={(e) => setClientInfo({ ...clientInfo, kraPin: e.target.value.toUpperCase() })} 
-                                   placeholder="e.g. P051234567X / A012345678Z" 
-                                   className="w-full p-3 bg-white border border-gray-200 text-xs font-mono font-bold tracking-widest text-brand-green focus:ring-1 focus:ring-brand-green outline-none uppercase"
-                                />
-                             </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1.5">
+                      <Mail size={12} className="text-brand-gold" /> Email Address
+                    </label>
+                    <input 
+                      type="email" 
+                      placeholder="contact@company.co.ke"
+                      value={clientInfo.leadEmail}
+                      onChange={(e) => setClientInfo(prev => ({ ...prev, leadEmail: e.target.value }))}
+                      className="w-full p-3 bg-brand-cream/40 border border-brand-green/15 rounded-xl text-xs text-brand-green font-medium focus:outline-none focus:border-brand-gold"
+                    />
+                  </div>
+                </div>
 
-                             <div className="space-y-1.5">
-                                <label className="text-[9px] font-bold text-brand-gold uppercase tracking-[0.3em] flex items-center gap-1.5">
-                                   <Mail size={11} /> Finance / Accounts Email <span className="text-rose-500 font-bold">*</span>
-                                </label>
-                                <input 
-                                   type="email" 
-                                   value={clientInfo.etimsEmail} 
-                                   onChange={(e) => setClientInfo({ ...clientInfo, etimsEmail: e.target.value })} 
-                                   placeholder="accounts@company.co.ke" 
-                                   className="w-full p-3 bg-white border border-gray-200 text-xs font-semibold text-brand-green focus:ring-1 focus:ring-brand-green outline-none"
-                                />
-                             </div>
+                {/* ETIMS TAX INVOICE TOGGLE */}
+                <div className="p-4 bg-brand-sand/50 rounded-2xl border border-brand-green/15 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <ShieldCheck size={18} className="text-brand-green" />
+                      <div>
+                        <span className="text-xs font-serif font-bold text-brand-green block">Generate Official eTIMS Tax Invoice</span>
+                        <span className="text-[10px] text-gray-500">Enable if your finance department requires KRA PIN validated tax invoicing</span>
+                      </div>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input 
+                        type="checkbox" 
+                        checked={clientInfo.needEtims} 
+                        onChange={(e) => setClientInfo(prev => ({ ...prev, needEtims: e.target.checked }))}
+                        className="sr-only peer"
+                      />
+                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-green"></div>
+                    </label>
+                  </div>
 
-                             <div className="space-y-1.5">
-                                <label className="text-[9px] font-bold text-brand-gold uppercase tracking-[0.3em] flex items-center gap-1.5">
-                                   <Phone size={11} /> Finance Phone Number <span className="text-rose-500 font-bold">*</span>
-                                </label>
-                                <input 
-                                   type="tel" 
-                                   value={clientInfo.etimsPhone} 
-                                   onChange={(e) => setClientInfo({ ...clientInfo, etimsPhone: e.target.value })} 
-                                   placeholder="+254 7XX XXX XXX" 
-                                   className="w-full p-3 bg-white border border-gray-200 text-xs font-semibold text-brand-green focus:ring-1 focus:ring-brand-green outline-none"
-                                />
-                             </div>
-                          </div>
-
-                          <div className="text-[9px] text-emerald-800 bg-white p-2.5 border border-emerald-200 flex items-center gap-2">
-                             <CheckCircle2 size={13} className="text-emerald-600 flex-shrink-0" />
-                             <span>Official eTIMS invoice with validated KRA credentials will be generated under Cross Connect Africa Ltd (KRA PIN: <strong>P052198744M</strong>).</span>
-                          </div>
-                       </div>
-                    )}
-                 </div>
+                  {clientInfo.needEtims && (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-brand-green/10">
+                      <input 
+                        type="text" 
+                        placeholder="Registered Company Name for Tax"
+                        value={clientInfo.companyName}
+                        onChange={(e) => setClientInfo(prev => ({ ...prev, companyName: e.target.value }))}
+                        className="p-2.5 bg-white border border-gray-200 rounded-xl text-xs"
+                      />
+                      <input 
+                        type="text" 
+                        placeholder="Company KRA PIN (e.g. P051XXXXXXZ)"
+                        value={clientInfo.kraPin}
+                        onChange={(e) => setClientInfo(prev => ({ ...prev, kraPin: e.target.value }))}
+                        className="p-2.5 bg-white border border-gray-200 rounded-xl text-xs font-mono uppercase"
+                      />
+                    </div>
+                  )}
+                </div>
               </section>
 
-              {/* 02: CORE PILLAR & PROGRAM SELECTION (BUILDER STYLE) */}
-              <section className="space-y-8">
-                 <div className="flex items-center gap-3 border-b border-gray-100 pb-3">
-                    <div className="w-8 h-8 bg-brand-green text-brand-gold flex items-center justify-center font-bold font-serif text-xs">02</div>
-                    <h3 className="text-sm font-serif font-bold text-brand-green uppercase tracking-wider">Service Pillars & Selection</h3>
-                 </div>
-                 
-                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    {/* Category Selector Grid */}
-                    <div className="space-y-4">
-                       <label className="text-[9px] font-bold text-brand-gold uppercase tracking-[0.6em] block">Service Pillar</label>
-                       <div className="grid grid-cols-2 gap-2">
-                          {CATEGORIES.map(cat => (
-                             <button
-                               key={cat.id}
-                               type="button"
-                               onClick={() => { 
-                                 setActiveCategory(cat); 
-                                 setSelectedProgram(cat.programs[0]); 
-                                 setDurationIdx(0);
-                               }}
-                               className={`p-3 rounded-none border transition-all text-left text-[8px] font-bold uppercase tracking-widest flex items-center gap-2 ${
-                                 activeCategory.id === cat.id 
-                                 ? 'bg-brand-green text-brand-gold border-brand-green shadow-xl' 
-                                 : 'bg-gray-50 text-gray-400 border-transparent hover:border-brand-gold/30'
-                               }`}
-                             >
-                                {cat.icon} {cat.title}
-                             </button>
-                          ))}
-                       </div>
-                    </div>
+              {/* 02: SERVICE PILLAR & EXACT RATE CARD PROGRAM */}
+              <section className="space-y-6">
+                <div className="flex items-center gap-3 border-b border-gray-100 pb-3">
+                  <div className="w-8 h-8 bg-brand-green text-brand-gold flex items-center justify-center font-bold font-serif text-xs rounded-lg">02</div>
+                  <h3 className="text-sm font-serif font-bold text-brand-green uppercase tracking-wider">Service Pillar & Programme</h3>
+                </div>
 
-                    {/* Program Selection Buttons */}
-                    <div className="space-y-4">
-                       <label className="text-[9px] font-bold text-brand-gold uppercase tracking-[0.6em] block">Program Selection</label>
-                       <div className="space-y-1.5 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">
-                          {activeCategory.programs.map(prog => (
-                             <button
-                               key={prog.id}
-                               type="button"
-                               onClick={() => {
-                                 setSelectedProgram(prog);
-                                 setDurationIdx(0);
-                               }}
-                               className={`w-full text-left p-3 rounded-none border transition-all flex items-center justify-between ${
-                                 selectedProgram?.id === prog.id 
-                                 ? 'bg-brand-sand border-brand-green shadow-sm' 
-                                 : 'bg-gray-50 border-transparent hover:border-brand-gold/20'
-                               }`}
-                             >
-                                <div className="flex items-center gap-3">
-                                   <div className={`p-1.5 rounded-none ${selectedProgram?.id === prog.id ? 'bg-brand-green text-brand-gold' : 'bg-white text-gray-300'}`}>
-                                     {prog.icon}
-                                   </div>
-                                   <div>
-                                     <span className="font-bold text-[8px] uppercase tracking-wider text-brand-green block">{prog.title}</span>
-                                     <span className="text-[7px] text-gray-400 font-serif italic">{prog.audience}</span>
-                                   </div>
-                                </div>
-                                <ChevronRight size={12} className="text-brand-gold flex-shrink-0" />
-                             </button>
-                          ))}
-                       </div>
-                    </div>
-                 </div>
+                {/* Pillar Switcher (5 Cards) */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
+                  {CATEGORIES.map(cat => (
+                    <button
+                      key={cat.id}
+                      type="button"
+                      onClick={() => {
+                        setActiveCategory(cat);
+                        setSelectedProgram(cat.programs[0]);
+                        setDurationIdx(0);
+                      }}
+                      className={`p-3 rounded-2xl border text-center transition-all flex flex-col items-center gap-1.5 ${
+                        activeCategory.id === cat.id 
+                          ? 'bg-brand-green text-brand-gold border-brand-green shadow-md font-bold' 
+                          : 'bg-brand-cream/60 text-gray-600 border-transparent hover:border-brand-green/20'
+                      }`}
+                    >
+                      <div className="text-base">{cat.icon}</div>
+                      <span className="text-[10px] uppercase tracking-wider leading-tight">{cat.title}</span>
+                    </button>
+                  ))}
+                </div>
 
-                 {/* Configuration Row */}
-                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4 border-t border-gray-100">
-                    <div className="space-y-3">
-                       <label className="text-[9px] font-bold text-brand-gold uppercase tracking-[0.6em] block">Variant Configuration</label>
-                       <select 
-                          value={durationIdx} 
-                          onChange={(e) => setDurationIdx(parseInt(e.target.value))}
-                          className="w-full p-3.5 bg-gray-50 border-none rounded-none text-[9px] font-bold uppercase tracking-widest text-brand-green focus:ring-1 focus:ring-brand-green shadow-sm outline-none"
-                       >
-                          {selectedProgram?.durations?.map((d, i) => {
-                             const isFlat = selectedProgram.priceType === 'flat_rate' || d.isGroup;
-                             return <option key={i} value={i}>{d.label} — {formatKES(d.price)} {isFlat ? '(Flat)' : '(pp)'}</option>
-                          }) || <option value={0}>Standard — {selectedProgram ? formatKES(selectedProgram.basePrice) : ''}</option>}
-                       </select>
-                    </div>
-
-                    <div className="space-y-3">
-                       <label className="text-[9px] font-bold text-brand-gold uppercase tracking-[0.6em] block">Deployment Date</label>
-                       <CustomCalendar value={missionDate} onChange={setMissionDate} />
-                    </div>
-
-                    <div className="space-y-3">
-                       <div className="flex justify-between items-center">
-                         <label className="text-[9px] font-bold text-brand-gold uppercase tracking-[0.6em] block">Participant Scale (Pax)</label>
-                         {results.discountPercent > 0 && (
-                           <span className="text-[8px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-1.5 py-0.5 border border-emerald-200">
-                             {results.discountPercent}% Off Core
-                           </span>
-                         )}
-                       </div>
-                       <input 
-                          type="number" 
-                          value={pax} 
-                          onChange={(e) => setPax(Math.max(0, parseInt(e.target.value) || 0))}
-                          className="w-full p-3.5 bg-gray-50 border-none rounded-none font-serif font-bold text-xl text-brand-green focus:ring-1 focus:ring-brand-green outline-none" 
-                       />
-                       <p className="text-[8px] text-gray-500 font-sans leading-tight">
-                         Preferential institutional concessions apply from 30+ pax (30+ @ 5%, 50+ @ 10%, 100+ @ 15%).
-                       </p>
-                    </div>
-                 </div>
-
-                 {/* Medic Standby Risk Multiplier */}
-                 {selectedProgram?.id === 'medic_standby' && (
-                   <div className="p-4 bg-brand-sand/50 border border-brand-green/10 rounded-none space-y-2">
-                      <label className="text-[9px] font-bold text-brand-gold uppercase tracking-[0.4em] flex items-center gap-2">
-                        <AlertTriangle size={12} className="text-brand-gold" /> Event Risk Profile Surcharge
-                      </label>
-                      <select 
-                         value={eventType} 
-                         onChange={(e) => setEventType(e.target.value as any)}
-                         className="w-full p-3 bg-white border border-gray-200 text-[10px] font-bold uppercase text-brand-green outline-none"
-                      >
-                         {Object.values(EVENT_TYPE_RISK).map(e => (
-                            <option key={e.id} value={e.id}>{e.label} (Risk Factor: x{e.multiplier})</option>
-                         ))}
-                      </select>
-                   </div>
-                 )}
-              </section>
-
-              {/* 03: FIELD LOGISTICS */}
-              <section className="space-y-8">
-                 <div className="flex items-center gap-3 border-b border-gray-100 pb-3">
-                    <div className="w-8 h-8 bg-brand-green text-brand-gold flex items-center justify-center font-bold font-serif text-xs">03</div>
-                    <h3 className="text-sm font-serif font-bold text-brand-green uppercase tracking-wider">Field Logistics</h3>
-                 </div>
-                 
-                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div className="space-y-6">
-                       <div className="space-y-2">
-                          <label className="text-[9px] font-bold text-brand-gold uppercase tracking-[0.4em] flex items-center gap-2"><Map size={12}/> Venue Coordination</label>
-                          <select value={venueType} onChange={(e) => setVenueType(e.target.value as any)} className="w-full p-3.5 bg-gray-50 border-none text-[10px] font-bold uppercase text-brand-green outline-none">
-                             {Object.values(VENUE_TYPES).map(v => <option key={v.id} value={v.id}>{v.label} ({v.price > 0 ? formatKES(v.price) : 'Provided'})</option>)}
-                          </select>
-                       </div>
-
-                       <div className="space-y-2">
-                          <label className="text-[9px] font-bold text-brand-gold uppercase tracking-[0.4em] flex items-center gap-2"><Truck size={12}/> Mission Fleet</label>
-                          <select value={fleetType} onChange={(e) => setFleetType(e.target.value as any)} className="w-full p-3.5 bg-gray-50 border-none text-[10px] font-bold uppercase text-brand-green outline-none">
-                             {Object.values(FLEET_SOLUTIONS).map(f => <option key={f.id} value={f.id}>{f.label} ({f.capacity > 0 ? f.capacity + ' pax — ' + formatKES(f.price) : 'Self Drive'})</option>)}
-                          </select>
-                          {fleetType !== 'none' && (
-                            <label className="flex items-center gap-2 cursor-pointer pt-1">
-                              <input 
-                                type="checkbox" 
-                                checked={offroadSurcharge} 
-                                onChange={(e) => setOffroadSurcharge(e.target.checked)} 
-                                className="accent-brand-green" 
-                              />
-                              <span className="text-[9px] font-bold uppercase text-gray-500 tracking-wider">Off-road Terrain Upgrade (+40% fleet rate)</span>
-                            </label>
-                          )}
-                       </div>
-                    </div>
-
-                    <div className="space-y-3">
-                       <label className="text-[9px] font-bold text-brand-gold uppercase tracking-[0.4em] flex items-center gap-2"><Utensils size={12}/> Field Catering</label>
-                       <div className="grid grid-cols-2 gap-2">
-                          {[
-                            { id: 'breakfast', label: 'Breakfast', price: 400 },
-                            { id: 'lunch', label: 'Lunch', price: 800 },
-                            { id: 'dinner', label: 'Dinner', price: 1200 },
-                            { id: 'tea', label: 'Tea & Snacks', price: 250 }
-                          ].map(m => (
-                             <button 
-                                key={m.id} 
-                                type="button"
-                                onClick={() => setSelectedMeals(prev => prev.includes(m.id) ? prev.filter(x => x !== m.id) : [...prev, m.id])} 
-                                className={`p-3 border text-center transition-all ${selectedMeals.includes(m.id) ? 'bg-brand-green text-brand-gold border-brand-green shadow-md' : 'bg-gray-50 border-transparent text-gray-400 hover:border-brand-gold/30'}`}
-                             >
-                                <div className="text-[8px] font-bold uppercase tracking-widest">{m.label}</div>
-                                <div className="text-[10px] font-bold mt-0.5">{formatKES(m.price)}</div>
-                             </button>
-                          ))}
-                       </div>
-                    </div>
-                 </div>
-              </section>
-
-              {/* 04: STRATEGIC ENHANCEMENTS */}
-              <section className="space-y-8">
-                 <div className="flex items-center gap-3 border-b border-gray-100 pb-3">
-                    <div className="w-8 h-8 bg-brand-green text-brand-gold flex items-center justify-center font-bold font-serif text-xs">04</div>
-                    <h3 className="text-sm font-serif font-bold text-brand-green uppercase tracking-wider">Strategic Enhancements</h3>
-                 </div>
-
-                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-                    {filteredAddons.map(addon => (
+                {/* Programme Selection Buttons within Pillar */}
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">
+                    Choose Specific {activeCategory.title} Service
+                  </label>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    {activeCategory.programs.map(prog => (
                       <button
-                        key={addon.id}
+                        key={prog.id}
                         type="button"
-                        onClick={() => toggleAddon(addon.id)}
-                        className={`p-4 border text-left transition-all flex flex-col justify-between min-h-[110px] ${
-                          chosenAddons.includes(addon.id) 
-                          ? 'bg-brand-green text-brand-gold border-brand-green ring-1 ring-brand-gold shadow-lg' 
-                          : 'bg-white text-gray-500 border-gray-100 hover:border-brand-gold/30'
+                        onClick={() => {
+                          setSelectedProgram(prog);
+                          setDurationIdx(0);
+                        }}
+                        className={`p-3.5 rounded-2xl text-left border transition-all flex items-start justify-between gap-3 ${
+                          selectedProgram?.id === prog.id
+                            ? 'bg-brand-sand border-brand-green shadow-sm ring-1 ring-brand-green'
+                            : 'bg-white border-gray-100 hover:border-brand-gold/40'
                         }`}
                       >
-                        <div>
-                          <div className="flex justify-between items-start mb-1 gap-1">
-                             <span className="text-[9px] font-bold uppercase tracking-wider leading-tight">{addon.label}</span>
-                             {chosenAddons.includes(addon.id) && <CheckCircle2 size={14} className="flex-shrink-0 text-brand-gold" />}
-                          </div>
-                          <p className="text-[7px] opacity-70 uppercase tracking-[0.2em]">{addon.type === 'pp' ? 'Per Participant' : 'Flat Mission Rate'}</p>
+                        <div className="space-y-0.5">
+                          <span className="font-serif font-bold text-xs text-brand-green block">{prog.title}</span>
+                          <span className="text-[10px] text-gray-500 font-sans line-clamp-1">{prog.outcomes}</span>
                         </div>
-                        <div className={`text-xs font-serif font-bold ${chosenAddons.includes(addon.id) ? 'text-white' : 'text-brand-green'}`}>
-                          {formatKES(addon.price)}
+                        <div className={`p-1.5 rounded-lg shrink-0 ${selectedProgram?.id === prog.id ? 'bg-brand-green text-brand-gold' : 'bg-gray-100 text-gray-400'}`}>
+                          {prog.icon}
                         </div>
                       </button>
                     ))}
-                 </div>
+                  </div>
+                </div>
 
-                 {filteredAddons.length === 0 && (
-                   <div className="p-8 text-center bg-gray-50 border border-dashed border-gray-200">
-                      <p className="text-xs font-serif italic text-gray-400">"Select a pillar to view available strategic enhancements."</p>
-                   </div>
-                 )}
+                {/* Configuration: Variant, Date & Pax */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t border-gray-100">
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider block">
+                      {selectedProgram?.priceType === 'mc_v6' ? 'Occasion & Included Hours' : 'Duration / Option'}
+                    </label>
+                    <select
+                      value={durationIdx}
+                      onChange={(e) => setDurationIdx(parseInt(e.target.value))}
+                      className="w-full p-3 bg-brand-cream/40 border border-brand-green/15 rounded-xl text-xs text-brand-green font-semibold focus:outline-none"
+                    >
+                      {selectedProgram?.durations?.map((d, i) => (
+                        <option key={i} value={i}>{d.label}</option>
+                      )) || <option value={0}>Standard Scope</option>}
+                    </select>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider block">
+                      Target Deployment Date
+                    </label>
+                    <CustomCalendar value={missionDate} onChange={setMissionDate} />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <div className="flex justify-between items-center">
+                      <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider block">
+                        Participant / Crowd Count
+                      </label>
+                      {results.effectivePerHead > 0 && pax > 0 && (
+                        <span className="text-[9px] font-mono font-bold text-brand-gold">
+                          ~{formatKES(results.effectivePerHead)}/pax
+                        </span>
+                      )}
+                    </div>
+                    <input 
+                      type="number"
+                      min="1"
+                      value={pax}
+                      onChange={(e) => setPax(Math.max(1, parseInt(e.target.value) || 1))}
+                      className="w-full p-3 bg-brand-cream/40 border border-brand-green/15 rounded-xl font-serif font-bold text-lg text-brand-green focus:outline-none"
+                    />
+                  </div>
+                </div>
+
+                {/* SPECIAL 1: TEAM BUILDING GROUP TYPE & VOLUME RATE + PA SYSTEM (Pages 3-5) */}
+                {selectedProgram?.priceType === 'team_building_v6' && selectedProgram.teamBuildingRates && (
+                  <div className="p-4 bg-brand-sand/50 rounded-2xl border border-brand-green/15 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <label className="text-[10px] font-bold uppercase tracking-wider text-brand-green flex items-center gap-1.5">
+                        <Users size={13} className="text-brand-gold" /> Group Type (Per-Head Rate & Minimum Fee)
+                      </label>
+                      <span className="text-[10px] font-bold text-brand-gold uppercase tracking-wider">Auto Volume Tiers (5%–20% Off)</span>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                      {(['corporate', 'community', 'youth'] as GroupType[]).map((gt) => {
+                        const cfg = selectedProgram.teamBuildingRates![gt];
+                        return (
+                          <button
+                            key={gt}
+                            type="button"
+                            onClick={() => setGroupType(gt)}
+                            className={`p-3 rounded-xl text-left border transition-all text-xs ${
+                              groupType === gt 
+                                ? 'bg-brand-green text-brand-gold font-bold border-brand-green shadow-xs' 
+                                : 'bg-white text-gray-600 border-gray-200 hover:border-brand-gold/40'
+                            }`}
+                          >
+                            <div className="font-bold leading-snug">{cfg.label}</div>
+                            <div className="text-[10px] opacity-85 mt-1 font-mono">
+                              KES {cfg.perHead.toLocaleString()}/head · Min {formatKES(cfg.minFee)}
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {/* Volume Tier Indicator */}
+                    <div className="text-[11px] text-gray-600 flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-brand-green/10">
+                      <span>Volume Tiers: <strong>30–49 (5% off)</strong> · <strong>50–99 (10% off)</strong> · <strong>100–199 (15% off)</strong> · <strong>200+ (20% off)</strong></span>
+                      {results.minFeeApplied && (
+                        <span className="text-amber-800 bg-amber-100 px-2 py-0.5 rounded font-semibold text-[10px]">
+                          Minimum session fee applied
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Public Address System Option (Recommended over 60 pax) */}
+                    <div className="pt-2 border-t border-brand-green/10 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                      <label className="flex items-center gap-2 cursor-pointer text-xs text-brand-green font-semibold">
+                        <input 
+                          type="checkbox"
+                          checked={includePaSystem}
+                          onChange={(e) => setIncludePaSystem(e.target.checked)}
+                          className="accent-brand-green rounded w-4 h-4"
+                        />
+                        <Volume2 size={14} className="text-brand-gold" />
+                        <span>Add PA System with Technician ({getPaPriceForPax(pax).tierLabel})</span>
+                      </label>
+                      {pax > 60 && !includePaSystem && (
+                        <span className="text-[10px] text-amber-700 font-medium">Recommended for groups over 60 people (or bring yours free)</span>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* SPECIAL 2: SAFETY FULL-CHAIN 10% BUNDLE & 15% YEARLY REFRESHER (Pages 6-7) */}
+                {(selectedProgram?.supportsFullChainBundle || selectedProgram?.supportsRefresher) && (
+                  <div className="p-4 bg-brand-sand/50 rounded-2xl border border-brand-green/15 space-y-3">
+                    {selectedProgram.supportsFullChainBundle && (
+                      <div className="space-y-1.5">
+                        <div className="flex items-center justify-between">
+                          <label className="text-[10px] font-bold uppercase tracking-wider text-brand-green flex items-center gap-1.5">
+                            <ShieldCheck size={13} className="text-brand-gold" /> Optional: Bundle with Site, Pre & Post Assessments (Save 10%)
+                          </label>
+                          <span className="text-[9px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full">Save 10% on the 4</span>
+                        </div>
+                        <select
+                          value={assessmentBundleSite}
+                          onChange={(e) => {
+                            const val = e.target.value as keyof typeof ASSESSMENT_SITES;
+                            setAssessmentBundleSite(val);
+                            if (val !== 'none') setIsYearlyRefresher(false);
+                          }}
+                          className="w-full p-2.5 bg-white border border-gray-200 rounded-xl text-xs text-brand-green font-semibold"
+                        >
+                          {Object.values(ASSESSMENT_SITES).map(s => (
+                            <option key={s.id} value={s.id}>{s.label}</option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
+
+                    {selectedProgram.supportsRefresher && assessmentBundleSite === 'none' && (
+                      <label className="flex items-center gap-2 cursor-pointer text-xs text-brand-green font-semibold">
+                        <input 
+                          type="checkbox"
+                          checked={isYearlyRefresher}
+                          onChange={(e) => setIsYearlyRefresher(e.target.checked)}
+                          className="accent-brand-green rounded w-4 h-4"
+                        />
+                        <span>Yearly Refresher: Repeating the same course within 12 months (15% off course fee)</span>
+                      </label>
+                    )}
+                  </div>
+                )}
+
+                {/* SPECIAL 3: EVENT MEDICS & AMBULANCE CONFIGURATOR (Page 15) */}
+                {selectedProgram?.priceType === 'medic_v6' && (
+                  <div className="p-4 bg-brand-sand/50 rounded-2xl border border-brand-green/15 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <label className="text-[10px] font-bold text-brand-green uppercase tracking-wider flex items-center gap-1.5">
+                        <AlertTriangle size={13} className="text-brand-gold" /> Event Medics & Ambulance Configuration (KES 2,400/hr base, 4h min)
+                      </label>
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider block">Event Risk Tier</label>
+                      <select
+                        value={medicRisk}
+                        onChange={(e) => setMedicRisk(e.target.value as keyof typeof MEDIC_RISK_TIERS)}
+                        className="w-full p-3 bg-white border border-gray-200 rounded-xl text-xs text-brand-green font-semibold"
+                      >
+                        {Object.values(MEDIC_RISK_TIERS).map(t => (
+                          <option key={t.id} value={t.id}>{t.label}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1">
+                          <Clock size={12} className="text-brand-gold" /> Standby Hours (Min 4 hrs)
+                        </label>
+                        <input 
+                          type="number"
+                          min="4"
+                          max="48"
+                          value={medicHours}
+                          onChange={(e) => setMedicHours(Math.max(4, parseInt(e.target.value) || 4))}
+                          className="w-full p-2.5 bg-white border border-gray-200 rounded-xl font-mono font-bold text-sm text-brand-green"
+                        />
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <div className="flex justify-between items-center">
+                          <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Number of Medics</label>
+                          <button
+                            type="button"
+                            onClick={() => setUseAutoMedics(!useAutoMedics)}
+                            className="text-[10px] text-brand-gold font-bold underline"
+                          >
+                            {useAutoMedics ? `Auto (${recommendedMedics} rec.)` : 'Custom'}
+                          </button>
+                        </div>
+                        <input 
+                          type="number"
+                          min="1"
+                          value={effectiveMedicsCount}
+                          disabled={useAutoMedics}
+                          onChange={(e) => {
+                            setUseAutoMedics(false);
+                            setManualMedics(Math.max(1, parseInt(e.target.value) || 1));
+                          }}
+                          className="w-full p-2.5 bg-white border border-gray-200 rounded-xl font-mono font-bold text-sm text-brand-green disabled:bg-gray-100"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-brand-green/10">
+                      <label className="flex items-start gap-2 cursor-pointer text-xs text-brand-green">
+                        <input 
+                          type="checkbox"
+                          checked={includeAmbulance}
+                          onChange={(e) => setIncludeAmbulance(e.target.checked)}
+                          className="accent-brand-green rounded w-4 h-4 mt-0.5"
+                        />
+                        <span>
+                          <strong>Ambulance w/ Driver & EMT</strong><br />
+                          <span className="text-[10px] text-gray-500">KES 28,000 up to 8 hrs (+KES 3,000/extra hr)</span>
+                        </span>
+                      </label>
+
+                      <label className="flex items-start gap-2 cursor-pointer text-xs text-brand-green">
+                        <input 
+                          type="checkbox"
+                          checked={includeMedicalPlan}
+                          onChange={(e) => setIncludeMedicalPlan(e.target.checked)}
+                          className="accent-brand-green rounded w-4 h-4 mt-0.5"
+                        />
+                        <span>
+                          <strong>Event Medical Plan & Risk Review</strong><br />
+                          <span className="text-[10px] text-gray-500">KES 5,000 flat fee</span>
+                        </span>
+                      </label>
+                    </div>
+                  </div>
+                )}
+
+                {/* SPECIAL 4: MC SERVICES EXTRA HOURS & PA (Page 14) */}
+                {selectedProgram?.priceType === 'mc_v6' && (
+                  <div className="p-4 bg-brand-sand/50 rounded-2xl border border-brand-green/15 space-y-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1">
+                          <Clock size={12} className="text-brand-gold" /> Extra Hours Beyond Included ({selectedProgram.durations?.[durationIdx]?.includedHours || 4} hrs)
+                        </label>
+                        <div className="flex items-center gap-2">
+                          <input 
+                            type="number"
+                            min="0"
+                            max="12"
+                            value={mcExtraHours}
+                            onChange={(e) => setMcExtraHours(Math.max(0, parseInt(e.target.value) || 0))}
+                            className="w-24 p-2.5 bg-white border border-gray-200 rounded-xl font-mono font-bold text-sm text-brand-green"
+                          />
+                          <span className="text-xs text-gray-600">
+                            × {formatKES(selectedProgram.durations?.[durationIdx]?.extraHourRate || 3000)} / extra hr
+                          </span>
+                        </div>
+                      </div>
+
+                      <label className="flex items-center gap-2 cursor-pointer text-xs text-brand-green font-semibold">
+                        <input 
+                          type="checkbox"
+                          checked={includePaSystem}
+                          onChange={(e) => setIncludePaSystem(e.target.checked)}
+                          className="accent-brand-green rounded w-4 h-4"
+                        />
+                        <Volume2 size={14} className="text-brand-gold" />
+                        <span>Add PA System w/ Technician ({formatKES(getPaPriceForPax(pax).price)})</span>
+                      </label>
+                    </div>
+                  </div>
+                )}
+
               </section>
+
+              {/* 03: TRAVEL OUTSIDE NAIROBI & FIELD LOGISTICS */}
+              <section className="space-y-6">
+                <div className="flex items-center gap-3 border-b border-gray-100 pb-3">
+                  <div className="w-8 h-8 bg-brand-green text-brand-gold flex items-center justify-center font-bold font-serif text-xs rounded-lg">03</div>
+                  <h3 className="text-sm font-serif font-bold text-brand-green uppercase tracking-wider">Travel Outside Nairobi & Field Logistics</h3>
+                </div>
+
+                {/* Travel Outside Nairobi (~KES 132/km return trip included) */}
+                <div className="p-4 bg-white rounded-2xl border border-brand-green/15 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <label className="text-[10px] font-bold uppercase tracking-wider text-brand-green flex items-center gap-1.5">
+                      <Globe size={13} className="text-brand-gold" /> Travel Outside Nairobi (~KES 132/km return trip included)
+                    </label>
+                    <span className="text-[10px] font-mono text-gray-400">Rate Card 2026</span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <select
+                      value={travelZone}
+                      onChange={(e) => setTravelZone(e.target.value as keyof typeof TRAVEL_ZONES)}
+                      disabled={clientCoversTravel}
+                      className="w-full p-3 bg-brand-cream/40 border border-brand-green/15 rounded-xl text-xs text-brand-green font-semibold disabled:opacity-50"
+                    >
+                      {Object.values(TRAVEL_ZONES).map(z => (
+                        <option key={z.id} value={z.id}>
+                          {z.label}
+                        </option>
+                      ))}
+                    </select>
+
+                    {travelZone === 'custom' && !clientCoversTravel && (
+                      <div className="flex items-center gap-2">
+                        <input 
+                          type="number"
+                          min="1"
+                          value={customKm}
+                          onChange={(e) => setCustomKm(Math.max(0, parseInt(e.target.value) || 0))}
+                          className="w-full p-3 bg-brand-cream/40 border border-brand-green/15 rounded-xl text-xs font-mono font-bold text-brand-green"
+                          placeholder="Distance in km"
+                        />
+                        <span className="text-xs text-gray-500 whitespace-nowrap font-mono">km × 132</span>
+                      </div>
+                    )}
+                  </div>
+
+                  <label className="flex items-center gap-2 cursor-pointer pt-1 text-xs text-gray-700">
+                    <input 
+                      type="checkbox"
+                      checked={clientCoversTravel}
+                      onChange={(e) => setClientCoversTravel(e.target.checked)}
+                      className="accent-brand-green rounded"
+                    />
+                    <span>Client organisation covers facilitator travel & accommodation directly (KES 0 surcharge)</span>
+                  </label>
+                </div>
+
+                {/* Venue & Fleet Selectors */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1.5">
+                      <Map size={12} className="text-brand-gold" /> Optional Venue Coordination
+                    </label>
+                    <select
+                      value={venueType}
+                      onChange={(e) => setVenueType(e.target.value as any)}
+                      className="w-full p-3 bg-brand-cream/40 border border-brand-green/15 rounded-xl text-xs text-brand-green font-semibold"
+                    >
+                      {Object.values(VENUE_TYPES).map(v => (
+                        <option key={v.id} value={v.id}>
+                          {v.label} {v.price > 0 ? `(${formatKES(v.price)})` : ''}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1.5">
+                      <Truck size={12} className="text-brand-gold" /> Optional Group Transport Fleet
+                    </label>
+                    <select
+                      value={fleetType}
+                      onChange={(e) => setFleetType(e.target.value as any)}
+                      className="w-full p-3 bg-brand-cream/40 border border-brand-green/15 rounded-xl text-xs text-brand-green font-semibold"
+                    >
+                      {Object.values(FLEET_SOLUTIONS).map(f => (
+                        <option key={f.id} value={f.id}>
+                          {f.label} {f.capacity > 0 ? `— ${formatKES(f.price)}` : ''}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {/* Field Catering Options */}
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1.5">
+                    <Utensils size={12} className="text-brand-gold" /> Optional Group Catering / Meals (Passed on at cost)
+                  </label>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    {[
+                      { id: 'breakfast', label: 'Breakfast', price: 400 },
+                      { id: 'lunch', label: 'Buffet Lunch', price: 800 },
+                      { id: 'dinner', label: 'Dinner', price: 1200 },
+                      { id: 'tea', label: 'Tea & Snacks', price: 250 }
+                    ].map(m => {
+                      const isSelected = selectedMeals.includes(m.id);
+                      return (
+                        <button
+                          key={m.id}
+                          type="button"
+                          onClick={() => setSelectedMeals(prev => prev.includes(m.id) ? prev.filter(x => x !== m.id) : [...prev, m.id])}
+                          className={`p-3 rounded-xl border text-center transition-all ${
+                            isSelected 
+                              ? 'bg-brand-green text-brand-gold border-brand-green font-bold shadow-xs' 
+                              : 'bg-white text-gray-600 border-gray-200 hover:border-brand-gold/40'
+                          }`}
+                        >
+                          <div className="text-[10px] uppercase font-bold">{m.label}</div>
+                          <div className="text-xs font-mono mt-0.5">{formatKES(m.price)} pp</div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+              </section>
+
+              {/* 04: OPTIONAL EXTRAS & ADD-ONS */}
+              {filteredAddons.length > 0 && (
+                <section className="space-y-6">
+                  <div className="flex items-center gap-3 border-b border-gray-100 pb-3">
+                    <div className="w-8 h-8 bg-brand-green text-brand-gold flex items-center justify-center font-bold font-serif text-xs rounded-lg">04</div>
+                    <h3 className="text-sm font-serif font-bold text-brand-green uppercase tracking-wider">Optional Extras & Add-ons</h3>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5">
+                    {filteredAddons.map(addon => {
+                      const isChecked = chosenAddons.includes(addon.id);
+                      return (
+                        <button
+                          key={addon.id}
+                          type="button"
+                          onClick={() => toggleAddon(addon.id)}
+                          className={`p-3.5 rounded-2xl border text-left transition-all flex flex-col justify-between ${
+                            isChecked 
+                              ? 'bg-brand-green text-brand-gold border-brand-green shadow-md ring-1 ring-brand-gold' 
+                              : 'bg-white text-gray-600 border-gray-100 hover:border-brand-gold/40'
+                          }`}
+                        >
+                          <div className="flex justify-between items-start gap-1">
+                            <span className="text-[11px] font-bold leading-tight">{addon.label}</span>
+                            {isChecked && <CheckCircle2 size={14} className="text-brand-gold shrink-0 mt-0.5" />}
+                          </div>
+                          <div className="pt-2 text-xs font-mono font-bold">
+                            {formatKES(addon.price)} <span className="text-[9px] font-sans font-normal opacity-70">({addon.type === 'pp' ? 'each / pax' : 'flat'})</span>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </section>
+              )}
+
             </div>
           </div>
 
-          {/* QUOTE STUB COLUMN (RIGHT SIDE) */}
-          <div className="lg:col-span-5 print:hidden">
-             <div id="quote-doc" className="bg-white p-8 md:p-10 shadow-2xl paper-texture sticky top-32 border border-gray-100">
-                <header className="border-b-[6px] border-brand-green pb-6 mb-8">
-                   <div className="flex justify-between items-start mb-4 gap-3">
-                      <div className="flex items-center gap-3">
-                         <div className="p-1.5 bg-brand-green/5 border border-brand-green/20 rounded">
-                            <Logo className="w-10 h-10 flex-shrink-0" />
-                         </div>
-                         <div>
-                            <h3 className="font-serif font-black text-xl text-brand-green tracking-tight leading-none uppercase">
-                               Cross Connect
-                            </h3>
-                            <span className="text-brand-gold text-[9px] tracking-[0.4em] font-bold uppercase block mt-0.5">
-                               Africa
-                            </span>
-                         </div>
-                      </div>
-                      <div className="text-right flex-shrink-0">
-                         <div className="text-[8px] font-bold uppercase text-gray-400 tracking-widest">{quoteId}</div>
-                         <div className="text-[9px] font-bold uppercase text-brand-gold tracking-[0.3em]">
-                           {clientInfo.needEtims ? 'eTIMS Invoice' : 'Strategy Record'}
-                         </div>
-                      </div>
-                   </div>
-
-                   <div className="space-y-1.5 mb-2">
-                      <h2 className="text-2xl font-serif font-bold text-brand-green italic truncate leading-tight">
-                        {clientInfo.needEtims 
-                          ? (clientInfo.companyName || clientInfo.organization || 'Prospective Partner') 
-                          : (clientInfo.organization || clientInfo.leadContact || 'Prospective Partner')}
-                      </h2>
-                      
-                      <div className="space-y-0.5 text-xs text-gray-600 font-sans">
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-[9px] uppercase tracking-wider font-bold text-brand-gold">Lead Contact:</span>
-                          <span className="font-serif font-bold text-brand-green italic text-sm">{clientInfo.leadContact || 'Not Specified'}</span>
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-[9px] uppercase tracking-wider font-bold text-gray-400">Email:</span>
-                          <span className="text-gray-700">{clientInfo.leadEmail || 'Not Specified'}</span>
-                        </div>
-                        {clientInfo.leadPhone && (
-                          <div className="flex items-center gap-1.5">
-                            <span className="text-[9px] uppercase tracking-wider font-bold text-gray-400">Phone:</span>
-                            <span className="text-gray-700">{clientInfo.leadPhone}</span>
-                          </div>
-                        )}
-                      </div>
-
-                      {clientInfo.needEtims && (
-                        <div className="p-2.5 bg-emerald-50 border border-emerald-200 text-[9px] space-y-1 mt-2">
-                          <div className="flex items-center gap-1.5 text-emerald-800 font-bold uppercase tracking-wider">
-                            <CheckCircle2 size={11} className="text-emerald-600" />
-                            <span>eTIMS Tax Invoice Requested</span>
-                          </div>
-                          <div className="text-gray-700">
-                            Company: <strong>{clientInfo.companyName || clientInfo.organization || 'Not Specified'}</strong>
-                          </div>
-                          <div className="text-gray-700 font-mono">
-                            KRA PIN: <strong>{clientInfo.kraPin || 'Pending Provision'}</strong>
-                          </div>
-                        </div>
-                      )}
-                   </div>
-
-                   <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest pt-1 border-t border-gray-100">
-                     {new Date(missionDate).toLocaleDateString('en-KE')} — {pax} PAX
-                   </p>
-                </header>
-
-                <div className="space-y-5">
-                   {results.missionBase > 0 && (
-                     <div className="flex justify-between items-end border-b border-gray-50 pb-3">
-                        <div className="space-y-0.5">
-                           <span className="text-[8px] font-bold text-gray-400 uppercase tracking-widest block">01 Mission Core</span>
-                           <span className="text-[11px] font-serif font-bold italic text-brand-green">{selectedProgram?.title}</span>
-                        </div>
-                        <span className="text-xs font-bold text-brand-green">{formatKES(results.missionBase)}</span>
-                     </div>
-                   )}
-
-                   {results.logisticsBase > 0 && (
-                     <div className="flex justify-between items-end border-b border-gray-50 pb-3">
-                        <div className="space-y-0.5">
-                           <span className="text-[8px] font-bold text-gray-400 uppercase tracking-widest block">02 Logistics & Hospitality</span>
-                           <span className="text-[11px] font-serif font-bold italic text-brand-green">Venue, Transport, Field Meals</span>
-                        </div>
-                        <span className="text-xs font-bold text-brand-green">{formatKES(results.logisticsBase)}</span>
-                     </div>
-                   )}
-
-                   {/* Itemized Enhancements in Quote Sidebar */}
-                   {chosenAddons.length > 0 && (
-                     <div className="space-y-3 pt-1">
-                        <span className="text-[8px] font-bold text-gray-400 uppercase tracking-widest block">03 Strategic Enhancements</span>
-                        {chosenAddons.map(id => {
-                          const addon = STRATEGIC_ADDONS.find(a => a.id === id);
-                          if (!addon) return null;
-                          const price = addon.type === 'pp' ? addon.price * (pax > 0 ? pax : 1) : addon.price;
-                          return (
-                            <div key={id} className="flex justify-between items-end border-b border-gray-50 pb-1.5 last:border-0 pr-1">
-                               <div className="space-y-0.5 max-w-[70%]">
-                                  <span className="text-[9px] font-serif italic text-brand-green leading-tight block truncate">{addon.label}</span>
-                                  <span className="text-[7px] text-gray-400 uppercase tracking-tighter">({addon.type === 'pp' ? 'Per Pax' : 'Flat'})</span>
-                               </div>
-                               <span className="text-[10px] font-bold text-brand-green whitespace-nowrap">{formatKES(price)}</span>
-                            </div>
-                          );
-                        })}
-                     </div>
-                   )}
-
-                   <section className="bg-brand-green text-white p-6 mt-8 space-y-3 shadow-xl">
-                      <div className="flex justify-between items-center">
-                         <span className="text-brand-gold text-[9px] font-bold uppercase tracking-[0.5em] block">Total Investment</span>
-                         {results.discountPercent > 0 && (
-                           <span className="text-[8px] uppercase tracking-wider font-bold bg-brand-gold text-brand-green px-2 py-0.5">
-                             {results.discountPercent}% Volume Concession
-                           </span>
-                         )}
-                      </div>
-                      
-                      {results.totalSavings > 0 && (
-                        <div className="flex items-baseline justify-between text-xs text-white/60">
-                           <span>Standard Scale Rate:</span>
-                           <span className="line-through">{formatKES(results.subtotal + results.totalSavings)}</span>
-                        </div>
-                      )}
-
-                      <div className="text-2xl md:text-4xl font-serif font-bold text-brand-gold tracking-tighter leading-none">{formatKES(results.subtotal)}</div>
-                      
-                      {results.totalSavings > 0 && (
-                        <div className="text-[9px] text-emerald-300 font-sans flex items-center gap-1.5 pt-1">
-                           <Tag size={11} /> You save {formatKES(results.totalSavings)} with volume tier pricing
-                        </div>
-                      )}
-
-                      <div className="pt-3 border-t border-white/10 flex justify-between items-center">
-                         <span className="text-[8px] uppercase font-bold tracking-[0.3em] opacity-60">Security Deposit (50%)</span>
-                         <span className="text-lg font-serif font-bold text-brand-gold">{formatKES(results.deposit)}</span>
-                      </div>
-                   </section>
-
-                   {/* Professional Volume Policy Note */}
-                   <div className="p-3 bg-brand-sand/60 border border-brand-green/10 text-[9px] text-brand-green/90 leading-relaxed font-sans">
-                     <div className="font-bold uppercase tracking-wider text-[8px] text-brand-gold mb-0.5">Volume & Commercial Agreements:</div>
-                     Preferential concessions are available for large cohorts (30+ pax) or customized institutional frameworks as agreed upon with our engagement directors.
-                   </div>
-
-                   <div className="pt-6 flex flex-col gap-3">
-                      <button 
-                        onClick={handleWhatsApp} 
-                        disabled={!selectedProgram || (pax === 0 && selectedProgram.priceType !== 'flat_rate' && selectedProgram.category !== 'hosting' && selectedProgram.id !== 'medic_standby')}
-                        className="w-full py-4 bg-[#25D366] text-white font-bold uppercase tracking-[0.3em] text-[9px] shadow-lg flex items-center justify-center gap-3 disabled:opacity-50 active:scale-[0.98] transition-all hover:brightness-105"
-                      >
-                         <MessageCircle size={18} /> Request Proposal via WhatsApp
-                      </button>
-
-                      <button 
-                        onClick={() => setShowInvoiceModal(true)} 
-                        className="w-full py-3.5 bg-brand-sand border border-brand-green/30 text-brand-green font-bold text-[9px] uppercase tracking-[0.2em] flex items-center justify-center gap-2 hover:bg-brand-sand/80 transition-all shadow-sm active:scale-[0.98]"
-                      >
-                        <Eye size={16} className="text-brand-gold" /> Preview Official Invoice
-                      </button>
-
-                      <button 
-                        onClick={handlePrint} 
-                        className="w-full py-4 bg-brand-green text-white font-bold text-[9px] uppercase tracking-[0.25em] flex items-center justify-center gap-2.5 hover:bg-brand-green/90 transition-all shadow-md active:scale-[0.98]"
-                      >
-                        <FileDown size={17} className="text-brand-gold" /> Export Official Invoice / Quote (PDF)
-                      </button>
-
-                      <button 
-                        onClick={handleCopyQuote} 
-                        className="w-full py-3 border border-brand-green/30 text-brand-green font-bold text-[8px] uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-brand-cream transition-colors active:scale-[0.98]"
-                      >
-                        {copiedQuote ? (
-                          <>
-                            <Check size={14} className="text-emerald-600" /> Quotation Copied to Clipboard
-                          </>
-                        ) : (
-                          <>
-                            <Copy size={14} /> Copy Proforma Summary
-                          </>
-                        )}
-                      </button>
-
-                      <div className="pt-2 text-[9px] text-gray-400 text-center font-sans leading-tight">
-                        Includes Bank Remittance Details (Absa Bank, Paybill: 303030) ready for Procurement & Finance approval.
-                      </div>
-                   </div>
+          {/* QUOTATION SUMMARY COLUMN (RIGHT SIDE) */}
+          <div className="lg:col-span-5 sticky top-32 space-y-6">
+            <div className="bg-white rounded-3xl p-6 md:p-8 shadow-2xl border border-brand-green/10 space-y-6">
+              
+              {/* Header */}
+              <div className="border-b border-gray-100 pb-4 flex justify-between items-start">
+                <div className="flex items-center gap-3">
+                  <Logo className="w-10 h-10" />
+                  <div>
+                    <span className="font-serif font-black text-lg text-brand-green block leading-none uppercase">CROSS CONNECT</span>
+                    <span className="text-brand-gold text-[9px] tracking-[0.35em] font-bold uppercase block mt-0.5">AFRICA · 2026 RATE CARD</span>
+                  </div>
                 </div>
-             </div>
-          </div>
-        </div>
-      </div>
-
-      {/* 3. INTERACTIVE ON-SCREEN INVOICE MODAL */}
-      {showInvoiceModal && (
-        <div className="fixed inset-0 z-[1000] bg-brand-green/80 backdrop-blur-md flex items-center justify-center p-3 md:p-6 overflow-y-auto">
-          <div className="bg-white max-w-4xl w-full my-auto shadow-2xl border border-brand-green/20 overflow-hidden flex flex-col max-h-[92vh]">
-            
-            {/* Modal Control Bar */}
-            <div className="bg-brand-green text-white p-4 flex justify-between items-center border-b border-brand-gold/30 shrink-0">
-              <div className="flex items-center gap-3">
-                <FileText size={18} className="text-brand-gold" />
-                <div>
-                  <span className="font-serif font-bold text-sm tracking-wide block">
-                    {clientInfo.needEtims ? 'Official eTIMS Tax Invoice & Proforma' : 'Official Proforma Invoice'}
-                  </span>
-                  <span className="text-[9px] text-brand-gold uppercase tracking-widest">
-                    Ref: {quoteId}
+                <div className="text-right">
+                  <span className="text-[9px] font-mono text-gray-400 block">{quoteId}</span>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-brand-gold">
+                    {clientInfo.needEtims ? 'eTIMS Proforma' : 'Valid 30 Days'}
                   </span>
                 </div>
               </div>
+
+              {/* Engagement Overview */}
+              <div className="space-y-2">
+                <div className="text-sm font-serif font-bold text-brand-green leading-snug">
+                  {selectedProgram?.title}
+                </div>
+                <div className="flex flex-wrap items-center gap-2 text-xs text-gray-500 font-sans">
+                  <span>{pax} Participants</span>
+                  <span>·</span>
+                  <span>{new Date(missionDate).toLocaleDateString('en-KE')}</span>
+                  {selectedProgram?.priceType === 'team_building_v6' && (
+                    <>
+                      <span>·</span>
+                      <span className="text-brand-green font-semibold text-[10px] bg-brand-sand px-1.5 py-0.5 rounded capitalize">
+                        {groupType === 'corporate' ? 'Corporate / NGO' : groupType === 'community' ? 'Chama / Church' : 'Youth / School'}
+                      </span>
+                    </>
+                  )}
+                  {selectedProgram?.priceType === 'medic_v6' && (
+                    <>
+                      <span>·</span>
+                      <span className="text-brand-green font-semibold text-[10px] bg-brand-sand px-1.5 py-0.5 rounded">
+                        {effectiveMedicsCount} Medic{effectiveMedicsCount > 1 ? 's' : ''} × {Math.max(4, medicHours)}h
+                      </span>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              {/* Line Items Breakdown */}
+              <div className="space-y-3 pt-2 text-xs font-sans divide-y divide-gray-50">
+                <div className="flex justify-between items-baseline pt-2">
+                  <span className="text-gray-600 font-medium">01 Service Fee:</span>
+                  <span className="font-mono font-bold text-brand-green">{formatKES(results.missionBase)}</span>
+                </div>
+
+                {results.paPrice > 0 && (
+                  <div className="flex justify-between items-baseline pt-2">
+                    <span className="text-gray-600">PA System w/ Technician:</span>
+                    <span className="font-mono text-gray-800">{formatKES(results.paPrice)}</span>
+                  </div>
+                )}
+
+                {results.travelSurcharge > 0 && (
+                  <div className="flex justify-between items-baseline pt-2">
+                    <span className="text-gray-600">Travel Outside Nairobi:</span>
+                    <span className="font-mono text-brand-green">{formatKES(results.travelSurcharge)}</span>
+                  </div>
+                )}
+
+                {results.venuePrice > 0 && (
+                  <div className="flex justify-between items-baseline pt-2">
+                    <span className="text-gray-600">Venue Coordination:</span>
+                    <span className="font-mono text-gray-800">{formatKES(results.venuePrice)}</span>
+                  </div>
+                )}
+
+                {results.transportPrice > 0 && (
+                  <div className="flex justify-between items-baseline pt-2">
+                    <span className="text-gray-600">Group Fleet:</span>
+                    <span className="font-mono text-gray-800">{formatKES(results.transportPrice)}</span>
+                  </div>
+                )}
+
+                {results.mealsPrice > 0 && (
+                  <div className="flex justify-between items-baseline pt-2">
+                    <span className="text-gray-600">Catering ({selectedMeals.length} items):</span>
+                    <span className="font-mono text-gray-800">{formatKES(results.mealsPrice)}</span>
+                  </div>
+                )}
+
+                {chosenAddons.length > 0 && (
+                  <div className="flex justify-between items-baseline pt-2">
+                    <span className="text-gray-600">Optional Extras ({chosenAddons.length}):</span>
+                    <span className="font-mono text-gray-800">{formatKES(results.addonsBase - results.paPrice)}</span>
+                  </div>
+                )}
+
+                {results.discountLabel && (
+                  <div className="flex justify-between items-baseline pt-2 text-emerald-800 bg-emerald-50/70 p-2 rounded-lg">
+                    <span className="font-semibold text-[11px]">{results.discountLabel}</span>
+                    {results.totalSavings > 0 && (
+                      <span className="font-mono font-bold">-{formatKES(results.totalSavings)}</span>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Total Investment Card */}
+              <div className="bg-brand-green text-white p-6 rounded-2xl shadow-xl space-y-3">
+                <div className="flex justify-between items-baseline">
+                  <span className="text-[10px] font-bold uppercase tracking-[0.4em] text-brand-gold">
+                    Total Investment
+                  </span>
+                  {pax > 0 && (
+                    <span className="text-[11px] font-mono text-brand-cream/80">
+                      ~{formatKES(results.effectivePerHead)}/pax
+                    </span>
+                  )}
+                </div>
+
+                <div className="text-3xl md:text-4xl font-serif font-bold text-brand-gold tracking-tight">
+                  {formatKES(results.subtotal)}
+                </div>
+
+                <div className="pt-2 border-t border-white/10 flex justify-between items-center text-xs">
+                  <span className="text-gray-300">50% Deposit to Confirm Date:</span>
+                  <span className="font-serif font-bold text-brand-gold">{formatKES(results.deposit)}</span>
+                </div>
+              </div>
+
+              {/* Remittance Credentials Callout */}
+              <div className="p-3 bg-brand-sand/50 rounded-xl text-[10px] text-gray-600 font-sans space-y-1">
+                <p><strong>Payment Terms:</strong> 50% deposit confirms date; balance due on completion. Excludes taxes.</p>
+                <p><strong>Remittance:</strong> {OFFICIAL_PROFORMA_REMITTANCE.bank} · Paybill: <strong>{OFFICIAL_PROFORMA_REMITTANCE.paybill}</strong> (Acc: {OFFICIAL_PROFORMA_REMITTANCE.accountNumber})</p>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="space-y-2.5 pt-1">
+                <button
+                  onClick={handleWhatsApp}
+                  disabled={results.subtotal === 0}
+                  className="w-full py-4 bg-[#25D366] hover:bg-[#20ba59] text-white font-bold uppercase tracking-widest text-xs rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                >
+                  <MessageCircle size={18} /> Request Proposal on WhatsApp
+                </button>
+
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    onClick={() => setShowInvoiceModal(true)}
+                    className="py-3 bg-brand-cream hover:bg-brand-sand text-brand-green font-bold uppercase tracking-wider text-[10px] rounded-xl border border-brand-green/20 transition-all flex items-center justify-center gap-1.5"
+                  >
+                    <Eye size={14} className="text-brand-gold" /> Preview Invoice
+                  </button>
+
+                  <button
+                    onClick={handlePrint}
+                    className="py-3 bg-brand-green hover:bg-brand-green/90 text-brand-gold font-bold uppercase tracking-wider text-[10px] rounded-xl transition-all shadow-sm flex items-center justify-center gap-1.5"
+                  >
+                    <FileDown size={14} /> Export PDF
+                  </button>
+                </div>
+
+                <button
+                  onClick={handleCopyQuote}
+                  className="w-full py-2.5 text-gray-600 hover:text-brand-green text-xs font-semibold rounded-xl border border-gray-200 transition-colors flex items-center justify-center gap-1.5"
+                >
+                  {copiedQuote ? (
+                    <>
+                      <Check size={14} className="text-emerald-600" /> Quotation Copied!
+                    </>
+                  ) : (
+                    <>
+                      <Copy size={14} /> Copy Proforma Summary
+                    </>
+                  )}
+                </button>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      {/* 3. INTERACTIVE ON-SCREEN PROFORMA / INVOICE PREVIEW MODAL */}
+      {showInvoiceModal && (
+        <div 
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 md:p-6 overflow-y-auto animate-fade-in"
+        >
+          <div 
+            onClick={e => e.stopPropagation()}
+            className="bg-white max-w-4xl w-full my-auto rounded-3xl shadow-2xl border border-brand-green/20 overflow-hidden flex flex-col max-h-[92vh]"
+          >
+            {/* Modal Bar */}
+            <div className="bg-brand-green text-white p-4 px-6 flex justify-between items-center border-b border-brand-gold/30 shrink-0">
+              <div className="flex items-center gap-3">
+                <FileText size={18} className="text-brand-gold" />
+                <div>
+                  <span className="font-serif font-bold text-sm block">
+                    {clientInfo.needEtims ? 'Official eTIMS Tax Invoice & Proforma' : 'Official Proforma Quotation'}
+                  </span>
+                  <span className="text-[10px] text-brand-gold font-mono">Ref: {quoteId}</span>
+                </div>
+              </div>
+
               <div className="flex items-center gap-2">
-                <button 
+                <button
                   onClick={handlePrint}
-                  className="px-4 py-2 bg-brand-gold text-brand-green font-bold text-[9px] uppercase tracking-widest flex items-center gap-1.5 hover:brightness-110 active:scale-95 transition-all"
+                  className="px-4 py-2 bg-brand-gold text-brand-green font-bold text-xs uppercase tracking-wider rounded-lg hover:bg-white transition-all flex items-center gap-1.5 shadow-sm"
                 >
                   <Printer size={13} /> Print / Export PDF
                 </button>
-                <button 
+                <button
                   onClick={() => setShowInvoiceModal(false)}
-                  className="p-2 text-white/80 hover:text-white hover:bg-white/10 rounded transition-colors"
-                  aria-label="Close invoice preview"
+                  className="p-2 text-white/80 hover:text-white rounded-lg hover:bg-white/10"
                 >
                   <X size={20} />
                 </button>
               </div>
             </div>
 
-            {/* Modal Document Body */}
-            <div className="p-6 md:p-10 overflow-y-auto font-serif text-brand-green bg-brand-cream/30 space-y-6">
-              
+            {/* Modal Body */}
+            <div className="p-6 md:p-10 overflow-y-auto space-y-6 bg-brand-cream/20">
               {/* Letterhead */}
-              <div className="flex flex-col sm:flex-row justify-between items-start border-b-4 border-brand-green pb-6 gap-4">
+              <div className="flex flex-col sm:flex-row justify-between items-start border-b-2 border-brand-green pb-6 gap-4">
                 <div className="flex items-center gap-4">
-                  <div className="p-2 bg-brand-green/5 border border-brand-green/20 rounded flex items-center justify-center">
-                    <Logo className="w-14 h-14" />
-                  </div>
+                  <Logo className="w-14 h-14" />
                   <div>
-                    <h1 className="text-2xl md:text-3xl font-serif font-black tracking-tight text-brand-green uppercase leading-none">
-                      CROSS CONNECT
-                    </h1>
-                    <span className="text-brand-gold text-xs tracking-[0.45em] font-bold uppercase block mt-1">
-                      AFRICA
-                    </span>
-                    <span className="text-[8px] text-gray-500 font-sans tracking-widest uppercase block mt-0.5">
-                      Wilderness Leadership & Experiential Operations • Nairobi, Kenya
-                    </span>
+                    <h2 className="text-2xl font-serif font-black text-brand-green uppercase leading-none">CROSS CONNECT AFRICA</h2>
+                    <span className="text-brand-gold text-xs font-bold uppercase tracking-[0.3em] block mt-1">Connecting People. Building Resilience. Saving Lives.</span>
+                    <span className="text-xs text-gray-500 font-sans mt-0.5 block">Valley View Office Park, B1 Office 1, Nairobi · +254 710 974 670</span>
                   </div>
                 </div>
                 <div className="sm:text-right">
-                  <span className={`inline-block px-3 py-1 text-[9px] font-bold uppercase tracking-widest mb-1 ${
-                    clientInfo.needEtims 
-                      ? 'bg-brand-green text-brand-gold ring-1 ring-brand-gold' 
-                      : 'bg-brand-green text-brand-gold'
-                  }`}>
-                    {clientInfo.needEtims ? 'Official eTIMS Tax Invoice' : 'Official Proforma Quotation'}
+                  <span className="inline-block px-3 py-1 bg-brand-green text-brand-gold text-xs font-bold uppercase tracking-wider rounded-md mb-1">
+                    {clientInfo.needEtims ? 'eTIMS TAX PROFORMA' : 'PROFORMA INVOICE'}
                   </span>
-                  <h2 className="text-lg font-bold italic text-brand-green mb-0.5">Strategic Engagement Estimate</h2>
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500">Ref: {quoteId}</p>
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500">Issued: {new Date().toLocaleDateString('en-KE', { dateStyle: 'long' })}</p>
+                  <p className="text-xs text-gray-500 font-mono">Date: {new Date().toLocaleDateString('en-KE')}</p>
+                  <p className="text-xs text-gray-500 font-mono">KRA PIN: {OFFICIAL_PROFORMA_REMITTANCE.kraPin}</p>
                 </div>
               </div>
 
-              {/* Company & Treasury Details */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-white border border-gray-200 text-[10px] font-sans">
-                <div>
-                  <p className="font-bold text-brand-green uppercase tracking-wider mb-0.5">{OFFICIAL_PROFORMA_REMITTANCE.companyName}</p>
-                  <p className="text-gray-600">Location: <strong>{OFFICIAL_PROFORMA_REMITTANCE.location}</strong></p>
-                  <p className="text-gray-600">Email: <strong>{OFFICIAL_PROFORMA_REMITTANCE.email}</strong></p>
-                  <p className="text-gray-600">Phone: <strong>{OFFICIAL_PROFORMA_REMITTANCE.phone}</strong></p>
+              {/* Client & Remittance Summary */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 text-xs font-sans">
+                <div className="p-4 bg-white rounded-xl border border-gray-200 space-y-1">
+                  <span className="text-[10px] font-bold uppercase text-gray-400 block">Billed Entity</span>
+                  <p className="font-bold text-sm text-brand-green font-serif">
+                    {clientInfo.needEtims ? (clientInfo.companyName || clientInfo.organization || 'Prospective Client') : (clientInfo.organization || clientInfo.leadContact || 'Prospective Client')}
+                  </p>
+                  <p className="text-gray-600">Contact: {clientInfo.leadContact || 'Lead Facilitator'}</p>
+                  <p className="text-gray-600">Phone: {clientInfo.leadPhone || 'Not Specified'}</p>
+                  {clientInfo.leadEmail && <p className="text-gray-600">Email: {clientInfo.leadEmail}</p>}
+                  {clientInfo.needEtims && <p className="font-mono text-emerald-800 font-bold mt-1">KRA PIN: {clientInfo.kraPin || 'Pending'}</p>}
                 </div>
-                <div className="md:text-right">
-                  <p className="font-bold text-brand-green uppercase tracking-wider mb-0.5">Treasury & Remittance Details</p>
-                  <p className="text-gray-600">Bank: <strong>{OFFICIAL_PROFORMA_REMITTANCE.bank}</strong></p>
-                  <p className="text-gray-600">Paybill: <strong>{OFFICIAL_PROFORMA_REMITTANCE.paybill}</strong></p>
-                  <p className="text-gray-600">Account Number: <strong>{OFFICIAL_PROFORMA_REMITTANCE.accountNumber}</strong></p>
-                  <p className="text-gray-600">M-Pesa Number: <strong>{OFFICIAL_PROFORMA_REMITTANCE.mpesaNumber}</strong></p>
+
+                <div className="p-4 bg-white rounded-xl border border-gray-200 space-y-1 text-right">
+                  <span className="text-[10px] font-bold uppercase text-gray-400 block">Remittance Details</span>
+                  <p className="font-bold text-brand-green">{OFFICIAL_PROFORMA_REMITTANCE.bank}</p>
+                  <p className="font-mono">Account No: <strong>{OFFICIAL_PROFORMA_REMITTANCE.accountNumber}</strong></p>
+                  <p className="font-mono">Paybill: <strong>{OFFICIAL_PROFORMA_REMITTANCE.paybill}</strong> (Acc: {OFFICIAL_PROFORMA_REMITTANCE.accountNumber})</p>
+                  <p className="font-mono">M-Pesa: <strong>{OFFICIAL_PROFORMA_REMITTANCE.mpesaNumber}</strong></p>
                 </div>
               </div>
 
-              {/* Client & Deployment Summary */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 font-sans">
-                <div className="space-y-3 bg-white p-4 border border-gray-100">
-                  <h3 className="text-[10px] font-bold uppercase tracking-[0.3em] text-brand-gold border-b border-gray-100 pb-2 font-serif">
-                    Client & Invoicing Details
-                  </h3>
-                  <div className="space-y-2 text-xs">
-                    <div>
-                      <span className="text-[8px] font-bold uppercase tracking-wider text-gray-400 block">Lead Contact Name</span>
-                      <p className="font-serif font-bold text-base text-brand-green italic">{clientInfo.leadContact || 'Lead Contact Representative'}</p>
-                    </div>
-                    <div>
-                      <span className="text-[8px] font-bold uppercase tracking-wider text-gray-400 block">Lead Contact Email</span>
-                      <p className="text-gray-800 break-words">{clientInfo.leadEmail || 'email@organization.com'}</p>
-                    </div>
-                    {clientInfo.leadPhone && (
-                      <div>
-                        <span className="text-[8px] font-bold uppercase tracking-wider text-gray-400 block">Lead Contact Phone</span>
-                        <p className="text-gray-800">{clientInfo.leadPhone}</p>
-                      </div>
-                    )}
-                    <div>
-                      <span className="text-[8px] font-bold uppercase tracking-wider text-gray-400 block">Organization</span>
-                      <p className="text-gray-800 font-semibold">{clientInfo.organization || clientInfo.companyName || 'Not Specified'}</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-3 bg-white p-4 border border-gray-100">
-                  <h3 className="text-[10px] font-bold uppercase tracking-[0.3em] text-brand-gold border-b border-gray-100 pb-2 font-serif">
-                    Operational Scope
-                  </h3>
-                  <div className="space-y-1.5 text-xs">
-                    <p><span className="font-bold text-gray-600">Mission:</span> <span className="font-serif italic text-brand-green font-bold">{selectedProgram?.title}</span></p>
-                    <p><span className="font-bold text-gray-600">Scale:</span> {pax} Participants</p>
-                    <p><span className="font-bold text-gray-600">Deployment Date:</span> {new Date(missionDate).toLocaleDateString('en-KE', { dateStyle: 'full' })}</p>
-                    <p><span className="font-bold text-gray-600">Duration:</span> {results.days} Day(s)</p>
-                    <p><span className="font-bold text-gray-600">Pillar:</span> {selectedProgram?.category.replace('_', ' ').toUpperCase()}</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Dedicated eTIMS Tax Invoice Details (If eTIMS is selected) */}
-              {clientInfo.needEtims && (
-                <div className="p-4 bg-emerald-50/80 border-2 border-brand-green/30 text-xs font-sans">
-                  <div className="flex justify-between items-center border-b border-brand-green/20 pb-2 mb-3">
-                    <div className="flex items-center gap-2">
-                      <span className="px-2 py-0.5 bg-brand-green text-brand-gold text-[8px] font-bold uppercase tracking-widest">
-                        KRA eTIMS Tax Invoice Details
-                      </span>
-                      <span className="text-[10px] font-bold text-emerald-800">
-                        Statutory Deductibility & VAT Ready
-                      </span>
-                    </div>
-                    <span className="text-[9px] text-gray-500 font-mono">CCA-eTIMS/SYS-2024</span>
-                  </div>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-[10px]">
-                    <div>
-                      <span className="text-gray-500 uppercase tracking-wider block text-[8px]">Name of Company</span>
-                      <strong className="text-brand-green text-xs block">{clientInfo.companyName || clientInfo.organization || 'Not Specified'}</strong>
-                    </div>
-                    <div>
-                      <span className="text-gray-500 uppercase tracking-wider block text-[8px]">KRA PIN</span>
-                      <strong className="font-mono text-xs text-brand-green block tracking-wider">{clientInfo.kraPin || 'Pending Provision'}</strong>
-                    </div>
-                    <div>
-                      <span className="text-gray-500 uppercase tracking-wider block text-[8px]">Finance Email</span>
-                      <span className="text-gray-800 block truncate">{clientInfo.etimsEmail || clientInfo.leadEmail || 'Not Specified'}</span>
-                    </div>
-                    <div>
-                      <span className="text-gray-500 uppercase tracking-wider block text-[8px]">Finance Phone</span>
-                      <span className="text-gray-800 block">{clientInfo.etimsPhone || clientInfo.leadPhone || 'Not Specified'}</span>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Itemized Investment Table */}
-              <div className="bg-white border border-gray-200">
-                <table className="w-full text-left border-collapse">
-                  <thead>
-                    <tr className="bg-brand-sand text-[10px] font-bold uppercase tracking-widest">
-                      <th className="py-3 px-4 border-b-2 border-brand-green">Description of Engagement</th>
-                      <th className="py-3 px-4 border-b-2 border-brand-green text-right">Investment (KES)</th>
+              {/* Items Table */}
+              <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-brand-green text-brand-gold">
+                    <tr>
+                      <th className="p-3 font-bold uppercase text-[10px]">Deliverable Description</th>
+                      <th className="p-3 font-bold uppercase text-[10px] text-center">Scale / Basis</th>
+                      <th className="p-3 font-bold uppercase text-[10px] text-right">Total (KES)</th>
                     </tr>
                   </thead>
-                  <tbody className="text-sm">
+                  <tbody className="divide-y divide-gray-100 font-sans">
                     <tr>
-                      <td className="py-3 px-4 border-b border-gray-100 font-bold italic">
-                        01 Core Pillar: {selectedProgram?.title}
-                        {results.discountPercent > 0 && (
-                          <span className="inline-block mt-1 text-[8px] uppercase tracking-wider font-bold bg-brand-sand px-2 py-0.5 text-brand-green border border-brand-green/20 block w-fit">
-                            {results.discountLabel}
-                          </span>
-                        )}
+                      <td className="p-3">
+                        <span className="font-bold font-serif text-brand-green text-sm block">{selectedProgram?.title}</span>
+                        <span className="text-[11px] text-gray-500 italic font-serif">
+                          {selectedProgram?.durations?.[durationIdx]?.label || selectedProgram?.description}
+                        </span>
                       </td>
-                      <td className="py-3 px-4 border-b border-gray-100 text-right font-bold">
-                        {results.discountPercent > 0 && (
-                          <span className="line-through text-xs text-gray-400 block font-normal">
-                            {formatKES(results.undiscountedMissionBase)}
-                          </span>
-                        )}
-                        {formatKES(results.missionBase)}
-                      </td>
+                      <td className="p-3 text-center font-mono">{pax} Pax</td>
+                      <td className="p-3 text-right font-mono font-bold text-brand-green">{formatKES(results.missionBase)}</td>
                     </tr>
-                    {results.totalSavings > 0 && (
-                      <tr className="bg-emerald-50/50">
-                        <td className="py-2 px-4 border-b border-gray-100 font-serif italic text-emerald-800 text-xs">
-                          • Negotiated Volume Concession applied to core engagement scale ({pax} PAX)
-                        </td>
-                        <td className="py-2 px-4 border-b border-gray-100 text-right font-bold text-emerald-700 text-sm">
-                          -{formatKES(results.totalSavings)}
-                        </td>
-                      </tr>
-                    )}
-                    {results.logisticsBase > 0 && (
+
+                    {results.paPrice > 0 && (
                       <tr>
-                        <td className="py-3 px-4 border-b border-gray-100 font-bold italic">
-                          02 Field Logistics & Hospitality
-                        </td>
-                        <td className="py-3 px-4 border-b border-gray-100 text-right font-bold">{formatKES(results.logisticsBase)}</td>
+                        <td className="p-3 text-gray-700">Public Address System w/ Technician ({getPaPriceForPax(pax).tierLabel})</td>
+                        <td className="p-3 text-center font-mono">PA System</td>
+                        <td className="p-3 text-right font-mono">{formatKES(results.paPrice)}</td>
                       </tr>
                     )}
-                    {chosenAddons.length > 0 && chosenAddons.map((id) => {
-                      const addon = STRATEGIC_ADDONS.find(a => a.id === id);
-                      if (!addon) return null;
-                      const price = addon.type === 'pp' ? addon.price * (pax > 0 ? pax : 1) : addon.price;
+
+                    {results.travelSurcharge > 0 && (
+                      <tr>
+                        <td className="p-3">
+                          <span className="font-semibold text-gray-800">Travel Outside Nairobi</span>
+                          <span className="text-[11px] text-gray-500 block">{travelZone === 'custom' ? `${customKm} km @ KES 132/km` : TRAVEL_ZONES[travelZone].label}</span>
+                        </td>
+                        <td className="p-3 text-center font-mono">Travel</td>
+                        <td className="p-3 text-right font-mono">{formatKES(results.travelSurcharge)}</td>
+                      </tr>
+                    )}
+
+                    {results.venuePrice > 0 && (
+                      <tr>
+                        <td className="p-3 text-gray-700">Venue Coordination ({VENUE_TYPES[venueType].label})</td>
+                        <td className="p-3 text-center font-mono">{results.days} Day(s)</td>
+                        <td className="p-3 text-right font-mono">{formatKES(results.venuePrice)}</td>
+                      </tr>
+                    )}
+
+                    {results.transportPrice > 0 && (
+                      <tr>
+                        <td className="p-3 text-gray-700">Fleet Transport ({FLEET_SOLUTIONS[fleetType].label})</td>
+                        <td className="p-3 text-center font-mono">Fleet</td>
+                        <td className="p-3 text-right font-mono">{formatKES(results.transportPrice)}</td>
+                      </tr>
+                    )}
+
+                    {results.mealsPrice > 0 && (
+                      <tr>
+                        <td className="p-3 text-gray-700">Field Catering ({selectedMeals.join(', ')})</td>
+                        <td className="p-3 text-center font-mono">{pax} Pax</td>
+                        <td className="p-3 text-right font-mono">{formatKES(results.mealsPrice)}</td>
+                      </tr>
+                    )}
+
+                    {chosenAddons.map(id => {
+                      const a = STRATEGIC_ADDONS.find(x => x.id === id);
+                      if (!a) return null;
+                      const amt = a.type === 'pp' ? a.price * (pax > 0 ? pax : 1) : a.price;
                       return (
                         <tr key={id}>
-                          <td className="py-2 px-4 border-b border-gray-100 font-bold italic text-xs">
-                            • {addon.label}
-                          </td>
-                          <td className="py-2 px-4 border-b border-gray-100 text-right font-bold text-xs">{formatKES(price)}</td>
+                          <td className="p-3 text-gray-700">{a.label}</td>
+                          <td className="p-3 text-center font-mono">{a.type === 'pp' ? 'Per Person' : 'Flat'}</td>
+                          <td className="p-3 text-right font-mono">{formatKES(amt)}</td>
                         </tr>
                       );
                     })}
+
+                    {results.totalSavings > 0 && (
+                      <tr className="bg-emerald-50 text-emerald-900">
+                        <td className="p-3 font-semibold">{results.discountLabel}</td>
+                        <td className="p-3 text-center font-mono text-xs">Discount</td>
+                        <td className="p-3 text-right font-mono font-bold">-{formatKES(results.totalSavings)}</td>
+                      </tr>
+                    )}
                   </tbody>
-                  <tfoot>
-                    <tr className="bg-brand-sand/50">
-                      <td className="py-4 px-4 text-right text-xs font-bold uppercase tracking-widest text-gray-500">Total Strategic Investment</td>
-                      <td className="py-4 px-4 text-right text-xl font-bold text-brand-green border-b-2 border-brand-green">{formatKES(results.subtotal)}</td>
-                    </tr>
-                    <tr>
-                      <td className="py-2 px-4 text-right text-[10px] uppercase font-bold tracking-wider text-gray-400">50% Mobilization Deposit</td>
-                      <td className="py-2 px-4 text-right text-sm font-bold text-brand-gold">{formatKES(results.deposit)}</td>
-                    </tr>
-                  </tfoot>
                 </table>
               </div>
 
-              {/* Terms & Authorized Signature */}
-              <div className="bg-white p-4 border border-gray-200 grid grid-cols-1 md:grid-cols-2 gap-6 items-end text-[10px]">
-                <div className="space-y-1 opacity-75 font-sans">
-                  <p className="font-bold text-brand-green uppercase tracking-wider mb-1">Commercial & Legal Terms</p>
-                  <p>• 50% Mobilization deposit secures deployment date.</p>
-                  <p>• Quote valid for 30 days from date of issue.</p>
-                  <p>• eTIMS Electronic Tax Register receipt issued upon payment clearance.</p>
-                </div>
-                <div className="text-right">
-                  <div className="text-xs uppercase font-bold text-brand-green font-serif">
-                    Kevin Muhoro, Founder
+              {/* Total Card */}
+              <div className="flex justify-end">
+                <div className="w-80 bg-brand-green text-white p-5 rounded-2xl space-y-2 text-xs font-sans">
+                  <div className="flex justify-between items-baseline">
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-brand-gold">Total Investment:</span>
+                    <span className="text-xl font-serif font-bold text-brand-gold font-mono">{formatKES(results.subtotal)}</span>
                   </div>
-                  <div className="text-[9px] font-bold text-brand-gold uppercase tracking-widest">
-                    Cross Connect Africa Ltd
+                  <div className="flex justify-between items-center pt-2 border-t border-white/10 text-gray-300">
+                    <span>50% Confirmation Deposit:</span>
+                    <span className="font-mono font-bold text-white">{formatKES(results.deposit)}</span>
                   </div>
                 </div>
               </div>
@@ -1444,11 +1790,48 @@ M-Pesa: ${OFFICIAL_PROFORMA_REMITTANCE.mpesaNumber}`;
         </div>
       )}
 
-      <style>{`
-        .custom-scrollbar::-webkit-scrollbar { width: 3px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #d97706; opacity: 0.2; }
-      `}</style>
+      {/* 4. MODAL PDF EMBED VIEWER */}
+      {showPdfModal && (
+        <div 
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 md:p-6 animate-fade-in"
+        >
+          <div className="bg-white w-full max-w-5xl h-[88vh] rounded-3xl overflow-hidden shadow-2xl flex flex-col">
+            <div className="p-4 bg-brand-green text-white flex items-center justify-between border-b border-brand-gold/30">
+              <div className="flex items-center gap-3">
+                <FileText size={18} className="text-brand-gold" />
+                <span className="font-serif font-bold text-sm">Cross Connect Africa — Official 2026 Rate Card</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <a 
+                  href={showPdfModal} 
+                  download
+                  className="px-3.5 py-1.5 bg-brand-gold text-brand-green font-bold text-xs uppercase tracking-wider rounded-lg hover:bg-white transition-colors flex items-center gap-1.5 shadow-xs"
+                >
+                  <Download size={13} />
+                  <span>Download PDF</span>
+                </a>
+                <button 
+                  onClick={() => setShowPdfModal(null)}
+                  className="p-1.5 hover:bg-white/10 rounded-lg text-white"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+            </div>
+
+            <div className="flex-1 w-full h-full bg-gray-100">
+              <iframe 
+                src={showPdfModal}
+                title="Cross Connect Africa Official Rate Card 2026"
+                className="w-full h-full border-none"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };

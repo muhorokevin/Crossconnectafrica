@@ -1,4 +1,3 @@
-
 export interface ItineraryItem {
   id: string;
   time: string;
@@ -41,14 +40,22 @@ export interface Event {
   addons: { name: string; price: number }[];
 }
 
+export type ShopSectionId = 'fire_safety' | 'first_aid' | 'tactical_hiking' | 'ministry_merch';
+
 export interface Product {
   id: string;
   name: string;
   category: string;
+  sectionId?: ShopSectionId;
   price: string;
   description: string;
   valueProp: string;
   image: string;
+  specs?: string[];
+  certBadge?: string;
+  sku?: string;
+  stockStatus?: 'In Stock' | 'Fast Dispatch' | 'Pre-Order' | 'Bulk Available';
+  unit?: string;
   isBundle?: boolean;
   impactLabel?: string; // e.g., "Supports Children's Home Outreach"
 }

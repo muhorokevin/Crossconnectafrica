@@ -89,10 +89,10 @@ const Home: React.FC<HomeProps> = ({ setView }) => {
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <button 
-              onClick={() => setView(ViewState.ADVENTURE_BUILDER)}
+              onClick={() => setView(ViewState.EVENTS)}
               className="w-full sm:w-auto px-8 md:px-10 py-4 md:py-5 bg-brand-gold text-brand-green font-bold uppercase tracking-[0.3em] text-[9px] md:text-[10px] kinetic-btn flex items-center justify-center gap-3 group"
             >
-              Explore Programs <Zap size={15} className="group-hover:rotate-12 transition-transform" />
+              Upcoming Expeditions <Zap size={15} className="group-hover:rotate-12 transition-transform" />
             </button>
             <button 
               onClick={() => setView(ViewState.CALCULATOR)}
@@ -231,10 +231,10 @@ const Home: React.FC<HomeProps> = ({ setView }) => {
                   </div>
                   <div className="mt-5 pt-3 border-t border-brand-green/10">
                     <button 
-                      onClick={() => setView(ViewState.ADVENTURE_BUILDER)}
+                      onClick={() => setView(ViewState.CALCULATOR)}
                       className="text-[9px] font-bold uppercase tracking-widest text-brand-green hover:text-brand-gold flex items-center gap-1.5 transition-colors"
                     >
-                      View Details <ArrowRight size={12} />
+                      Instant Quote <ArrowRight size={12} />
                     </button>
                   </div>
                 </div>

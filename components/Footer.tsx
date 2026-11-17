@@ -75,7 +75,7 @@ const Footer: React.FC<FooterProps> = ({ setView }) => {
                 <li><button onClick={(e) => handleLinkClick(e, ViewState.HOME)} className="hover:text-white transition-colors text-left">Our Story</button></li>
                 <li><button onClick={(e) => handleLinkClick(e, ViewState.ABOUT)} className="hover:text-white transition-colors text-left">About Us</button></li>
                 <li><button onClick={(e) => handleLinkClick(e, ViewState.EVENTS)} className="hover:text-white transition-colors text-left">Expeditions</button></li>
-                <li><button onClick={(e) => handleLinkClick(e, ViewState.ADVENTURE_BUILDER)} className="hover:text-white transition-colors text-left">Corporate Programs</button></li>
+                <li><button onClick={(e) => handleLinkClick(e, ViewState.CALCULATOR)} className="hover:text-white transition-colors text-left">Corporate Programs</button></li>
             </ul>
           </div>
 

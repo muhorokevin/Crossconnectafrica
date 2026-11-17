@@ -5,7 +5,7 @@ import Footer from './components/Footer';
 import Home from './pages/Home';
 import About from './pages/About';
 import Gallery from './pages/Gallery';
-import AdventureBuilder, { Program } from './pages/AdventureBuilder';
+import { Program } from './data/programs';
 import Calculator from './pages/Calculator';
 import Events from './pages/Events';
 import Shop from './pages/Shop';
@@ -59,8 +59,7 @@ const App: React.FC = () => {
         return <About setView={setCurrentView} />;
       case ViewState.GALLERY:
         return <Gallery setView={setCurrentView} onNavigateToBooking={handleNavigateToBooking} />;
-      case ViewState.ADVENTURE_BUILDER:
-        return <AdventureBuilder onNavigateToBooking={handleNavigateToBooking} />;
+
       case ViewState.CALCULATOR:
         return <Calculator initialData={bookingContext} />;
       case ViewState.EVENTS:

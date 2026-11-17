@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { 
+import React, { useState, useEffect, useRef, useMemo } from 'react';
+import {
   Maximize2, X, ChevronLeft, ChevronRight, Share2, ArrowRight,
-  Play, Film, Image as ImageIcon, Grid, Check
+  Play, Film, Check
 } from 'lucide-react';
 import { ViewState } from '../types';
 import { BookingContextData } from '../App';
@@ -15,15 +15,15 @@ export interface GalleryItem {
 
 const GALLERY_ITEMS: GalleryItem[] = [
   // Featured Action Videos
-  { 
-    id: 'cca-vid-1', 
-    type: 'video', 
+  {
+    id: 'cca-vid-1',
+    type: 'video',
     url: 'https://i.imgur.com/zP0E5jy.mp4',
     posterUrl: 'https://i.imgur.com/zP0E5jym.jpg'
   },
-  { 
-    id: 'cca-vid-2', 
-    type: 'video', 
+  {
+    id: 'cca-vid-2',
+    type: 'video',
     url: 'https://i.imgur.com/ta9deUd.mp4',
     posterUrl: 'https://i.imgur.com/ta9deUdm.jpg'
   },
@@ -71,6 +71,22 @@ const GALLERY_ITEMS: GalleryItem[] = [
   { id: 'cca-36', type: 'photo', url: 'https://i.imgur.com/H7y7KfG.jpg' }
 ];
 
+type RowLayout = 'split-even' | 'full' | 'split-wide-left' | 'split-wide-right';
+
+interface GalleryRow {
+  layout: RowLayout;
+  entries: { item: GalleryItem; index: number }[];
+}
+
+const ROW_PATTERN: RowLayout[] = [
+  'split-even',
+  'full',
+  'split-wide-left',
+  'split-even',
+  'full',
+  'split-wide-right'
+];
+
 interface GalleryProps {
   setView?: (view: ViewState) => void;
   onNavigateToBooking?: (data: BookingContextData) => void;
@@ -82,17 +98,45 @@ const Gallery: React.FC<GalleryProps> = ({ setView, onNavigateToBooking }) => {
   const [copiedLink, setCopiedLink] = useState(false);
   const filmstripRef = useRef<HTMLDivElement>(null);
 
-  const filteredItems = GALLERY_ITEMS.filter(
-    item => activeFilter === 'all' || item.type === activeFilter
+  const filteredItems = useMemo(
+    () => GALLERY_ITEMS.filter(item => activeFilter === 'all' || item.type === activeFilter),
+    [activeFilter]
   );
 
-  const openLightbox = (index: number) => {
-    setLightboxIndex(index);
-  };
+  // Build balanced editorial rows matching the showcase collage rhythm
+  const rows = useMemo<GalleryRow[]>(() => {
+    const built: GalleryRow[] = [];
+    let cursor = 0;
+    let step = 0;
 
-  const closeLightbox = () => {
-    setLightboxIndex(null);
-  };
+    while (cursor < filteredItems.length) {
+      const remaining = filteredItems.length - cursor;
+      const desiredLayout = ROW_PATTERN[step % ROW_PATTERN.length];
+
+      if (desiredLayout === 'full' || remaining === 1) {
+        built.push({
+          layout: 'full',
+          entries: [{ item: filteredItems[cursor], index: cursor }]
+        });
+        cursor += 1;
+      } else {
+        built.push({
+          layout: desiredLayout,
+          entries: [
+            { item: filteredItems[cursor], index: cursor },
+            { item: filteredItems[cursor + 1], index: cursor + 1 }
+          ]
+        });
+        cursor += 2;
+      }
+      step += 1;
+    }
+
+    return built;
+  }, [filteredItems]);
+
+  const openLightbox = (index: number) => setLightboxIndex(index);
+  const closeLightbox = () => setLightboxIndex(null);
 
   const handlePrev = (e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
@@ -108,7 +152,6 @@ const Gallery: React.FC<GalleryProps> = ({ setView, onNavigateToBooking }) => {
     }
   };
 
-  // Scroll active thumbnail into center view
   useEffect(() => {
     if (lightboxIndex !== null && filmstripRef.current) {
       const activeThumb = filmstripRef.current.children[lightboxIndex] as HTMLElement;
@@ -118,7 +161,6 @@ const Gallery: React.FC<GalleryProps> = ({ setView, onNavigateToBooking }) => {
     }
   }, [lightboxIndex]);
 
-  // Keyboard navigation for lightbox
   useEffect(() => {
     if (lightboxIndex === null) return;
 
@@ -140,159 +182,150 @@ const Gallery: React.FC<GalleryProps> = ({ setView, onNavigateToBooking }) => {
     closeLightbox();
     if (setView) {
       if (onNavigateToBooking) {
-        onNavigateToBooking({
-          categoryTitle: 'Cross Connect Africa Services'
-        });
+        onNavigateToBooking({ categoryTitle: 'Cross Connect Africa Services' });
       } else {
         setView(ViewState.CALCULATOR);
       }
     }
   };
 
+  const photoCount = GALLERY_ITEMS.filter(i => i.type === 'photo').length;
+  const videoCount = GALLERY_ITEMS.filter(i => i.type === 'video').length;
+
   return (
-    <div className="bg-brand-cream min-h-screen pt-28 pb-20">
-      
-      {/* Header Banner */}
-      <div className="bg-brand-green text-brand-cream py-14 px-6 relative overflow-hidden border-b border-brand-gold/20">
-        <div className="max-w-7xl mx-auto text-center relative z-10">
-          <span className="text-brand-gold text-xs font-bold uppercase tracking-[0.5em] mb-3 block">
-            Visual Experience
-          </span>
-          <h1 className="text-4xl md:text-6xl font-serif font-bold italic tracking-tight mb-4">
-            Cross Connect <span className="not-italic text-brand-gold">Gallery & Highlights</span>
-          </h1>
-          <p className="text-gray-300 text-base md:text-lg max-w-2xl mx-auto font-serif italic leading-relaxed">
-            Moments and video clips captured in action across Kenya — featuring corporate team building, first aid & fire safety drills, event medical standby, school adventure clubs, hikes, and professional event hosting.
-          </p>
-        </div>
-      </div>
+    <div className="bg-white min-h-screen pt-32 md:pt-36 pb-24 text-neutral-900">
 
-      <div className="max-w-7xl mx-auto px-4 md:px-6 mt-8">
-        
-        {/* Media Type Filter Tabs */}
-        <div className="flex items-center justify-center gap-3 pb-4 pt-2 mb-8">
+      {/* Minimalist Editorial Header */}
+      <header className="max-w-2xl mx-auto px-6 text-center mb-10 md:mb-12">
+        <h1 className="text-3xl md:text-5xl font-serif font-medium tracking-tight text-neutral-900 mb-4">
+          Our Work
+        </h1>
+        <p className="text-sm md:text-base text-neutral-500 font-sans leading-relaxed max-w-md mx-auto">
+          Moments from corporate team building, fire safety drills, first aid training, and wilderness expeditions across Kenya.
+        </p>
+
+        {/* Quiet Editorial Text Filter */}
+        <nav
+          aria-label="Filter gallery media"
+          className="mt-8 flex items-center justify-center gap-6 text-xs font-medium tracking-wide"
+        >
           <button
+            type="button"
             onClick={() => setActiveFilter('all')}
-            className={`px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 ${
+            className={`pb-1 transition-colors whitespace-nowrap shrink-0 border-b ${
               activeFilter === 'all'
-                ? 'bg-brand-green text-brand-gold shadow-md scale-105'
-                : 'bg-white text-gray-700 hover:bg-brand-cream border border-gray-200'
+                ? 'border-neutral-900 text-neutral-900 font-semibold'
+                : 'border-transparent text-neutral-400 hover:text-neutral-700'
             }`}
           >
-            <Grid size={15} /> All Media ({GALLERY_ITEMS.length})
+            All ({GALLERY_ITEMS.length})
           </button>
-
           <button
+            type="button"
             onClick={() => setActiveFilter('photo')}
-            className={`px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 ${
+            className={`pb-1 transition-colors whitespace-nowrap shrink-0 border-b ${
               activeFilter === 'photo'
-                ? 'bg-brand-green text-brand-gold shadow-md scale-105'
-                : 'bg-white text-gray-700 hover:bg-brand-cream border border-gray-200'
+                ? 'border-neutral-900 text-neutral-900 font-semibold'
+                : 'border-transparent text-neutral-400 hover:text-neutral-700'
             }`}
           >
-            <ImageIcon size={15} /> Photos ({GALLERY_ITEMS.filter(i => i.type === 'photo').length})
+            Photos ({photoCount})
           </button>
-
           <button
+            type="button"
             onClick={() => setActiveFilter('video')}
-            className={`px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 ${
+            className={`pb-1 transition-colors whitespace-nowrap shrink-0 border-b ${
               activeFilter === 'video'
-                ? 'bg-brand-green text-brand-gold shadow-md scale-105'
-                : 'bg-white text-gray-700 hover:bg-brand-cream border border-gray-200'
+                ? 'border-neutral-900 text-neutral-900 font-semibold'
+                : 'border-transparent text-neutral-400 hover:text-neutral-700'
             }`}
           >
-            <Film size={15} /> Videos ({GALLERY_ITEMS.filter(i => i.type === 'video').length})
+            Videos ({videoCount})
           </button>
-        </div>
+        </nav>
+      </header>
 
-        {/* Pure Picture Grid (Just Pictures Without Descriptions) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-          {filteredItems.map((item, index) => (
+      {/* Edge-to-Edge Editorial Collage Grid (Tight White Hairline Seams, Pure Pictures) */}
+      <main className="max-w-5xl mx-auto px-4 md:px-6 space-y-1.5">
+        {rows.map((row, rowIdx) => {
+          if (row.layout === 'full') {
+            const { item, index } = row.entries[0];
+            return (
+              <div key={`row-${rowIdx}`} className="w-full">
+                <GalleryTile
+                  item={item}
+                  onOpen={() => openLightbox(index)}
+                  heightClass="h-[260px] sm:h-[400px] md:h-[520px]"
+                />
+              </div>
+            );
+          }
+
+          return (
             <div
-              key={item.id}
-              onClick={() => openLightbox(index)}
-              className="group relative aspect-[4/3] rounded-2xl overflow-hidden bg-black shadow-sm hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:-translate-y-1 border border-brand-green/10 hover:border-brand-gold/60"
+              key={`row-${rowIdx}`}
+              className="grid grid-cols-1 md:grid-cols-12 gap-1.5"
             >
-              {item.type === 'video' ? (
-                <div className="w-full h-full relative">
-                  <video
-                    src={item.url}
-                    poster={item.posterUrl}
-                    muted
-                    loop
-                    playsInline
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                    onMouseOver={(e) => (e.target as HTMLVideoElement).play().catch(() => {})}
-                    onMouseOut={(e) => (e.target as HTMLVideoElement).pause()}
-                  />
-                  
-                  {/* Center Video Play Indicator */}
-                  <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors flex items-center justify-center">
-                    <span className="p-4 rounded-full bg-brand-gold/90 text-brand-green shadow-xl transform group-hover:scale-110 transition-transform flex items-center justify-center">
-                      <Play size={24} className="fill-current ml-0.5" />
-                    </span>
-                  </div>
+              {row.entries.map((entry, colIdx) => {
+                const colSpanClass =
+                  row.layout === 'split-even'
+                    ? 'md:col-span-6'
+                    : row.layout === 'split-wide-left'
+                    ? colIdx === 0
+                      ? 'md:col-span-8'
+                      : 'md:col-span-4'
+                    : colIdx === 0
+                    ? 'md:col-span-4'
+                    : 'md:col-span-8';
 
-                  {/* Clean Corner Video Badge */}
-                  <span className="absolute top-3 left-3 bg-black/60 backdrop-blur-md text-white text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full border border-white/20 flex items-center gap-1">
-                    <Film size={12} className="text-brand-gold" /> Video
-                  </span>
-                </div>
-              ) : (
-                <div className="w-full h-full relative">
-                  <img
-                    src={item.url}
-                    alt="Cross Connect Africa"
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                    loading="lazy"
-                  />
-                  
-                  {/* Subtle Dark Hover Overlay with Zoom Icon (No text description) */}
-                  <div className="absolute inset-0 bg-black/35 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                    <span className="p-3.5 rounded-full bg-white/20 backdrop-blur-md text-white border border-white/30 transform scale-90 group-hover:scale-100 transition-transform shadow-lg">
-                      <Maximize2 size={22} />
-                    </span>
+                return (
+                  <div key={entry.item.id} className={colSpanClass}>
+                    <GalleryTile
+                      item={entry.item}
+                      onOpen={() => openLightbox(entry.index)}
+                      heightClass="h-[260px] sm:h-[340px] md:h-[390px]"
+                    />
                   </div>
-                </div>
-              )}
+                );
+              })}
             </div>
-          ))}
-        </div>
-
-      </div>
+          );
+        })}
+      </main>
 
       {/* Lightbox Modal */}
       {lightboxIndex !== null && filteredItems[lightboxIndex] && (
-        <div 
+        <div
           onClick={closeLightbox}
           role="dialog"
           aria-modal="true"
           aria-label="Media Lightbox"
-          className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex flex-col justify-between p-4 md:p-6 animate-fade-in"
+          className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex flex-col justify-between p-4 md:p-6"
         >
           {/* Top Control Bar */}
-          <div 
-            onClick={e => e.stopPropagation()} 
+          <div
+            onClick={e => e.stopPropagation()}
             className="w-full flex items-center justify-between text-white pb-3 border-b border-white/10"
           >
             <div className="flex items-center gap-3">
-              <span className="text-white/70 text-xs font-mono uppercase tracking-widest bg-white/10 px-3 py-1.5 rounded-full border border-white/10">
+              <span className="text-white/75 text-xs font-mono uppercase tracking-widest tabular-nums">
                 {lightboxIndex + 1} / {filteredItems.length}
               </span>
             </div>
 
             <div className="flex items-center gap-2">
               <span className="hidden sm:inline text-white/50 text-[11px] font-mono mr-2">
-                ESC to close • ← → to browse
+                ESC to close · ← → to browse
               </span>
 
               <button
+                type="button"
                 onClick={() => {
                   const url = filteredItems[lightboxIndex].url;
                   if (navigator.share) {
                     navigator.share({
                       title: 'Cross Connect Africa Media',
-                      url: url,
+                      url
                     }).catch(() => {});
                   } else {
                     navigator.clipboard.writeText(url);
@@ -300,12 +333,12 @@ const Gallery: React.FC<GalleryProps> = ({ setView, onNavigateToBooking }) => {
                     setTimeout(() => setCopiedLink(false), 2200);
                   }
                 }}
-                className="px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors border border-white/10"
+                className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs font-medium flex items-center gap-1.5 transition-colors border border-white/10"
                 title="Share link"
               >
                 {copiedLink ? (
                   <>
-                    <Check size={14} className="text-emerald-400" /> Copied!
+                    <Check size={14} className="text-emerald-400" /> Copied
                   </>
                 ) : (
                   <>
@@ -315,41 +348,41 @@ const Gallery: React.FC<GalleryProps> = ({ setView, onNavigateToBooking }) => {
               </button>
 
               <button
+                type="button"
                 onClick={closeLightbox}
                 aria-label="Close Lightbox"
-                className="p-2.5 rounded-full bg-white/10 text-white hover:bg-brand-gold hover:text-brand-green transition-all border border-white/10"
+                className="p-2.5 rounded-lg bg-white/10 text-white hover:bg-brand-gold hover:text-brand-green transition-colors border border-white/10"
               >
-                <X size={20} />
+                <X size={18} />
               </button>
             </div>
           </div>
 
           {/* Central Media Stage */}
-          <div 
-            onClick={e => e.stopPropagation()} 
+          <div
+            onClick={e => e.stopPropagation()}
             className="relative flex-1 flex items-center justify-center py-2 px-2 sm:px-12 w-full max-h-[75vh]"
           >
-            {/* Left Arrow */}
             <button
+              type="button"
               onClick={handlePrev}
               aria-label="Previous Media"
-              className="absolute left-2 sm:left-4 z-20 p-3 md:p-4 rounded-full bg-black/60 text-white hover:bg-brand-gold hover:text-brand-green transition-all border border-white/10"
+              className="absolute left-2 sm:left-4 z-20 p-3 md:p-4 rounded-full bg-black/60 text-white hover:bg-brand-gold hover:text-brand-green transition-colors border border-white/10"
             >
-              <ChevronLeft size={24} />
+              <ChevronLeft size={22} />
             </button>
 
-            {/* Right Arrow */}
             <button
+              type="button"
               onClick={handleNext}
               aria-label="Next Media"
-              className="absolute right-2 sm:right-4 z-20 p-3 md:p-4 rounded-full bg-black/60 text-white hover:bg-brand-gold hover:text-brand-green transition-all border border-white/10"
+              className="absolute right-2 sm:right-4 z-20 p-3 md:p-4 rounded-full bg-black/60 text-white hover:bg-brand-gold hover:text-brand-green transition-colors border border-white/10"
             >
-              <ChevronRight size={24} />
+              <ChevronRight size={22} />
             </button>
 
-            {/* Media Player Container */}
             {filteredItems[lightboxIndex].type === 'video' ? (
-              <div className="w-full max-w-4xl max-h-full rounded-2xl overflow-hidden bg-black shadow-2xl border border-white/10 flex items-center justify-center">
+              <div className="w-full max-w-4xl max-h-full overflow-hidden bg-black shadow-2xl border border-white/10 flex items-center justify-center">
                 <video
                   src={filteredItems[lightboxIndex].url}
                   controls
@@ -363,44 +396,45 @@ const Gallery: React.FC<GalleryProps> = ({ setView, onNavigateToBooking }) => {
               <img
                 src={filteredItems[lightboxIndex].url}
                 alt="Cross Connect Africa Gallery"
-                className="max-w-full max-h-[72vh] object-contain rounded-2xl shadow-2xl border border-white/10 select-none"
+                referrerPolicy="no-referrer"
+                className="max-w-full max-h-[72vh] object-contain shadow-2xl select-none"
               />
             )}
           </div>
 
           {/* Bottom Actions & Thumbnail Filmstrip */}
-          <div 
-            onClick={e => e.stopPropagation()} 
+          <div
+            onClick={e => e.stopPropagation()}
             className="w-full pt-3 border-t border-white/10 flex flex-col items-center gap-3"
           >
-            <div className="flex items-center gap-3">
-              <button
-                onClick={handleQuoteClick}
-                className="px-6 py-2 bg-brand-gold text-brand-green rounded-full font-bold text-xs uppercase tracking-widest hover:bg-white transition-all shadow-lg flex items-center gap-2"
-              >
-                Book a Service <ArrowRight size={14} />
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={handleQuoteClick}
+              className="px-6 py-2 bg-brand-gold text-brand-green rounded-lg font-bold text-xs uppercase tracking-wider hover:bg-white transition-colors flex items-center gap-2"
+            >
+              Book a Service <ArrowRight size={14} />
+            </button>
 
-            {/* Thumbnail Carousel Scrub Strip */}
-            <div 
+            <div
               ref={filmstripRef}
-              className="w-full max-w-3xl flex items-center gap-2 overflow-x-auto py-1 scrollbar-none"
+              className="w-full max-w-3xl flex items-center gap-1.5 overflow-x-auto py-1 scrollbar-none"
             >
               {filteredItems.map((item, idx) => (
                 <button
+                  type="button"
                   key={item.id}
                   onClick={() => setLightboxIndex(idx)}
-                  className={`relative shrink-0 w-12 h-10 rounded-md overflow-hidden transition-all border ${
-                    idx === lightboxIndex 
-                      ? 'border-brand-gold ring-2 ring-brand-gold/60 scale-105' 
+                  className={`relative shrink-0 w-12 h-10 overflow-hidden transition-opacity border ${
+                    idx === lightboxIndex
+                      ? 'border-brand-gold ring-2 ring-brand-gold/60 opacity-100'
                       : 'border-white/20 opacity-50 hover:opacity-90'
                   }`}
                 >
-                  <img 
-                    src={item.type === 'video' ? (item.posterUrl || item.url) : item.url} 
+                  <img
+                    src={item.type === 'video' ? (item.posterUrl || item.url) : item.url}
                     alt="Thumbnail"
-                    className="w-full h-full object-cover" 
+                    referrerPolicy="no-referrer"
+                    className="w-full h-full object-cover"
                   />
                   {item.type === 'video' && (
                     <span className="absolute inset-0 bg-black/40 flex items-center justify-center text-white">
@@ -410,12 +444,62 @@ const Gallery: React.FC<GalleryProps> = ({ setView, onNavigateToBooking }) => {
                 </button>
               ))}
             </div>
-
           </div>
-
         </div>
       )}
+    </div>
+  );
+};
 
+interface GalleryTileProps {
+  item: GalleryItem;
+  onOpen: () => void;
+  heightClass: string;
+}
+
+const GalleryTile: React.FC<GalleryTileProps> = ({ item, onOpen, heightClass }) => {
+  return (
+    <div
+      onClick={onOpen}
+      className={`group relative w-full ${heightClass} overflow-hidden bg-neutral-100 cursor-pointer`}
+    >
+      {item.type === 'video' ? (
+        <div className="w-full h-full relative bg-neutral-900">
+          <video
+            src={item.url}
+            poster={item.posterUrl}
+            muted
+            loop
+            playsInline
+            className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500"
+            onMouseOver={e => (e.target as HTMLVideoElement).play().catch(() => {})}
+            onMouseOut={e => (e.target as HTMLVideoElement).pause()}
+          />
+          <div className="absolute inset-0 bg-black/20 group-hover:bg-black/35 transition-colors flex items-center justify-center">
+            <span className="w-12 h-12 rounded-full bg-white/90 text-neutral-900 shadow-lg flex items-center justify-center group-hover:scale-105 transition-transform">
+              <Play size={20} className="fill-current ml-0.5" />
+            </span>
+          </div>
+          <span className="absolute top-3 left-3 text-white/90 text-[11px] font-medium flex items-center gap-1 drop-shadow">
+            <Film size={12} /> Video
+          </span>
+        </div>
+      ) : (
+        <div className="w-full h-full relative">
+          <img
+            src={item.url}
+            alt="Cross Connect Africa"
+            referrerPolicy="no-referrer"
+            loading="lazy"
+            className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500"
+          />
+          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+            <span className="opacity-0 group-hover:opacity-100 transition-opacity p-3 rounded-full bg-white/85 text-neutral-900 shadow-md">
+              <Maximize2 size={18} />
+            </span>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

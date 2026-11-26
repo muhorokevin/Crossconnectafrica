@@ -258,8 +258,8 @@ const Home: React.FC<HomeProps> = ({ setView, onNavigateToBooking }) => {
 
       {/* TRACK RECORD */}
       <section className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-10 py-20 md:py-28 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
-        <div className="lg:col-span-7 reveal relative rounded-[32px] overflow-hidden aspect-[4/3] lg:aspect-[5/4]">
-          <img src="/images/group-photo.jpg" alt="Group photo after a 250-person staff team day" loading="lazy" className="w-full h-full object-cover" />
+        <div className="lg:col-span-7 reveal relative rounded-[32px] overflow-hidden aspect-[3/2]">
+          <img src="/images/big-group-rope-bridge.jpg" alt="The 250-person staff team gathered in front of the rope bridge at CITAM Kadolta" loading="lazy" className="w-full h-full object-cover" />
           <div className="absolute left-4 bottom-4 flex items-center gap-2 px-4 py-2 rounded-full bg-white/90 backdrop-blur text-brand-ink text-sm font-semibold">
             <MapPin size={15} className="text-brand-gold" /> CITAM Kadolta, Nairobi · 5 Sep 2026
           </div>
@@ -286,7 +286,7 @@ const Home: React.FC<HomeProps> = ({ setView, onNavigateToBooking }) => {
       <section className="pb-20 md:pb-28 overflow-hidden" aria-label="Photos from our events">
         <div className="flex w-max gap-3 animate-marquee hover:[animation-play-state:paused]">
           {[...Array(2)].flatMap((_, k) =>
-            ['/images/big-group-rope-bridge.jpg', '/images/team-water-relay.jpg', '/images/warmup-crowd.jpg', '/images/kadolta-team-fun.jpg', '/images/team-archery.jpg', '/images/marshal-radio.jpg', '/images/mc-wedding.jpg', '/images/kadolta-team-016.jpg', '/images/team-relay.jpg', '/images/hike-mist.jpg', '/images/kevin-leading.jpg', '/images/catering-buffet.jpg'].map((src, i) => (
+            ['/images/team-water-relay.jpg', '/images/warmup-crowd.jpg', '/images/kadolta-team-fun.jpg', '/images/team-archery.jpg', '/images/marshal-radio.jpg', '/images/mc-wedding.jpg', '/images/kadolta-team-016.jpg', '/images/team-relay.jpg', '/images/hike-mist.jpg', '/images/kevin-leading.jpg', '/images/catering-buffet.jpg'].map((src, i) => (
               <div key={`${k}-${i}`} className="w-60 sm:w-72 aspect-[4/5] rounded-[24px] overflow-hidden bg-brand-sand shrink-0" aria-hidden={k === 1}>
                 <img src={src} alt="" loading="lazy" className="w-full h-full object-cover" />
               </div>

@@ -286,7 +286,7 @@ const Home: React.FC<HomeProps> = ({ setView, onNavigateToBooking }) => {
       <section className="pb-20 md:pb-28 overflow-hidden" aria-label="Photos from our events">
         <div className="flex w-max gap-3 animate-marquee hover:[animation-play-state:paused]">
           {[...Array(2)].flatMap((_, k) =>
-            ['/images/warmup-crowd.jpg', '/images/team-archery.jpg', '/images/indoor-session.jpg', '/images/mc-wedding.jpg', '/images/team-relay.jpg', '/images/team-water-game.jpg', '/images/kevin-leading.jpg', '/images/group-discussion.jpg'].map((src, i) => (
+            ['/images/big-group-rope-bridge.jpg', '/images/team-water-relay.jpg', '/images/warmup-crowd.jpg', '/images/kadolta-team-fun.jpg', '/images/team-archery.jpg', '/images/marshal-radio.jpg', '/images/mc-wedding.jpg', '/images/kadolta-team-016.jpg', '/images/team-relay.jpg', '/images/hike-mist.jpg', '/images/kevin-leading.jpg', '/images/catering-buffet.jpg'].map((src, i) => (
               <div key={`${k}-${i}`} className="w-60 sm:w-72 aspect-[4/5] rounded-[24px] overflow-hidden bg-brand-sand shrink-0" aria-hidden={k === 1}>
                 <img src={src} alt="" loading="lazy" className="w-full h-full object-cover" />
               </div>

@@ -28,6 +28,19 @@ const GALLERY_ITEMS: GalleryItem[] = [
     posterUrl: 'https://i.imgur.com/ta9deUdm.jpg'
   },
 
+  // Latest photos: CITAM Kadolta team days, catering, marshals and hikes
+  { id: 'kadolta-team-fun', type: 'photo', url: '/images/kadolta-team-fun.jpg' },
+  { id: 'big-group-rope-bridge', type: 'photo', url: '/images/big-group-rope-bridge.jpg' },
+  { id: 'team-water-relay', type: 'photo', url: '/images/team-water-relay.jpg' },
+  { id: 'kadolta-team-lawn', type: 'photo', url: '/images/kadolta-team-lawn.jpg' },
+  { id: 'marshal-radio', type: 'photo', url: '/images/marshal-radio.jpg' },
+  { id: 'kadolta-team-016', type: 'photo', url: '/images/kadolta-team-016.jpg' },
+  { id: 'catering-buffet', type: 'photo', url: '/images/catering-buffet.jpg' },
+  { id: 'kadolta-team-sign', type: 'photo', url: '/images/kadolta-team-sign.jpg' },
+  { id: 'hike-mist', type: 'photo', url: '/images/hike-mist.jpg' },
+  { id: 'catering-samosas', type: 'photo', url: '/images/catering-samosas.jpg' },
+  { id: 'kadolta-team-lawn-2', type: 'photo', url: '/images/kadolta-team-lawn-2.jpg' },
+
   // Batch 1 Photos
   { id: 'cca-1', type: 'photo', url: 'https://i.imgur.com/FBjiPbv.jpg' },
   { id: 'cca-2', type: 'photo', url: 'https://i.imgur.com/UBoZrzi.jpg' },

@@ -164,7 +164,7 @@ const PRODUCTS: Product[] = [
     price: '3900',
     description: 'Multipurpose dry chemical powder extinguisher for offices, schools, and churches. Tackles Class A (wood/paper), Class B (flammable liquids), and Class C (electrical) fires.',
     valueProp: 'Essential statutory workplace fire suppression at published 2026 pricing.',
-    image: 'https://images.unsplash.com/photo-1582139329536-e7284fece509?q=80&w=1000&auto=format&fit=crop',
+    image: '/images/shop-fire-extinguisher.jpg',
     sku: 'CCA-FS-EXT6',
     certBadge: 'KEBS / DOSHS Approved',
     stockStatus: 'In Stock',
@@ -183,7 +183,7 @@ const PRODUCTS: Product[] = [
     price: '4800',
     description: 'High-capacity ABC dry powder unit engineered for warehouses, halls, and large offices.',
     valueProp: 'High-yield suppression for high-occupancy halls and commercial facilities.',
-    image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?q=80&w=1000&auto=format&fit=crop',
+    image: '/images/shop-extinguisher-group.jpg',
     sku: 'CCA-FS-EXT9',
     certBadge: 'Industrial Grade',
     stockStatus: 'In Stock',
@@ -271,7 +271,7 @@ const PRODUCTS: Product[] = [
     price: '1400',
     description: 'Battery-operated optical smoke alarm for homes, hostels, and small offices. Heat detectors also available at KES 2,200.',
     valueProp: '24/7 early-warning life safety without complex wiring.',
-    image: 'https://images.unsplash.com/photo-1558002038-1055907df827?q=80&w=1000&auto=format&fit=crop',
+    image: '/images/shop-smoke-detector.jpg',
     sku: 'CCA-FS-SMK01',
     certBadge: 'CE & EN 14604',
     stockStatus: 'In Stock',
@@ -289,7 +289,7 @@ const PRODUCTS: Product[] = [
     price: '3200',
     description: 'Surface-mount manual break-glass fire call point allowing occupants to raise the fire alarm immediately by hand.',
     valueProp: 'Essential egress alarm point for corridors and exits.',
-    image: 'https://images.unsplash.com/photo-1541888946425-d0fbb186c5f7?q=80&w=1000&auto=format&fit=crop',
+    image: '/images/shop-call-point.jpg',
     sku: 'CCA-FS-MCP01',
     certBadge: 'BS 5839 Standard',
     stockStatus: 'In Stock',
@@ -342,7 +342,7 @@ const PRODUCTS: Product[] = [
     price: '16500',
     description: 'Fixed water-point 30m swing/manual fire hose reel for commercial buildings, schools, and apartments. (Loose 30m standpipe fire hose w/ nozzle: KES 9,500).',
     valueProp: 'Continuous pressurized water flow for building fire suppression.',
-    image: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?q=80&w=1000&auto=format&fit=crop',
+    image: '/images/equipment-hose-reel.jpg',
     sku: 'CCA-FS-HOSE30',
     certBadge: '30m Building Spec',
     stockStatus: 'In Stock',
@@ -350,6 +350,140 @@ const PRODUCTS: Product[] = [
       '30m Heavy-Duty Reinforced Hose with shut-off nozzle',
       'Fire hose cabinet (KES 5,500) & extinguisher cabinet (KES 3,800) available',
       'Photoluminescent Fire Safety Signs (KES 500 each) & A3 Notices (KES 800)'
+    ]
+  },
+  // Added from the equipment photos; prices from Rate Card 2026 v8, pages 13 and 14
+  {
+    id: 'fire-hose-30m',
+    name: 'Fire Hose, 30m with Nozzle',
+    category: 'Hoses & Hardware',
+    sectionId: 'fire_safety',
+    price: '9500',
+    description: 'Loose 30m fire hose with a nozzle, for standpipes and hydrants.',
+    valueProp: 'Reaches fires far from a fixed hose reel.',
+    image: '/images/shop-fire-hose.jpg',
+    sku: 'CCA-FS-HOSE-L30',
+    stockStatus: 'In Stock',
+    specs: [
+      '30m hose with nozzle',
+      'For standpipe and hydrant use',
+      'Fire hose cabinet available (KES 5,500)'
+    ]
+  },
+  {
+    id: 'fire-hose-cabinet',
+    name: 'Fire Hose Cabinet',
+    category: 'Hoses & Hardware',
+    sectionId: 'fire_safety',
+    price: '5500',
+    description: 'Wall cabinet that houses a fire hose and reel, keeping it clean, protected and easy to find.',
+    valueProp: 'Keeps your hose ready and in a marked place.',
+    image: '/images/shop-hose-cabinet.jpg',
+    sku: 'CCA-FS-HCAB',
+    stockStatus: 'In Stock',
+    specs: [
+      'Houses hose and reel',
+      'Installation per point: KES 600 (minimum KES 3,500 per visit in Nairobi)'
+    ]
+  },
+  {
+    id: 'fire-ext-cabinet',
+    name: 'Fire Extinguisher Cabinet',
+    category: 'Fire Extinguishers',
+    sectionId: 'fire_safety',
+    price: '3800',
+    description: 'Cabinet that protects an extinguisher from knocks and weather, and makes it easy to find in an emergency.',
+    valueProp: 'Protects units and marks where they are.',
+    image: '/images/shop-extinguisher-cabinet.jpg',
+    sku: 'CCA-FS-ECAB',
+    stockStatus: 'In Stock',
+    specs: [
+      'Protects units, easy to find',
+      'Steel wall bracket (KES 450) or floor stand (KES 1,200) also available'
+    ]
+  },
+  {
+    id: 'fire-alarm-bell',
+    name: 'Fire Alarm Bell / Sounder',
+    category: 'Alarms & Detectors',
+    sectionId: 'fire_safety',
+    price: '2800',
+    description: 'Loud bell that sounds the alarm through the building when a call point or detector is triggered.',
+    valueProp: 'Makes sure everyone hears the alarm.',
+    image: '/images/shop-alarm-bell.jpg',
+    sku: 'CCA-FS-BELL',
+    stockStatus: 'In Stock',
+    specs: [
+      'Audible alarm',
+      'Works with a fire alarm panel and manual call points (KES 3,200)'
+    ]
+  },
+  {
+    id: 'fire-alarm-panel-4',
+    name: 'Fire Alarm Panel, 4 Zone',
+    category: 'Alarms & Detectors',
+    sectionId: 'fire_safety',
+    price: '24000',
+    description: 'Control panel that links detectors, call points and bells, and shows which area raised the alarm. For small offices, schools and clinics.',
+    valueProp: 'One place to see and control your fire alarm.',
+    image: '/images/shop-alarm-panel.jpg',
+    sku: 'CCA-FS-PANEL4',
+    stockStatus: 'In Stock',
+    specs: [
+      '4 zones, for small offices, schools and clinics',
+      '8-zone panel for larger buildings and hostels: KES 38,000',
+      'Heat detectors (KES 2,200) and smoke alarms (KES 1,400) available'
+    ]
+  },
+  {
+    id: 'fire-safety-sign',
+    name: 'Fire Safety Sign (Glow-in-the-Dark)',
+    category: 'Signs & Notices',
+    sectionId: 'fire_safety',
+    price: '500',
+    unit: 'each',
+    description: 'Exit, assembly point and extinguisher location signs that glow in the dark, so people can find the way out when the lights fail.',
+    valueProp: 'Shows the way out, even in a power cut.',
+    image: '/images/shop-exit-signs.jpg',
+    sku: 'CCA-FS-SIGN',
+    stockStatus: 'In Stock',
+    specs: [
+      'Exit, assembly point and extinguisher location',
+      'Fire action notice, A3: KES 800 (evacuation steps and emergency numbers, for each floor)',
+      'Assembly point sign stand: KES 2,500',
+      'Rechargeable emergency light: KES 2,800'
+    ]
+  },
+  {
+    id: 'ppe-hi-vis-vest',
+    name: 'High-Visibility Vest',
+    category: 'Smoke Masks & PPE',
+    sectionId: 'fire_safety',
+    price: '450',
+    description: 'Reflective vest so marshals and wardens stand out during drills, evacuations and events.',
+    valueProp: 'Lets people see who is in charge.',
+    image: '/images/shop-hi-vis-vest.jpg',
+    sku: 'CCA-FS-VEST',
+    stockStatus: 'In Stock',
+    specs: [
+      'For marshals, wardens and drills',
+      'Emergency whistle also available (KES 150)'
+    ]
+  },
+  {
+    id: 'ppe-safety-helmet',
+    name: 'Safety Helmet',
+    category: 'Smoke Masks & PPE',
+    sectionId: 'fire_safety',
+    price: '900',
+    description: 'Hard hat for fire wardens and rescue teams.',
+    valueProp: 'Head protection for your response team.',
+    image: '/images/shop-safety-helmet.jpg',
+    sku: 'CCA-FS-HELMET',
+    stockStatus: 'In Stock',
+    specs: [
+      'For wardens and rescue teams',
+      'Heat-resistant fire gloves also available (KES 1,800 a pair)'
     ]
   },
 

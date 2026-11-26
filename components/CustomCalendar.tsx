@@ -119,7 +119,7 @@ const CustomCalendar: React.FC<CustomCalendarProps> = ({ value, onChange, classN
             {/* Grid Headers */}
             <div className="grid grid-cols-7 mb-2 text-center">
                 {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(d => (
-                    <span key={d} className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">{d}</span>
+                    <span key={d} className="text-xs font-bold text-gray-400 uppercase tracking-wider">{d}</span>
                 ))}
             </div>
 

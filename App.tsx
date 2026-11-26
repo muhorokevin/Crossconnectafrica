@@ -46,6 +46,20 @@ const App: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'instant' });
   }, [currentView]);
 
+  // Fade sections in as they scroll into view (elements with the "reveal" class)
+  useEffect(() => {
+    let io: IntersectionObserver | null = null;
+    const t = window.setTimeout(() => {
+      const els = Array.from(document.querySelectorAll<HTMLElement>('.reveal:not(.is-in)'));
+      if (!('IntersectionObserver' in window)) { els.forEach(el => el.classList.add('is-in')); return; }
+      io = new IntersectionObserver((entries) => {
+        entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('is-in'); io?.unobserve(e.target); } });
+      }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+      els.forEach(el => io!.observe(el));
+    }, 60);
+    return () => { window.clearTimeout(t); io?.disconnect(); };
+  }, [currentView]);
+
   const handleNavigateToBooking = (data: BookingContextData) => {
     setBookingContext(data);
     setCurrentView(ViewState.CALCULATOR);
@@ -54,7 +68,7 @@ const App: React.FC = () => {
   const renderView = () => {
     switch (currentView) {
       case ViewState.HOME:
-        return <Home setView={setCurrentView} />;
+        return <Home setView={setCurrentView} onNavigateToBooking={handleNavigateToBooking} />;
       case ViewState.ABOUT:
         return <About setView={setCurrentView} />;
       case ViewState.GALLERY:
@@ -75,7 +89,7 @@ const App: React.FC = () => {
       case ViewState.LIABILITY_WAIVER:
         return <LiabilityWaiver />;
       default:
-        return <Home setView={setCurrentView} />;
+        return <Home setView={setCurrentView} onNavigateToBooking={handleNavigateToBooking} />;
     }
   };
 
@@ -87,7 +101,8 @@ const App: React.FC = () => {
         {renderView()}
       </main>
 
-      <WhatsAppQuickChat />
+      {/* The quote page has its own WhatsApp button and a bottom bar on phones */}
+      {currentView !== ViewState.CALCULATOR && <WhatsAppQuickChat />}
       <Footer setView={setCurrentView} />
     </div>
   );

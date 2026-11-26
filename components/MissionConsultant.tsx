@@ -69,7 +69,7 @@ const MissionConsultant: React.FC = () => {
               <div className="text-sm font-bold flex items-center gap-1">
                 Kevin Muhoro <ShieldCheck size={12} className="text-brand-gold" />
               </div>
-              <div className="text-[10px] opacity-60 uppercase tracking-widest">Lead Strategist</div>
+              <div className="text-xs opacity-60 uppercase tracking-widest">Lead Strategist</div>
             </div>
           </div>
           <button onClick={() => setIsOpen(false)} className="hover:text-brand-gold transition-colors">

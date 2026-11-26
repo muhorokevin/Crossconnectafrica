@@ -17,9 +17,12 @@ const VENUES = [
 
 const TOPICS = [
   'Corporate Team Building (Nairobi / Destination)',
-  'First Aid Training (DOSHS Certified)',
+  'First Aid & Fire Safety Training',
+  'Families at Home (Fire Safety, First Aid & Games)',
+  'Site Assessments',
   'Fire Safety & Evacuation Drills',
-  'Event Medical Standby & EMT Support',
+  'Safety Equipment & Servicing',
+  'Event Medics & Ambulance',
   'School Adventure Clubs & Youth Camps',
   'Mountain Hiking & Expeditions',
   'MC & Corporate Event Hosting',
@@ -73,7 +76,7 @@ ${form.message || 'Kindly share package options, itinerary and official quote.'}
         <div className="text-center mb-16">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand-green/10 border border-brand-green/20 mb-4">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span className="text-[11px] font-bold uppercase tracking-widest text-brand-green">
+            <span className="text-[13px] font-bold uppercase tracking-widest text-brand-green">
               Official Kenya Desk • Valley View Office Park, Nairobi
             </span>
           </div>
@@ -95,7 +98,7 @@ ${form.message || 'Kindly share package options, itinerary and official quote.'}
               <div className="absolute top-0 right-0 p-32 bg-brand-gold rounded-full blur-3xl opacity-10 translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
               
               <div className="relative z-10">
-                <span className="text-brand-gold text-[9px] font-bold uppercase tracking-[0.5em] block mb-2">Direct Contact</span>
+                <span className="text-brand-gold text-xs font-bold uppercase tracking-[0.5em] block mb-2">Direct Contact</span>
                 <h3 className="text-2xl md:text-3xl font-serif font-bold mb-8">Nairobi Headquarters</h3>
                 
                 <div className="space-y-6">
@@ -106,7 +109,7 @@ ${form.message || 'Kindly share package options, itinerary and official quote.'}
                     <div>
                       <p className="font-bold text-lg leading-tight">+254 710 974 670</p>
                       <p className="text-white/60 text-xs mt-0.5">Mon–Sat, 7:00 AM – 7:00 PM EAT</p>
-                      <p className="text-emerald-400 text-[10px] font-bold uppercase tracking-wider mt-1">
+                      <p className="text-emerald-400 text-xs font-bold uppercase tracking-wider mt-1">
                         Emergency Standby Medics: 24/7 on call
                       </p>
                     </div>
@@ -153,17 +156,17 @@ ${form.message || 'Kindly share package options, itinerary and official quote.'}
                   </div>
                   <div>
                     <h4 className="text-xs font-bold text-brand-green">Trusted Across Kenya</h4>
-                    <p className="text-[10px] text-gray-500 font-sans">Corporate, Church & NGO Partners</p>
+                    <p className="text-xs text-gray-500 font-sans">Corporate, Church & NGO Partners</p>
                   </div>
                 </div>
-                <span className="px-2.5 py-1 bg-emerald-50 text-emerald-700 text-[10px] font-bold rounded-full">
+                <span className="px-2.5 py-1 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-full">
                   Verified Cohorts
                 </span>
               </div>
               <p className="text-xs text-gray-600 font-serif italic leading-relaxed mb-3">
                 "Consistently trusted for impactful corporate team retreats, accredited workplace safety drills, and high-altitude wilderness expeditions across Kenya."
               </p>
-              <div className="text-[10px] text-gray-500 font-sans flex items-center justify-between pt-2 border-t border-gray-100">
+              <div className="text-xs text-gray-500 font-sans flex items-center justify-between pt-2 border-t border-gray-100">
                 <span>Partners: CITAM • Kadolta Resort • Biblica</span>
                 <span className="text-brand-green font-bold">DOSHS & EMT Aligned</span>
               </div>
@@ -172,23 +175,23 @@ ${form.message || 'Kindly share package options, itinerary and official quote.'}
             {/* Official 2026 Company Profile & Rate Card Download Card */}
             <div className="p-6 bg-brand-sand/60 rounded-3xl border border-brand-gold/30 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div>
-                <span className="text-[9px] font-bold uppercase tracking-widest text-brand-gold block">Official 2026 Documents</span>
+                <span className="text-xs font-bold uppercase tracking-widest text-brand-gold block">Official 2026 Documents</span>
                 <h4 className="text-sm font-serif font-bold text-brand-green">Company Profile & Rate Card</h4>
-                <p className="text-[11px] text-gray-600 mt-0.5">Authoritative pricing, safety standards & service scope.</p>
+                <p className="text-[13px] text-gray-600 mt-0.5">Authoritative pricing, safety standards & service scope.</p>
               </div>
               <div className="flex items-center gap-2 shrink-0">
                 <a
-                  href="/assets/aistudio/Cross_Connect_Africa_Company_Profile_2026__2__0bc0b926.pdf"
+                  href="/docs/Cross_Connect_Africa_Company_Profile_2026.pdf"
                   download="Cross_Connect_Africa_Company_Profile_2026.pdf"
-                  className="px-3.5 py-2 bg-brand-green text-brand-gold rounded-xl font-bold text-[10px] uppercase tracking-wider hover:bg-brand-gold hover:text-brand-green transition-all shadow-sm flex items-center gap-1.5"
+                  className="px-3.5 py-2 bg-brand-green text-brand-gold rounded-xl font-bold text-xs uppercase tracking-wider hover:bg-brand-gold hover:text-brand-green transition-all shadow-sm flex items-center gap-1.5"
                 >
                   <Download size={13} />
                   <span>Profile</span>
                 </a>
                 <a
-                  href="/assets/aistudio/Cross_Connect_Africa_Rate_Card_2026_v6_c1ebbe23.pdf"
+                  href="/docs/Cross_Connect_Africa_Rate_Card_2026.pdf"
                   download="Cross_Connect_Africa_Rate_Card_2026.pdf"
-                  className="px-3.5 py-2 bg-white text-brand-green border border-brand-green/20 rounded-xl font-bold text-[10px] uppercase tracking-wider hover:bg-brand-sand transition-all shadow-sm flex items-center gap-1.5"
+                  className="px-3.5 py-2 bg-white text-brand-green border border-brand-green/20 rounded-xl font-bold text-xs uppercase tracking-wider hover:bg-brand-sand transition-all shadow-sm flex items-center gap-1.5"
                 >
                   <Download size={13} />
                   <span>Rate Card</span>
@@ -206,7 +209,7 @@ ${form.message || 'Kindly share package options, itinerary and official quote.'}
                   href="https://maps.google.com/?q=Valley+View+Office+Park+Nairobi" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="text-[10px] font-bold text-brand-gold uppercase tracking-wider hover:underline flex items-center gap-1"
+                  className="text-xs font-bold text-brand-gold uppercase tracking-wider hover:underline flex items-center gap-1"
                 >
                   Open in Maps <ExternalLink size={10} />
                 </a>
@@ -230,7 +233,7 @@ ${form.message || 'Kindly share package options, itinerary and official quote.'}
           {/* Right Column: Comprehensive Mission / Inquiry Form */}
           <div className="lg:col-span-7 bg-white p-8 md:p-10 rounded-3xl shadow-xl border border-brand-green/10">
             <div className="border-b border-gray-100 pb-5 mb-8">
-              <span className="text-brand-gold text-[9px] font-bold uppercase tracking-[0.5em] block mb-1">Interactive Inquiry</span>
+              <span className="text-brand-gold text-xs font-bold uppercase tracking-[0.5em] block mb-1">Interactive Inquiry</span>
               <h3 className="text-2xl md:text-3xl font-serif font-bold text-brand-green">
                 Request a Proposal or Consultation
               </h3>
@@ -244,7 +247,7 @@ ${form.message || 'Kindly share package options, itinerary and official quote.'}
               {/* Row 1: Name & Organization */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[10px] font-bold text-brand-green uppercase mb-2 tracking-wider">
+                  <label className="block text-xs font-bold text-brand-green uppercase mb-2 tracking-wider">
                     Full Name *
                   </label>
                   <input 
@@ -258,7 +261,7 @@ ${form.message || 'Kindly share package options, itinerary and official quote.'}
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-bold text-brand-green uppercase mb-2 tracking-wider">
+                  <label className="block text-xs font-bold text-brand-green uppercase mb-2 tracking-wider">
                     Organization / School / Group
                   </label>
                   <input 
@@ -274,7 +277,7 @@ ${form.message || 'Kindly share package options, itinerary and official quote.'}
               {/* Row 2: Phone/WhatsApp & Email */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[10px] font-bold text-brand-green uppercase mb-2 tracking-wider">
+                  <label className="block text-xs font-bold text-brand-green uppercase mb-2 tracking-wider">
                     WhatsApp / Phone Number *
                   </label>
                   <input 
@@ -288,7 +291,7 @@ ${form.message || 'Kindly share package options, itinerary and official quote.'}
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-bold text-brand-green uppercase mb-2 tracking-wider">
+                  <label className="block text-xs font-bold text-brand-green uppercase mb-2 tracking-wider">
                     Work / Personal Email
                   </label>
                   <input 
@@ -304,7 +307,7 @@ ${form.message || 'Kindly share package options, itinerary and official quote.'}
               {/* Row 3: Service Topic & Preferred Destination */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[10px] font-bold text-brand-green uppercase mb-2 tracking-wider">
+                  <label className="block text-xs font-bold text-brand-green uppercase mb-2 tracking-wider">
                     Service Required *
                   </label>
                   <select 
@@ -319,7 +322,7 @@ ${form.message || 'Kindly share package options, itinerary and official quote.'}
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-bold text-brand-green uppercase mb-2 tracking-wider">
+                  <label className="block text-xs font-bold text-brand-green uppercase mb-2 tracking-wider">
                     Preferred Venue / Region
                   </label>
                   <select 
@@ -337,7 +340,7 @@ ${form.message || 'Kindly share package options, itinerary and official quote.'}
               {/* Row 4: Scale (Pax) & Target Date */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[10px] font-bold text-brand-green uppercase mb-2 tracking-wider flex items-center gap-1.5">
+                  <label className="block text-xs font-bold text-brand-green uppercase mb-2 tracking-wider flex items-center gap-1.5">
                     <Users size={12} className="text-brand-gold" /> Estimated Participant Count (Pax)
                   </label>
                   <input 
@@ -351,7 +354,7 @@ ${form.message || 'Kindly share package options, itinerary and official quote.'}
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-bold text-brand-green uppercase mb-2 tracking-wider flex items-center gap-1.5">
+                  <label className="block text-xs font-bold text-brand-green uppercase mb-2 tracking-wider flex items-center gap-1.5">
                     <Calendar size={12} className="text-brand-gold" /> Target Event / Deployment Date
                   </label>
                   <input 
@@ -365,7 +368,7 @@ ${form.message || 'Kindly share package options, itinerary and official quote.'}
 
               {/* Message / Special Needs */}
               <div>
-                <label className="block text-[10px] font-bold text-brand-green uppercase mb-2 tracking-wider">
+                <label className="block text-xs font-bold text-brand-green uppercase mb-2 tracking-wider">
                   Specific Objectives or Requirements
                 </label>
                 <textarea 
@@ -377,7 +380,7 @@ ${form.message || 'Kindly share package options, itinerary and official quote.'}
               </div>
 
               {/* Compliance note */}
-              <div className="p-4 bg-brand-cream/80 border border-brand-green/10 rounded-xl flex items-center gap-3 text-[11px] text-gray-600">
+              <div className="p-4 bg-brand-cream/80 border border-brand-green/10 rounded-xl flex items-center gap-3 text-[13px] text-gray-600">
                 <ShieldCheck size={18} className="text-brand-gold shrink-0" />
                 <span>All corporate and institutional programs come with certified trainers, DOSHS-compliant drills, and event indemnity options.</span>
               </div>
@@ -392,7 +395,7 @@ ${form.message || 'Kindly share package options, itinerary and official quote.'}
                 </button>
               </div>
 
-              <p className="text-[10px] text-gray-400 text-center">
+              <p className="text-xs text-gray-400 text-center">
                 Submitting opens a pre-filled direct WhatsApp discussion with our lead facilitators in Nairobi.
               </p>
             </form>

@@ -1,317 +1,360 @@
-
-import React from 'react';
-import { 
-  ArrowRight, Zap, Award, MoveDown, Shield, Compass, Briefcase, Flame, 
-  CheckCircle2, Star, ShieldCheck, MapPin
+import React, { useEffect, useRef, useState } from 'react';
+import {
+  ArrowRight, ArrowUpRight, MessageCircle, Star, Download, Users, HeartPulse,
+  Mic2, Home as HomeIcon, Flame, CalendarDays, MapPin
 } from 'lucide-react';
 import { ViewState } from '../types';
+import { CATEGORIES, Program } from '../data/programs';
+import { BookingContextData } from '../App';
+import { RATE_CARD_PDF_URL, COMPANY_PROFILE_PDF_URL } from './Calculator';
 
 interface HomeProps {
   setView: (view: ViewState) => void;
+  onNavigateToBooking?: (data: BookingContextData) => void;
 }
 
-const TRUSTED_CLIENTS = [
-  'CITAM',
-  'Kadolta Resort',
-  'Biblica',
-  'NGOs'
+const findProgram = (id: string): Program | undefined =>
+  CATEGORIES.flatMap(c => c.programs).find(p => p.id === id);
+
+// Prices from Rate Card 2026 v8 ("The least each service costs")
+const SERVICES: { title: string; desc: string; from: string; img: string; programId?: string; view?: ViewState }[] = [
+  { title: 'Team building', desc: 'Physical games that get everyone moving, laughing and working together, planned around what your team needs.', from: 'From KES 6,000', img: '/images/team-sack-race.jpg', programId: 'tb_corporate_fullday' },
+  { title: 'First aid and fire safety training', desc: 'CPR, choking, bleeding, burns and live extinguisher practice, taught hands-on with Kenya Red Cross instructors.', from: 'From KES 23,400', img: '/images/first-aid-cpr.jpg', programId: 'first_aid' },
+  { title: 'Event medics', desc: 'Trained medics, kits and an ambulance on standby for weddings, sports days, concerts and conferences.', from: 'From KES 13,100', img: '/images/event-marshal.jpg', programId: 'medic_standby' },
+  { title: 'MC and event hosting', desc: 'Kevin hosts weddings, galas, company, church and school events in English and Swahili.', from: 'From KES 10,000', img: '/images/mc-kevin.jpg', programId: 'mc_service' },
+  { title: 'Families at home', desc: 'Fire safety, first aid and fun for one household, at your home. One price for up to 6 people.', from: 'From KES 8,000', img: '/images/family-outing.jpg', programId: 'family_packages' },
+  { title: 'Fire and emergency drills', desc: 'Planned evacuation drills with marshals, emergency services if needed, and a written report.', from: 'From KES 70,000', img: '/images/fire-training.jpg', programId: 'fire_drill' },
+  { title: 'Site assessments', desc: 'We inspect your site, write up the gaps, and can test your staff before and after training.', from: 'From KES 8,500', img: '/images/equipment-safety-point.jpg', programId: 'readiness_assessment' },
+  { title: 'Safety equipment', desc: 'Extinguishers, first aid kits, alarms and signs, supplied and fitted.', from: 'Packs from KES 5,000', img: '/images/equipment-extinguishers.jpg', view: ViewState.SHOP }
 ];
 
-const COMPLIANCE_PILLARS = [
-  { title: 'DOSHS Compliant', subtitle: 'Workplace Safety & Evacuation' },
-  { title: 'Certified EMT Medics', subtitle: 'On-Demand Medical Standby' },
-  { title: 'Licensed Wilderness Guides', subtitle: 'Mountain & Forest Escorts' },
-  { title: 'Full Public Liability', subtitle: 'Comprehensive Event Indemnity' }
+const QUICK_PICKS: { label: string; icon: React.ReactNode; programId: string }[] = [
+  { label: 'Team building day', icon: <Users size={18} />, programId: 'tb_corporate_fullday' },
+  { label: 'First aid training', icon: <HeartPulse size={18} />, programId: 'first_aid' },
+  { label: 'Fire safety training', icon: <Flame size={18} />, programId: 'fire_safety_training' },
+  { label: 'Medics for an event', icon: <HeartPulse size={18} />, programId: 'medic_standby' },
+  { label: 'An MC for my event', icon: <Mic2 size={18} />, programId: 'mc_service' },
+  { label: 'Safety for my family', icon: <HomeIcon size={18} />, programId: 'family_packages' }
 ];
 
-const CORE_SERVICES = [
-  { 
-    icon: <Briefcase size={24} />, 
-    title: 'Corporate Team Building', 
-    desc: 'High-impact indoor & outdoor team facilitation designed for collaboration and trust.',
-    img: 'https://i.imgur.com/H7y7KfG.jpg'
-  },
-  { 
-    icon: <Shield size={24} />, 
-    title: 'First Aid & Fire Safety', 
-    desc: 'DOSHS-compliant staff training, live fire extinguisher drills, and CPR certification.',
-    img: 'https://i.imgur.com/NLpqywt.jpg'
-  },
-  { 
-    icon: <Zap size={24} />, 
-    title: 'Event Medical Standby', 
-    desc: 'Professional EMT paramedical standby, trauma response, and ambulance coordination.',
-    img: 'https://i.imgur.com/dXyQVwQ.jpeg'
-  },
-  { 
-    icon: <Compass size={24} />, 
-    title: 'School Adventure Clubs', 
-    desc: 'Junior Adventurers and Senior Pioneers expeditions, bushcraft, and leadership camps.',
-    img: 'https://images.unsplash.com/photo-1475483768296-6163e08872a1?q=80&w=1000'
-  }
+// Company Profile 2026 v2, page 3
+const STEPS = [
+  { title: 'Assess', desc: 'We find out what you need and where the gaps are.' },
+  { title: 'Equip', desc: 'We recommend the right equipment.' },
+  { title: 'Train', desc: 'We teach the skills, hands-on.' },
+  { title: 'Practise', desc: 'We run drills so the skills stick.' },
+  { title: 'Connect', desc: 'We build teamwork through shared activities.' },
+  { title: 'Improve', desc: 'We review what worked and suggest next steps.' }
 ];
 
-const FEATURED_DESTINATIONS = [
-  { name: 'Naivasha Lakefront', desc: 'Resort grounds, Hell\'s Gate & scenic challenge zones' },
-  { name: 'Sagana White Water', desc: 'River rapids, zip-lining & tactical problem-solving' },
-  { name: 'Limuru & Tigoni', desc: 'Cool forest trails, tea plantations & retreat lodges' },
-  { name: 'Your Facility / On-Site', desc: 'Turnkey mobile setup at your headquarters or campus' }
-];
+const WHO_WE_SERVE = ['Corporates and businesses', 'NGOs', 'Schools and colleges', 'Churches and ministries', 'Chamas and community groups', 'Families', 'Event organisers'];
 
-const Home: React.FC<HomeProps> = ({ setView }) => {
+const STATEMENT = 'We get teams moving together, teach people what to do when an emergency happens, and stand by at your event when it counts, so everyone goes home safe.';
+const STATEMENT_ACCENT = new Set(['goes', 'home', 'safe.']);
+
+const WHATSAPP_URL = 'https://wa.me/254710974670?text=' + encodeURIComponent('Hello Cross Connect Africa, I would like to ask about booking.');
+
+// Words light up one by one as the statement scrolls through the screen
+const FillStatement: React.FC = () => {
+  const ref = useRef<HTMLParagraphElement>(null);
+  const words = STATEMENT.split(' ');
+  const [lit, setLit] = useState(0);
+  useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { setLit(words.length); return; }
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      const el = ref.current;
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      const vh = window.innerHeight;
+      const p = Math.min(1, Math.max(0, (vh * 0.85 - r.top) / (r.height + vh * 0.35)));
+      setLit(Math.round(p * words.length));
+    };
+    const onScroll = () => { if (!raf) raf = requestAnimationFrame(update); };
+    update();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    return () => { window.removeEventListener('scroll', onScroll); window.removeEventListener('resize', onScroll); cancelAnimationFrame(raf); };
+  }, []);
   return (
-    <div className="w-full overflow-x-hidden">
-      {/* 1. CINEMATIC HERO */}
-      <section className="relative min-h-[90vh] md:h-screen w-full flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 z-0">
-          <img 
-            src="https://images.unsplash.com/photo-1454496522488-7a8e488e8606?q=80&w=2076&auto=format&fit=crop" 
-            alt="Majestic Mountain Peak" 
-            className="w-full h-full object-cover brightness-[0.32] animate-slow-zoom" 
+    <p ref={ref} className="font-display font-semibold text-[1.75rem] leading-[1.25] sm:text-4xl md:text-5xl md:leading-[1.18] tracking-tight">
+      {words.map((w, i) => (
+        <span key={i} className={`fill-word ${STATEMENT_ACCENT.has(w) ? 'accent' : ''} ${i < lit ? 'on' : ''}`}>{w} </span>
+      ))}
+    </p>
+  );
+};
+
+const Home: React.FC<HomeProps> = ({ setView, onNavigateToBooking }) => {
+  const openProgram = (programId?: string) => {
+    const program = programId ? findProgram(programId) : undefined;
+    if (program && onNavigateToBooking) onNavigateToBooking({ program });
+    else setView(ViewState.CALCULATOR);
+  };
+  const openService = (s: typeof SERVICES[number]) => (s.view ? setView(s.view) : openProgram(s.programId));
+
+  return (
+    <div className="w-full bg-brand-cream">
+      {/* HERO: inset photo frame, headline bottom-left, quick quote card bottom-right */}
+      <section className="p-2 sm:p-3">
+        <div className="relative min-h-[100svh] sm:min-h-[calc(100svh-24px)] rounded-[28px] sm:rounded-[36px] overflow-hidden bg-brand-ink flex flex-col justify-end">
+          <img
+            src="/images/hero-crowd.jpg"
+            alt="A cheering group at a Cross Connect Africa team day"
+            className="settle absolute inset-0 w-full h-full object-cover object-[50%_35%]"
+            fetchPriority="high"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-brand-green/30 via-transparent to-brand-green/90"></div>
-        </div>
+          <div className="absolute inset-0 bg-gradient-to-t from-brand-ink via-brand-ink/55 to-brand-ink/25" />
+          <div className="absolute inset-0 bg-gradient-to-r from-brand-ink/70 via-transparent to-transparent" />
 
-        <div className="relative z-10 text-center px-6 max-w-5xl mx-auto pt-24 pb-16">
-          <div className="inline-flex items-center gap-2 border border-brand-gold/40 rounded-full px-5 py-2 mb-6 backdrop-blur-md">
-            <Award size={13} className="text-brand-gold shrink-0" />
-            <span className="text-white text-[9px] font-bold uppercase tracking-[0.3em]">Character Forged Since 2023 • Nairobi, Kenya</span>
-          </div>
-          
-          <h1 className="text-4xl sm:text-6xl md:text-8xl font-serif text-white font-bold mb-6 leading-tight tracking-tight drop-shadow-2xl">
-            Rugged <br/>
-            <span className="text-brand-gold italic font-light">Refinement.</span>
-          </h1>
-          
-          <p className="text-gray-300 text-sm sm:text-lg md:text-xl mb-10 max-w-2xl mx-auto leading-relaxed font-serif italic opacity-90">
-            "Kenya's trusted partner for corporate team building, certified DOSHS first aid & fire safety training, event medical standby, and youth adventure camps."
-          </p>
-          
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <button 
-              onClick={() => setView(ViewState.EVENTS)}
-              className="w-full sm:w-auto px-8 md:px-10 py-4 md:py-5 bg-brand-gold text-brand-green font-bold uppercase tracking-[0.3em] text-[9px] md:text-[10px] kinetic-btn flex items-center justify-center gap-3 group"
-            >
-              Upcoming Expeditions <Zap size={15} className="group-hover:rotate-12 transition-transform" />
-            </button>
-            <button 
-              onClick={() => setView(ViewState.CALCULATOR)}
-              className="w-full sm:w-auto px-8 md:px-10 py-4 md:py-5 bg-transparent border border-white/40 text-white font-bold uppercase tracking-[0.3em] text-[9px] md:text-[10px] hover:bg-white hover:text-brand-green transition-all backdrop-blur-sm flex items-center justify-center gap-3 group"
-            >
-              Instant Proforma Quote <ArrowRight size={15} className="group-hover:translate-x-1.5 transition-transform" />
-            </button>
-          </div>
-        </div>
-
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 text-white/30 hidden md:block">
-          <MoveDown size={28} className="animate-bounce" />
-        </div>
-      </section>
-
-      {/* 2. TRUST STRIP & STATUTORY ASSURANCE */}
-      <section className="bg-brand-green py-6 border-b border-brand-gold/20 text-white">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <span className="text-[9px] font-bold uppercase tracking-[0.35em] text-brand-gold shrink-0">
-              Trusted Across Kenya:
-            </span>
-            <div className="flex flex-wrap items-center justify-center md:justify-end gap-x-6 gap-y-2 text-xs text-brand-cream/80 font-medium">
-              {TRUSTED_CLIENTS.map((name, i) => (
-                <span key={i} className="flex items-center gap-2">
-                  <span className="w-1 h-1 rounded-full bg-brand-gold"></span>
-                  {name}
-                </span>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 3. EDITORIAL NARRATIVE & STATUTORY ASSURANCE */}
-      <section className="py-20 md:py-28 px-6 bg-brand-cream">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
-            
-            {/* Visual Anchor */}
-            <div className="lg:col-span-5 relative group">
-              <div className="aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl relative">
-                <img 
-                  src="https://images.unsplash.com/photo-1501555088652-021faa106b9b?q=80&w=1973&auto=format&fit=crop" 
-                  className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
-                  alt="Wilderness Mentorship"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-brand-green/80 via-transparent to-transparent"></div>
-                <div className="absolute bottom-6 left-6 right-6 text-white">
-                  <span className="text-brand-gold text-[9px] font-bold uppercase tracking-[0.3em] block mb-1">Our Standard</span>
-                  <p className="text-xl font-serif font-bold italic">Grit, Discipline & Grace.</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Narrative Content */}
-            <div className="lg:col-span-7 space-y-6">
-              <span className="text-brand-gold text-[10px] font-bold uppercase tracking-[0.5em] block">
-                The Foundation
-              </span>
-              <h2 className="text-3xl md:text-5xl font-serif font-bold text-brand-green tracking-tight leading-tight">
-                Empowering Teams Through <br/>
-                <span className="italic font-light text-brand-gold">Purpose & Preparedness.</span>
-              </h2>
-              <div className="w-16 h-1 bg-brand-gold/40"></div>
-              
-              <p className="text-base md:text-lg text-gray-600 leading-relaxed font-serif italic">
-                "We unite experiential leadership development, accredited workplace safety drills, clinical paramedic standby, and youth mentorship to transform groups into cohesive, resilient teams."
+          <div className="relative z-10 w-full max-w-7xl mx-auto px-5 sm:px-8 lg:px-10 pt-32 pb-6 sm:pb-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-end">
+            <div className="lg:col-span-8">
+              <p className="rise eyebrow text-brand-amber" style={{ animationDelay: '.1s' }}>Nairobi · Anywhere in Kenya</p>
+              <h1 className="rise font-display font-bold text-white text-[clamp(2.5rem,4.7vw,4.6rem)] leading-[0.98] mt-5" style={{ animationDelay: '.2s', textShadow: '0 16px 38px rgba(0,0,0,.3)' }}>
+                Connecting people.<br />
+                Building resilience.<br />
+                <span className="text-brand-amber">Saving lives.</span>
+              </h1>
+              <p className="rise text-white/80 text-lg max-w-xl mt-6 leading-relaxed" style={{ animationDelay: '.35s' }}>
+                Team-building days, first aid and fire safety training, safety equipment, MCs and event medics. One team, one call.
               </p>
-
-              {/* 4 Clean Assurance Cards */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-                {COMPLIANCE_PILLARS.map((item, idx) => (
-                  <div key={idx} className="p-4 bg-white rounded-2xl border border-brand-green/10 flex items-start gap-3">
-                    <CheckCircle2 size={16} className="text-brand-gold shrink-0 mt-0.5" />
-                    <div>
-                      <h4 className="text-xs font-bold text-brand-green">{item.title}</h4>
-                      <p className="text-[11px] text-gray-500 font-sans mt-0.5">{item.subtitle}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <div className="pt-4 flex items-center gap-8 border-t border-brand-green/10">
-                <div>
-                  <div className="text-2xl sm:text-3xl font-serif font-bold text-brand-green">DOSHS</div>
-                  <div className="text-[9px] text-gray-500 font-bold uppercase tracking-wider mt-0.5">Safety Standards</div>
-                </div>
-                <div className="h-8 w-px bg-brand-green/10"></div>
-                <div>
-                  <div className="text-2xl sm:text-3xl font-serif font-bold text-brand-green">EMT</div>
-                  <div className="text-[9px] text-gray-500 font-bold uppercase tracking-wider mt-0.5">Emergency Readiness</div>
-                </div>
+              <div className="rise flex flex-col sm:flex-row gap-3 mt-8" style={{ animationDelay: '.45s' }}>
+                <button onClick={() => setView(ViewState.CALCULATOR)} className="group inline-flex items-center justify-between sm:justify-center gap-3 h-14 pl-7 pr-2 rounded-full bg-brand-amber text-brand-ink font-semibold text-base hover:bg-white transition-colors">
+                  Get your price
+                  <span className="w-10 h-10 rounded-full bg-brand-ink text-brand-amber flex items-center justify-center transition-transform group-hover:rotate-45"><ArrowUpRight size={18} /></span>
+                </button>
+                <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-2 h-14 px-7 rounded-full bg-white/10 backdrop-blur-md ring-1 ring-white/25 text-white font-semibold text-base hover:bg-white/20 transition-colors">
+                  <MessageCircle size={18} /> WhatsApp us
+                </a>
               </div>
             </div>
 
-          </div>
-        </div>
-      </section>
-
-      {/* 4. CORE SERVICES (STREAMLINED 4-CARD GRID) */}
-      <section className="py-20 md:py-24 bg-white border-y border-brand-green/10">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="text-center max-w-2xl mx-auto mb-14">
-            <span className="text-brand-gold text-[10px] font-bold uppercase tracking-[0.5em] block mb-2">Core Capabilities</span>
-            <h2 className="text-3xl md:text-5xl font-serif font-bold text-brand-green tracking-tight">
-              Featured <span className="text-brand-gold italic">Services.</span>
-            </h2>
-            <p className="text-gray-500 text-xs md:text-sm font-serif italic mt-3">
-              Curated experiences designed to meet statutory compliance, team unity, and emergency resilience.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {CORE_SERVICES.map((srv, idx) => (
-              <div 
-                key={idx} 
-                className="group bg-brand-cream border border-brand-green/10 rounded-3xl overflow-hidden hover:border-brand-gold/60 transition-all shadow-sm hover:shadow-xl flex flex-col justify-between"
-              >
-                <div className="relative h-44 overflow-hidden">
-                  <img 
-                    src={srv.img} 
-                    alt={srv.title} 
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-brand-green/80 via-transparent to-transparent"></div>
-                  <div className="absolute bottom-3 left-4 text-brand-gold">
-                    {srv.icon}
-                  </div>
-                </div>
-
-                <div className="p-5 flex-1 flex flex-col justify-between">
-                  <div>
-                    <h3 className="text-base font-serif font-bold text-brand-green mb-2">{srv.title}</h3>
-                    <p className="text-xs text-gray-600 leading-relaxed font-sans">{srv.desc}</p>
-                  </div>
-                  <div className="mt-5 pt-3 border-t border-brand-green/10">
-                    <button 
-                      onClick={() => setView(ViewState.CALCULATOR)}
-                      className="text-[9px] font-bold uppercase tracking-widest text-brand-green hover:text-brand-gold flex items-center gap-1.5 transition-colors"
+            {/* Quick start */}
+            <div className="rise lg:col-span-4 lg:justify-self-end w-full lg:max-w-sm" style={{ animationDelay: '.6s' }}>
+              <div className="rounded-[28px] bg-white/10 backdrop-blur-xl ring-1 ring-white/20 p-4 sm:p-5">
+                <p className="text-white font-semibold px-1">What are you planning?</p>
+                <p className="text-white/60 text-sm px-1 mt-0.5">Pick one and see your price in a minute.</p>
+                <div className="grid grid-cols-2 gap-2 mt-4">
+                  {QUICK_PICKS.map(q => (
+                    <button
+                      key={q.label}
+                      onClick={() => openProgram(q.programId)}
+                      className="group flex items-center gap-2.5 text-left p-3 rounded-2xl bg-white/90 hover:bg-white text-brand-ink transition-colors"
                     >
-                      Instant Quote <ArrowRight size={12} />
+                      <span className="w-8 h-8 shrink-0 rounded-full bg-brand-green text-brand-amber flex items-center justify-center">{q.icon}</span>
+                      <span className="text-[13.5px] font-semibold leading-tight">{q.label}</span>
                     </button>
-                  </div>
+                  ))}
                 </div>
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* 5. LOCATIONS & VENUE FLEXIBILITY */}
-      <section className="py-16 md:py-20 bg-brand-cream border-b border-brand-green/10">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 gap-4">
-            <div>
-              <span className="text-brand-gold text-[9px] font-bold uppercase tracking-[0.4em] block mb-1">Flexibility</span>
-              <h3 className="text-2xl md:text-4xl font-serif font-bold text-brand-green">
-                Where We <span className="text-brand-gold italic">Facilitate.</span>
-              </h3>
             </div>
-            <p className="text-gray-500 text-xs font-serif italic max-w-sm">
-              We deploy our facilitators, gear, and medical teams anywhere in Kenya or straight to your campus.
-            </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {FEATURED_DESTINATIONS.map((dest, i) => (
-              <div key={i} className="p-5 bg-white rounded-2xl border border-brand-green/10 hover:border-brand-gold/40 transition-colors">
-                <div className="flex items-center gap-2 text-brand-gold mb-2">
-                  <MapPin size={14} />
-                  <h4 className="text-sm font-serif font-bold text-brand-green">{dest.name}</h4>
-                </div>
-                <p className="text-[11px] text-gray-600 leading-relaxed">{dest.desc}</p>
-              </div>
-            ))}
+          <div className="relative z-10 border-t border-white/10">
+            <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-10 py-4 flex flex-wrap gap-x-6 gap-y-1 text-[13px] text-white/60">
+              <span>Trusted by CITAM, Kadolta Resort, Biblica, NGOs, schools and corporate teams</span>
+              <span className="hidden md:inline">·</span>
+              <span>Free travel within 50 km of Nairobi</span>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* 6. FOCUSED CLIENT TESTIMONIAL & CALL TO ACTION */}
-      <section className="py-20 md:py-28 relative flex items-center justify-center text-center overflow-hidden">
-        <div className="absolute inset-0">
-          <img 
-            src="https://images.unsplash.com/photo-1491438590914-bc09fcaaf77a?q=80&w=2070&auto=format&fit=crop" 
-            className="w-full h-full object-cover brightness-[0.25]" 
-            alt="Summit Landscape" 
-          />
-          <div className="absolute inset-0 bg-brand-green/70 mix-blend-multiply"></div>
+      {/* STATS */}
+      <section className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-10 py-14 md:py-20">
+        <dl className="grid grid-cols-2 lg:grid-cols-4 gap-y-10 gap-x-6">
+          {[
+            ['250', 'people at one staff team day, CITAM Kadolta, September 2026'],
+            ['8', 'services from one team, booked separately or together'],
+            ['50 km', 'around Nairobi with travel included in the price'],
+            ['50%', 'deposit confirms your date, balance on completion']
+          ].map(([n, l]) => (
+            <div key={n} className="reveal border-t border-brand-green/15 pt-5">
+              <dt className="font-display font-bold text-brand-green text-5xl md:text-6xl tracking-tight">{n}</dt>
+              <dd className="text-[15px] text-brand-green/65 mt-3 max-w-[16rem] leading-snug">{l}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+
+      {/* STATEMENT */}
+      <section className="px-2 sm:px-3">
+        <div className="rounded-[28px] sm:rounded-[36px] bg-brand-ink py-24 md:py-36">
+          <div className="max-w-5xl mx-auto px-6 sm:px-10">
+            <p className="eyebrow text-brand-amber mb-8">Why we exist</p>
+            <FillStatement />
+          </div>
+        </div>
+      </section>
+
+      {/* SERVICES */}
+      <section className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-10 py-20 md:py-28">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10 md:mb-14">
+          <div className="max-w-2xl reveal">
+            <p className="eyebrow text-brand-gold">What we do</p>
+            <h2 className="font-display font-bold text-brand-green text-4xl md:text-6xl leading-[1.02] mt-4">Book one service, or combine a few into one day.</h2>
+          </div>
+          <a href={RATE_CARD_PDF_URL} download className="reveal inline-flex items-center gap-2 h-12 px-5 rounded-full ring-1 ring-brand-green/20 text-brand-green font-semibold hover:bg-brand-green hover:text-white transition-colors shrink-0 self-start md:self-auto">
+            <Download size={17} /> 2026 rate card
+          </a>
         </div>
 
-        <div className="relative z-10 px-6 max-w-3xl mx-auto">
-          <div className="inline-flex items-center gap-1 text-brand-gold mb-4">
-            {[...Array(5)].map((_, i) => (
-              <Star key={i} size={15} fill="#d97706" />
-            ))}
-          </div>
-          
-          <blockquote className="text-base sm:text-xl text-white font-serif italic leading-relaxed mb-6">
-            "The balance between high-energy physical challenges, reflective leadership debriefs, and safety vigilance was world-class. Our team is still talking about it."
-          </blockquote>
-          
-          <p className="text-xs text-brand-gold font-bold uppercase tracking-widest mb-10">
-            Collins Moses • Silax Data Kenya
-          </p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 lg:auto-rows-[260px]">
+          {SERVICES.map((s, i) => {
+            const big = i === 0;
+            const wide = i === 1;
+            return (
+              <button
+                key={s.title}
+                onClick={() => openService(s)}
+                className={`reveal group relative text-left rounded-[28px] overflow-hidden bg-brand-green min-h-[300px] lg:min-h-0 ${big ? 'lg:col-span-2 lg:row-span-2' : ''} ${wide ? 'lg:col-span-2' : ''}`}
+                style={{ transitionDelay: `${(i % 4) * 70}ms` }}
+              >
+                <img src={s.img} alt="" loading="lazy" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                <div className="absolute inset-0 bg-gradient-to-t from-brand-ink/95 via-brand-ink/40 to-transparent" />
+                <span className="absolute top-4 left-4 px-3 py-1.5 rounded-full bg-white/90 text-brand-ink text-[13px] font-semibold">{s.from}</span>
+                <span className="absolute top-4 right-4 w-11 h-11 rounded-full bg-white/15 backdrop-blur-md ring-1 ring-white/25 text-white flex items-center justify-center transition-all group-hover:bg-brand-amber group-hover:text-brand-ink group-hover:rotate-45">
+                  <ArrowUpRight size={18} />
+                </span>
+                <div className="absolute inset-x-0 bottom-0 p-5 md:p-6">
+                  <h3 className={`font-display font-bold text-white leading-tight ${big ? 'text-3xl md:text-4xl' : 'text-xl md:text-2xl'}`}>{s.title}</h3>
+                  <p className={`text-white/75 mt-2 leading-relaxed ${big ? 'text-base max-w-md' : 'text-[14.5px] line-clamp-2'}`}>{s.desc}</p>
+                  <span className="inline-flex items-center gap-1.5 mt-3 text-sm font-semibold text-brand-amber">
+                    {s.view ? 'Browse equipment' : 'See your price'} <ArrowRight size={15} className="transition-transform group-hover:translate-x-1" />
+                  </span>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </section>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <button 
-              onClick={() => setView(ViewState.CALCULATOR)}
-              className="w-full sm:w-auto px-8 md:px-12 py-4 md:py-5 bg-brand-gold text-brand-green font-bold uppercase tracking-[0.3em] text-[9px] md:text-[10px] kinetic-btn shadow-lg"
-            >
-              Get Instant Quote
-            </button>
-            <button 
-              onClick={() => setView(ViewState.CONTACT)}
-              className="w-full sm:w-auto px-8 md:px-12 py-4 md:py-5 bg-transparent border border-white/40 text-white font-bold uppercase tracking-[0.3em] text-[9px] md:text-[10px] hover:bg-white hover:text-brand-green transition-all"
-            >
-              Contact Facilitators
-            </button>
+      {/* HOW WE WORK */}
+      <section className="px-2 sm:px-3">
+        <div className="rounded-[28px] sm:rounded-[36px] bg-brand-green text-white py-20 md:py-28 overflow-hidden">
+          <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-10">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-14">
+              <div className="lg:col-span-6 reveal">
+                <p className="eyebrow text-brand-amber">How we work</p>
+                <h2 className="font-display font-bold text-4xl md:text-6xl leading-[1.02] mt-4">Six steps, every job.</h2>
+              </div>
+              <p className="lg:col-span-5 lg:col-start-8 self-end text-white/70 text-lg leading-relaxed reveal">
+                From a one-off training to a year-long contract, we follow the same path from first assessment to steady improvement.
+              </p>
+            </div>
+            <ol className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 border-t border-white/15">
+              {STEPS.map((s, i) => (
+                <li key={s.title} className="reveal py-7 lg:pr-6 border-b lg:border-b-0 border-white/10 sm:odd:pr-6" style={{ transitionDelay: `${i * 80}ms` }}>
+                  <span className="text-[13px] font-semibold text-brand-amber tabular-nums">0{i + 1}</span>
+                  <h3 className="font-display font-bold text-2xl mt-3">{s.title}</h3>
+                  <p className="text-white/65 mt-2 leading-relaxed">{s.desc}</p>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </div>
+      </section>
+
+      {/* TRACK RECORD */}
+      <section className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-10 py-20 md:py-28 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
+        <div className="lg:col-span-7 reveal relative rounded-[32px] overflow-hidden aspect-[4/3] lg:aspect-[5/4]">
+          <img src="/images/group-photo.jpg" alt="Group photo after a 250-person staff team day" loading="lazy" className="w-full h-full object-cover" />
+          <div className="absolute left-4 bottom-4 flex items-center gap-2 px-4 py-2 rounded-full bg-white/90 backdrop-blur text-brand-ink text-sm font-semibold">
+            <MapPin size={15} className="text-brand-gold" /> CITAM Kadolta, Nairobi · 5 Sep 2026
+          </div>
+        </div>
+        <div className="lg:col-span-5 reveal">
+          <p className="eyebrow text-brand-gold">Recent work</p>
+          <h2 className="font-display font-bold text-brand-green text-4xl md:text-5xl leading-[1.04] mt-4">A staff team day for 250 people.</h2>
+          <p className="text-lg text-brand-green/70 leading-relaxed mt-5">
+            Five colour teams, a crew of seven, and games built around the company's five values, followed by free time at the venue.
+          </p>
+          <figure className="mt-8 p-6 md:p-7 rounded-[28px] bg-white shadow-soft">
+            <div className="flex gap-1 text-brand-gold mb-4" aria-label="5 stars">
+              {[...Array(5)].map((_, i) => <Star key={i} size={16} fill="currentColor" />)}
+            </div>
+            <blockquote className="text-brand-green text-lg leading-relaxed">
+              “The balance between high-energy physical challenges, reflective leadership debriefs, and safety vigilance was world-class. Our team is still talking about it.”
+            </blockquote>
+            <figcaption className="text-sm text-brand-green/60 mt-4"><span className="font-semibold text-brand-green">Collins Moses</span>, Silax Data Kenya</figcaption>
+          </figure>
+        </div>
+      </section>
+
+      {/* PHOTO MARQUEE */}
+      <section className="pb-20 md:pb-28 overflow-hidden" aria-label="Photos from our events">
+        <div className="flex w-max gap-3 animate-marquee hover:[animation-play-state:paused]">
+          {[...Array(2)].flatMap((_, k) =>
+            ['/images/warmup-crowd.jpg', '/images/team-archery.jpg', '/images/indoor-session.jpg', '/images/mc-wedding.jpg', '/images/team-relay.jpg', '/images/team-water-game.jpg', '/images/kevin-leading.jpg', '/images/group-discussion.jpg'].map((src, i) => (
+              <div key={`${k}-${i}`} className="w-60 sm:w-72 aspect-[4/5] rounded-[24px] overflow-hidden bg-brand-sand shrink-0" aria-hidden={k === 1}>
+                <img src={src} alt="" loading="lazy" className="w-full h-full object-cover" />
+              </div>
+            ))
+          )}
+        </div>
+        <div className="mt-8 text-center">
+          <button onClick={() => setView(ViewState.GALLERY)} className="inline-flex items-center gap-2 h-12 px-6 rounded-full ring-1 ring-brand-green/20 text-brand-green font-semibold hover:bg-brand-green hover:text-white transition-colors">
+            Open the gallery <ArrowRight size={16} />
+          </button>
+        </div>
+      </section>
+
+      {/* WHO WE SERVE + FAITH */}
+      <section className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-10 pb-20 md:pb-28 grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16">
+        <div className="reveal">
+          <p className="eyebrow text-brand-gold">Who we work with</p>
+          <h2 className="font-display font-bold text-brand-green text-3xl md:text-5xl leading-[1.05] mt-4">We come to your office, school, church or venue.</h2>
+          <ul className="flex flex-wrap gap-2 mt-8">
+            {WHO_WE_SERVE.map(w => (
+              <li key={w} className="px-4 py-2.5 rounded-full bg-white shadow-soft text-brand-green text-[15px] font-medium">{w}</li>
+            ))}
+          </ul>
+        </div>
+        <div className="reveal rounded-[32px] bg-brand-sand p-8 md:p-10 self-end">
+          <p className="text-brand-green/80 text-lg leading-relaxed">
+            We are a Christian company, and we work with clients of every faith and background. For church and Christian groups, we can add prayer, a short devotion or a Bible reflection to your day.
+          </p>
+          <p className="font-display font-semibold text-brand-green text-xl mt-6 leading-snug">“Whatever you do, work at it with all your heart, as working for the Lord.”</p>
+          <p className="text-sm text-brand-green/55 mt-2">Colossians 3:23</p>
+        </div>
+      </section>
+
+      {/* NEXT EVENT */}
+      <section className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-10 pb-20">
+        <div className="reveal rounded-[32px] bg-white shadow-soft p-6 sm:p-8 flex flex-col md:flex-row md:items-center gap-6">
+          <span className="w-16 h-16 shrink-0 rounded-[20px] bg-brand-amber text-brand-ink flex flex-col items-center justify-center leading-none">
+            <span className="text-[11px] font-bold tracking-widest">DEC</span>
+            <span className="font-display font-bold text-2xl">19</span>
+          </span>
+          <div className="flex-1">
+            <p className="text-sm font-semibold text-brand-gold flex items-center gap-1.5"><CalendarDays size={15} /> Next community event</p>
+            <h3 className="font-display font-bold text-brand-green text-2xl md:text-3xl mt-1">End-Year Gala Dinner</h3>
+            <p className="text-brand-green/65 mt-1">Saturday 19 December 2026 · KES 3,500 per person · Christian and alcohol-free</p>
+          </div>
+          <button onClick={() => setView(ViewState.EVENTS)} className="inline-flex items-center justify-center gap-2 h-12 px-6 rounded-full bg-brand-green text-white font-semibold shrink-0 hover:bg-brand-ink">
+            See events <ArrowRight size={16} />
+          </button>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="px-2 sm:px-3 pb-3">
+        <div className="relative rounded-[28px] sm:rounded-[36px] overflow-hidden bg-brand-ink">
+          <img src="/images/team-group-outdoor.jpg" alt="" loading="lazy" className="absolute inset-0 w-full h-full object-cover opacity-35" />
+          <div className="absolute inset-0 bg-gradient-to-t from-brand-ink via-brand-ink/70 to-brand-ink/40" />
+          <div className="relative z-10 max-w-4xl mx-auto px-6 py-24 md:py-36 text-center text-white">
+            <h2 className="reveal font-display font-bold text-4xl sm:text-5xl md:text-7xl leading-[1]">Let's plan your day.</h2>
+            <p className="reveal text-white/75 text-lg mt-6 max-w-xl mx-auto">See your price in a minute, then send it to us on WhatsApp. We reply with a written quote.</p>
+            <div className="reveal flex flex-col sm:flex-row gap-3 justify-center mt-10">
+              <button onClick={() => setView(ViewState.CALCULATOR)} className="group inline-flex items-center justify-between sm:justify-center gap-3 h-14 pl-7 pr-2 rounded-full bg-brand-amber text-brand-ink font-semibold text-base hover:bg-white transition-colors">
+                Get your price
+                <span className="w-10 h-10 rounded-full bg-brand-ink text-brand-amber flex items-center justify-center transition-transform group-hover:rotate-45"><ArrowUpRight size={18} /></span>
+              </button>
+              <a href={COMPANY_PROFILE_PDF_URL} download className="inline-flex items-center justify-center gap-2 h-14 px-7 rounded-full bg-white/10 backdrop-blur-md ring-1 ring-white/25 text-white font-semibold text-base hover:bg-white/20 transition-colors">
+                <Download size={18} /> Company profile
+              </a>
+            </div>
           </div>
         </div>
       </section>

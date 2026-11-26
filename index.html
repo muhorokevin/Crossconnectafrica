@@ -2,12 +2,12 @@
 <html lang="en" class="scroll-smooth w-full overflow-x-hidden">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     
     <!-- Primary Search Engine SEO Title & Meta -->
     <title>Cross Connect Africa | Team Building, First Aid Training & Adventure Kenya</title>
     <meta name="title" content="Cross Connect Africa | Team Building, First Aid Training & Adventure Kenya" />
-    <meta name="description" content="Connecting People. Building Resilience. Saving Lives. Kenyan provider of workplace safety training, emergency preparedness solutions, equipment support, team-building experiences and outdoor adventure programmes." />
+    <meta name="description" content="Connecting People. Building Resilience. Saving Lives. Nairobi company running team-building days, first aid and fire safety training, safety equipment, drills, MCs and event medics anywhere in Kenya. Instant quotes from our 2026 rate card." />
     <meta name="keywords" content="Cross Connect Africa, CCA Kenya, Team Building Kenya, First Aid Training Nairobi, Fire Safety Drills Kenya, Event Medic Standby, Hiking Expeditions Kenya, School Adventure Clubs Nairobi, Corporate Retreats Kenya, MC Hosting Nairobi" />
     <meta name="author" content="Cross Connect Africa" />
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
@@ -17,8 +17,8 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="shortcut icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/favicon.svg" />
-    <meta name="theme-color" content="#022c22" />
-    <meta name="msapplication-TileColor" content="#022c22" />
+    <meta name="theme-color" content="#0c2a21" />
+    <meta name="msapplication-TileColor" content="#0c2a21" />
 
     <!-- Geographic & Regional SEO -->
     <meta name="geo.region" content="KE" />
@@ -192,24 +192,31 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,400;1,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,500..800&family=Inter+Tight:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script>
       tailwind.config = {
         theme: {
           extend: {
             colors: {
               brand: {
-                green: '#022c22',
-                gold: '#d97706',
-                cream: '#FDFBF7',
-                stone: '#e7e5e4',
-                sand: '#f4f4f0',
-                clay: '#78350f',
+                green: '#0c2a21',
+                ink: '#081c16',
+                gold: '#d98a14',
+                amber: '#f2b544',
+                cream: '#f6f2ea',
+                stone: '#e6e0d3',
+                sand: '#eee8dc',
+                clay: '#7a3e0c',
               }
             },
             fontFamily: {
-              serif: ['"Playfair Display"', 'serif'],
-              sans: ['"Inter"', 'sans-serif'],
+              serif: ['"Archivo"', 'system-ui', 'sans-serif'],
+              display: ['"Archivo"', 'system-ui', 'sans-serif'],
+              sans: ['"Inter Tight"', 'system-ui', 'sans-serif'],
+            },
+            boxShadow: {
+              soft: '0 1px 2px rgba(8,28,22,.06), 0 8px 24px rgba(8,28,22,.08)',
+              lift: '0 2px 4px rgba(8,28,22,.06), 0 20px 48px rgba(8,28,22,.14)',
             }
           }
         }
@@ -217,15 +224,50 @@
     </script>
     <style>
       html, body {
+        background-color: #f6f2ea;
         width: 100%;
-        overflow-x: hidden;
+        overflow-x: clip;
         position: relative;
       }
       body {
-        background-color: #FDFBF7;
-        color: #022c22;
+        color: #0c2a21;
         -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        font-size: 16px;
       }
+      ::selection { background: rgba(217, 138, 20, .3); }
+      /* Display type: wide grotesk, tight tracking */
+      .font-serif, .font-display {
+        font-stretch: 108%;
+        font-variation-settings: "wdth" 108;
+        letter-spacing: -0.025em;
+      }
+      /* Archivo is loaded without italics; keep display type upright instead of a fake slant */
+      .font-serif.italic, .font-display.italic, .font-serif .italic, .font-display .italic, .font-serif i, .font-serif em { font-style: normal; }
+      .tabular-nums { font-variant-numeric: tabular-nums; }
+      /* Eyebrow label used across pages */
+      .eyebrow {
+        display: inline-flex; align-items: center; gap: .6rem;
+        font-size: .78rem; font-weight: 600; letter-spacing: .16em; text-transform: uppercase;
+      }
+      .eyebrow::before { content: ""; width: 28px; height: 1.5px; background: currentColor; opacity: .7; }
+      /* Scroll reveal */
+      .reveal { opacity: 0; transform: translateY(24px); transition: opacity .8s cubic-bezier(.22,1,.36,1), transform .8s cubic-bezier(.22,1,.36,1); }
+      .reveal.is-in { opacity: 1; transform: none; }
+      .no-js .reveal { opacity: 1; transform: none; }
+      /* Statement words fill on scroll */
+      .fill-word { color: rgba(246,242,234,.22); transition: color .35s ease; }
+      .fill-word.on { color: #f6f2ea; }
+      .fill-word.accent.on { color: #f2b544; }
+      /* Hide scrollbars on horizontal chip rows */
+      .no-scrollbar { scrollbar-width: none; }
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      @keyframes cca-marquee { from { transform: translateX(0) } to { transform: translateX(-50%) } }
+      .animate-marquee { animation: cca-marquee 40s linear infinite; }
+      @keyframes cca-rise { from { opacity: 0; transform: translateY(28px) } to { opacity: 1; transform: none } }
+      .rise { animation: cca-rise .9s cubic-bezier(.22,1,.36,1) both; }
+      @keyframes cca-settle { from { transform: scale(1.06) } to { transform: scale(1) } }
+      .settle { animation: cca-settle 1.8s cubic-bezier(.22,1,.36,1) both; }
       .noise-overlay::before {
         content: "";
         position: fixed;
@@ -234,6 +276,27 @@
         pointer-events: none;
         z-index: 9999;
       }
+      /* Visible focus for keyboard users */
+      :focus-visible {
+        outline: 2px solid #d98a14;
+        outline-offset: 2px;
+      }
+      img { color: transparent; }
+
+      /* Animations used across pages */
+      @keyframes cca-fade-in { from { opacity: 0 } to { opacity: 1 } }
+      @keyframes cca-fade-in-up { from { opacity: 0; transform: translateY(12px) } to { opacity: 1; transform: none } }
+      @keyframes cca-slow-zoom { from { transform: scale(1) } to { transform: scale(1.08) } }
+      .animate-fade-in { animation: cca-fade-in 0.25s ease-out both; }
+      .animate-fade-in-up { animation: cca-fade-in-up 0.3s ease-out both; }
+      .animate-slow-zoom { animation: cca-slow-zoom 20s ease-out both; }
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+        .reveal { opacity: 1; transform: none; }
+        .fill-word { color: #f6f2ea; }
+        .animate-marquee { animation: none; }
+      }
+
       .kinetic-btn {
         transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
       }

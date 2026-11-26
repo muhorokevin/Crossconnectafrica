@@ -429,7 +429,7 @@ Hello! I would like to book a spot or inquire about a group booking for this eve
 
               <div className="pt-4 border-t border-brand-green/10 flex items-center justify-between gap-4">
                 <div>
-                  <span className="text-[11px] text-gray-500 block">Per Person</span>
+                  <span className="text-[13px] text-gray-500 block">Per Person</span>
                   <span className="text-2xl font-serif font-bold text-brand-green tabular-nums">
                     {formatPrice(featuredEvent.price)}
                   </span>
@@ -535,7 +535,7 @@ Hello! I would like to book a spot or inquire about a group booking for this eve
 
                 <div className="px-6 py-4 border-t border-brand-green/10 flex items-center justify-between gap-3">
                   <div>
-                    <span className="text-[11px] text-gray-500 block">Investment</span>
+                    <span className="text-[13px] text-gray-500 block">Investment</span>
                     <span className="text-lg font-serif font-bold text-brand-green tabular-nums">
                       {formatPrice(event.price)}
                     </span>

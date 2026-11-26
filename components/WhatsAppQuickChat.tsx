@@ -104,7 +104,7 @@ const WhatsAppQuickChat: React.FC = () => {
                 </div>
                 <div>
                   <h3 className="text-sm font-bold tracking-tight">Cross Connect Africa</h3>
-                  <div className="flex items-center gap-1.5 text-[11px] text-emerald-300 mt-0.5">
+                  <div className="flex items-center gap-1.5 text-[13px] text-emerald-300 mt-0.5">
                     <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
                     <span>Online • Instant Kenyan Desk</span>
                   </div>
@@ -119,7 +119,7 @@ const WhatsAppQuickChat: React.FC = () => {
               </button>
             </div>
 
-            <div className="mt-3 text-[11px] text-gray-200 leading-relaxed bg-black/20 p-2.5 rounded-lg flex items-center gap-2">
+            <div className="mt-3 text-[13px] text-gray-200 leading-relaxed bg-black/20 p-2.5 rounded-lg flex items-center gap-2">
               <Clock size={13} className="text-brand-gold shrink-0" />
               <span>Typical response time: <strong>under 5 minutes</strong> during business hours.</span>
             </div>
@@ -127,7 +127,7 @@ const WhatsAppQuickChat: React.FC = () => {
 
           {/* Quick Select Buttons */}
           <div className="p-3 sm:p-4 overflow-y-auto max-h-[320px] space-y-2 custom-scrollbar bg-[#FDFBF7]">
-            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500 mb-2 px-1">
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-gray-500 mb-2 px-1">
               Select what you need:
             </p>
             {QUICK_OPTIONS.map(opt => (
@@ -140,7 +140,7 @@ const WhatsAppQuickChat: React.FC = () => {
                   <span className="text-xs font-bold text-brand-green group-hover:text-emerald-800 block">
                     {opt.title}
                   </span>
-                  <span className="text-[10px] text-gray-500 font-sans block mt-0.5">
+                  <span className="text-xs text-gray-500 font-sans block mt-0.5">
                     {opt.subtitle}
                   </span>
                 </div>
@@ -170,7 +170,7 @@ const WhatsAppQuickChat: React.FC = () => {
 
           {/* Footer note */}
           <div className="bg-gray-50 px-4 py-2 border-t border-gray-100 text-center">
-            <span className="text-[10px] text-gray-400 font-medium inline-flex items-center gap-1.5">
+            <span className="text-xs text-gray-400 font-medium inline-flex items-center gap-1.5">
               <ShieldCheck size={12} className="text-brand-gold" />
               Official Kenya Desk: +254 710 974 670
             </span>

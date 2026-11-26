@@ -314,7 +314,7 @@ const Gallery: React.FC<GalleryProps> = ({ setView, onNavigateToBooking }) => {
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="hidden sm:inline text-white/50 text-[11px] font-mono mr-2">
+              <span className="hidden sm:inline text-white/50 text-[13px] font-mono mr-2">
                 ESC to close · ← → to browse
               </span>
 
@@ -480,7 +480,7 @@ const GalleryTile: React.FC<GalleryTileProps> = ({ item, onOpen, heightClass }) 
               <Play size={20} className="fill-current ml-0.5" />
             </span>
           </div>
-          <span className="absolute top-3 left-3 text-white/90 text-[11px] font-medium flex items-center gap-1 drop-shadow">
+          <span className="absolute top-3 left-3 text-white/90 text-[13px] font-medium flex items-center gap-1 drop-shadow">
             <Film size={12} /> Video
           </span>
         </div>

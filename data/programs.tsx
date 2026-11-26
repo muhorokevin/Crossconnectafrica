@@ -17,7 +17,11 @@ export interface Program {
   outcomes: string;
   image: string;
   basePrice: number; 
-  priceType: 'per_person' | 'flat_rate' | 'two_part' | 'team_building_v6' | 'medic_v6' | 'mc_v6'; 
+  priceType: 'per_person' | 'flat_rate' | 'two_part' | 'team_building_v6' | 'medic_v6' | 'mc_v6' | 'family';
+  // Hikes and yearly clubs are quoted as complete packages: no travel or logistics extras
+  selfContained?: boolean;
+  // Crew members we send, used for travel (one vehicle per 4 crew)
+  crewByOption?: number[];
   // For two-part pricing (programme fee + per person fee)
   programFee?: number;
   perPersonFee?: number;
@@ -42,6 +46,10 @@ export interface Program {
     siteAssessPrice?: number;
     preAssessPrice?: number;
     postAssessPrice?: number;
+    // Families at home: flat price covers up to `includedPeople`, then a fee per extra person
+    includedPeople?: number;
+    extraPersonFee?: number;
+    bundleDiscountPercent?: number;
   }[];
 }
 
@@ -70,7 +78,7 @@ export const CATEGORIES: Category[] = [
         audience: 'Corporates & NGOs · Chamas & Churches · Youth & Schools',
         description: 'Priced per head with automatic volume discounts (5%–20% off for 30+ pax) and minimum session fee protection. Facilitation, props and game gear included.',
         outcomes: 'Collaboration, Focus, Trust & Shared Workplace Values.',
-        image: 'https://i.imgur.com/H7y7KfG.jpg',
+        image: '/images/team-sack-race.jpg',
         basePrice: 1500,
         priceType: 'team_building_v6',
         teamBuildingRates: {
@@ -101,7 +109,7 @@ export const CATEGORIES: Category[] = [
         audience: 'Staff Meetings, AGMs, Departments, Community & Youth Days',
         description: 'Focused half-day experiential challenges with automatic volume discounts (5%–20% off for 30+ pax). Small groups pay the minimum session fee.',
         outcomes: 'Energised Morale, Reconnection, Trust, Collaborative Mindset.',
-        image: 'https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?q=80&w=1000',
+        image: '/images/team-archery.jpg',
         basePrice: 1000,
         priceType: 'team_building_v6',
         teamBuildingRates: {
@@ -142,7 +150,7 @@ export const CATEGORIES: Category[] = [
         audience: 'Teams, Commercial Buildings, Offices, NGOs',
         description: 'Fire science, extinguisher choice, live extinguisher practice, and evacuation. Priced at KES 18,000 programme fee + KES 640 per person (10 pax = KES 24,400).',
         outcomes: 'Statutory Fire Compliance, Extinguisher Confidence, Evacuation Readiness.',
-        image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?q=80&w=1000',
+        image: '/images/equipment-extinguishers.jpg',
         basePrice: 18000,
         priceType: 'two_part',
         programFee: 18000,
@@ -170,7 +178,7 @@ export const CATEGORIES: Category[] = [
         audience: 'Corporates, Factories, NGOs, Community Teams',
         description: 'Bleeding, burns, choking, fractures, adult/child/infant CPR, and AED use. Priced at KES 30,000 programme fee + KES 1,700 per person (10 pax = KES 47,000).',
         outcomes: 'Workplace Lifesaving Readiness, CPR Mastery, Certificates.',
-        image: 'https://i.imgur.com/NLpqywt.jpg',
+        image: '/images/first-aid-cpr.jpg',
         basePrice: 30000,
         priceType: 'two_part',
         programFee: 30000,
@@ -196,17 +204,17 @@ export const CATEGORIES: Category[] = [
         icon: <ShieldAlert size={16} />,
         quoteTitle: 'Combined Fire & First Aid Day',
         audience: 'Corporate Offices, Manufacturing Plants, NGOs',
-        description: 'Fire awareness and first aid / CPR in one day. Priced at KES 26,500 programme fee + KES 1,680 per person (10 pax = KES 43,300).',
-        outcomes: 'Complete Dual Statutory Coverage in One Integrated Day.',
-        image: 'https://images.unsplash.com/photo-1582139329536-e7284fece509?q=80&w=1000',
-        basePrice: 26500,
+        description: 'Fire awareness and first aid / CPR in one day. Priced at KES 32,000 programme fee + KES 1,750 per person (10 people = KES 49,500).',
+        outcomes: 'Fire safety and first aid covered in one day.',
+        image: '/images/fire-training.jpg',
+        basePrice: 32000,
         priceType: 'two_part',
-        programFee: 26500,
-        perPersonFee: 1680,
+        programFee: 32000,
+        perPersonFee: 1750,
         supportsRefresher: true,
         supportsFullChainBundle: true,
         durations: [
-          { label: '1 Day Combo — KES 26,500 Programme Fee + KES 1,680 / person', price: 26500, programFee: 26500, perPersonFee: 1680, days: 1 }
+          { label: '1 day: KES 32,000 programme fee + KES 1,750 per person', price: 32000, programFee: 32000, perPersonFee: 1750, days: 1 }
         ],
         inclusions: [
           'Combined fire awareness and first aid / CPR curriculum',
@@ -225,13 +233,13 @@ export const CATEGORIES: Category[] = [
         audience: 'Appointed Fire Wardens, Marshals & Workplace First Aiders',
         description: 'For the few people an institution appoints. One flat fee covers up to 8 selected staff (not sold per head). Includes manuals, gear, and certification.',
         outcomes: 'Appointed Safety Officer Readiness, Record-Keeping & Command Control.',
-        image: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?q=80&w=1000',
-        basePrice: 40000,
+        image: '/images/indoor-session.jpg',
+        basePrice: 48000,
         priceType: 'flat_rate',
         supportsRefresher: true,
         durations: [
-          { label: 'Occupational Fire Warden & Marshal — 1 Day, up to 8 staff (KES 40,000)', price: 40000, days: 1, isGroup: true },
-          { label: 'Occupational First Aider (Advanced) — 2 Days, up to 8 staff (KES 66,000)', price: 66000, days: 2, isGroup: true }
+          { label: 'Fire warden and marshal: 1 day, up to 8 staff (KES 48,000)', price: 48000, days: 1, isGroup: true },
+          { label: 'First aider (advanced): 2 days, up to 8 staff (KES 72,000)', price: 72000, days: 2, isGroup: true }
         ],
         inclusions: [
           'Flat fee covers up to 8 appointed personnel',
@@ -250,7 +258,7 @@ export const CATEGORIES: Category[] = [
         audience: 'Premises Owners, Facility Managers, Schools, Corporates',
         description: 'Flat fees based on the size of your site, not the number of staff: Step 1 Site Assessment, Step 2 Pre-Training Readiness, or Step 4 Post-Training Practical Report.',
         outcomes: 'Scored Premises Inspection, Readiness Baseline & Post-Training Verification.',
-        image: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=1000',
+        image: '/images/equipment-safety-point.jpg',
         basePrice: 23000,
         priceType: 'flat_rate',
         durations: [
@@ -284,9 +292,11 @@ export const CATEGORIES: Category[] = [
         audience: 'Commercial Properties, Office Towers, Schools, Hospitals',
         description: 'Three tiers covering planning visit, facilitators, marshals, insurance, authority notification, and written report. Emergency services booked at cost + 10% handling.',
         outcomes: 'Live Evacuation Compliance, Response Timing & Post-Drill Report.',
-        image: 'https://images.unsplash.com/photo-1541888946425-d0fbb186c5f7?q=80&w=1000',
+        image: '/images/event-marshal.jpg',
         basePrice: 70000,
         priceType: 'flat_rate',
+        // Tier 1: lead + 4 marshals; Tier 2: + 3 instructors, 6 marshals; Tier 3: + 4 instructors, 10 marshals, 2 medics
+        crewByOption: [5, 10, 17],
         durations: [
           { label: 'Tier 1: Evacuation Drill — Half day, up to 100 people (KES 70,000)', price: 70000, days: 0.5, isGroup: true },
           { label: 'Tier 2: Drill with Response Team — Full day, up to 300 people (KES 180,000)', price: 180000, days: 1, isGroup: true },
@@ -311,7 +321,7 @@ export const CATEGORIES: Category[] = [
         audience: 'Meetings, Weddings, Sports Days, Concerts, Marathons',
         description: 'KES 2,400 per medic per hour (4-hour minimum) × risk multiplier (Low ×1.00, Medium ×1.15, High ×1.35) + stocked medic kit (KES 3,500 per 2 medics). From KES 13,100.',
         outcomes: 'Trained Medics on Standby, Rapid Triage & Optional Ambulance Cover.',
-        image: 'https://i.imgur.com/dXyQVwQ.jpeg',
+        image: '/images/event-marshal.jpg',
         basePrice: 13100,
         priceType: 'medic_v6',
         durations: [
@@ -325,6 +335,47 @@ export const CATEGORIES: Category[] = [
         ],
         participantsBring: ['N/A'],
         ccaProvides: ['Certified EMT medics', 'Stocked medic kits', 'Optional ambulance & medical risk plan']
+      }
+    ]
+  },
+
+  // ========================================================
+  // FAMILIES AT HOME (Rate Card 2026 v8, page 10)
+  // One flat price covers up to 6 people in one household
+  // ========================================================
+  {
+    id: 'families',
+    title: 'Families at Home',
+    icon: <Heart size={20} />,
+    programs: [
+      {
+        id: 'family_packages',
+        category: 'families',
+        title: 'Family Safety & Fun at Home',
+        icon: <Heart size={16} />,
+        quoteTitle: 'Families at Home Package',
+        audience: 'Parents, grandparents, older children and house help',
+        description: 'Fire safety, first aid and fun for one household, at your home in Nairobi. One flat price covers up to 6 people. Children from about 8 years can take part.',
+        outcomes: 'Know what to do if there is a fire, a burn, a fall or someone stops breathing.',
+        image: '/images/family-outing.jpg',
+        basePrice: 8000,
+        priceType: 'family',
+        durations: [
+          { label: 'Home fire safety (2 to 3 hours)', price: 9500, days: 1, includedPeople: 6, extraPersonFee: 1500 },
+          { label: 'Family first aid and CPR (3 to 4 hours)', price: 15000, days: 1, includedPeople: 6, extraPersonFee: 2500 },
+          { label: 'Family safety day: fire and first aid (about 5 hours)', price: 22000, days: 1, includedPeople: 6, extraPersonFee: 3000 },
+          { label: 'Family fun and bonding games (2 to 3 hours)', price: 8000, days: 1, includedPeople: 6, extraPersonFee: 1000 },
+          { label: 'Full family bundle: safety day plus games (10% off)', price: 30000, days: 1, includedPeople: 6, extraPersonFee: 4000, bundleDiscountPercent: 10 }
+        ],
+        inclusions: [
+          'Qualified instructor at your home',
+          'CPR manikins (adult, child and baby)',
+          'Training extinguisher and fire blanket',
+          'Bandages and practice materials',
+          'Everyone practises each skill, not just watches'
+        ],
+        participantsBring: ['Comfortable clothes'],
+        ccaProvides: ['Instructor', 'Manikins and practice kit', 'Training extinguisher and fire blanket']
       }
     ]
   },
@@ -417,6 +468,7 @@ export const CATEGORIES: Category[] = [
       },
       {
         id: 'club_basic',
+        selfContained: true,
         category: 'school_clubs',
         title: 'Adventure Club — Basic Package (Annual)',
         icon: <Target size={16} />,
@@ -440,6 +492,7 @@ export const CATEGORIES: Category[] = [
       },
       {
         id: 'club_standard',
+        selfContained: true,
         category: 'school_clubs',
         title: 'Adventure Club — Standard Package (Annual)',
         icon: <Award size={16} />,
@@ -474,6 +527,7 @@ export const CATEGORIES: Category[] = [
     programs: [
       {
         id: 'hike_easy',
+        selfContained: true,
         category: 'expeditions',
         title: 'Day Hikes & Trail Walks (Per Person)',
         icon: <Compass size={16} />,
@@ -499,6 +553,7 @@ export const CATEGORIES: Category[] = [
       },
       {
         id: 'hike_remote',
+        selfContained: true,
         category: 'expeditions',
         title: 'Alpine & Remote Expeditions (Per Person)',
         icon: <Star size={16} />,
@@ -541,7 +596,7 @@ export const CATEGORIES: Category[] = [
         audience: 'Weddings, Corporate Events, Galas, Churches, Schools & Concerts',
         description: 'Warm, bilingual (English & Swahili) hosting covering a pre-event briefing call, run-of-show, cue sheet, and energisers/crowd games. Starting from KES 10,000.',
         outcomes: 'Flawless Timing, Crowd Energy, Zero Dead Air.',
-        image: 'https://images.unsplash.com/photo-1472653431158-6364773b2a56?q=80&w=1000',
+        image: '/images/mc-kevin.jpg',
         basePrice: 22000,
         priceType: 'mc_v6',
         durations: [

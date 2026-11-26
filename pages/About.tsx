@@ -11,25 +11,31 @@ interface AboutProps {
 }
 
 const VALUES = [
-  { name: 'Faith', desc: 'Serving in a way that honours Christ.', icon: <Heart size={20} className="text-brand-gold" /> },
-  { name: 'Safety', desc: 'Respecting life through practical preparation.', icon: <Shield size={20} className="text-brand-gold" /> },
-  { name: 'Integrity', desc: 'Working honestly and transparently.', icon: <ShieldCheck size={20} className="text-brand-gold" /> },
-  { name: 'Connection', desc: 'Building unity and teamwork.', icon: <Users size={20} className="text-brand-gold" /> },
-  { name: 'Excellence', desc: 'Thoughtful, well-run execution.', icon: <Award size={20} className="text-brand-gold" /> },
-  { name: 'Growth', desc: 'Developing resilience and character.', icon: <Mountain size={20} className="text-brand-gold" /> }
+  { name: 'Faith', desc: 'We serve in a way that honours Christ.', icon: <Heart size={20} className="text-brand-gold" /> },
+  { name: 'Safety', desc: 'We plan every activity with safety first.', icon: <Shield size={20} className="text-brand-gold" /> },
+  { name: 'Integrity', desc: 'We are honest in how we work and charge.', icon: <ShieldCheck size={20} className="text-brand-gold" /> },
+  { name: 'Connection', desc: 'We bring people together.', icon: <Users size={20} className="text-brand-gold" /> },
+  { name: 'Excellence', desc: 'We prepare well and do the job properly.', icon: <Award size={20} className="text-brand-gold" /> },
+  { name: 'Growth', desc: 'We help people learn and grow.', icon: <Mountain size={20} className="text-brand-gold" /> }
 ];
 
+// Company Profile 2026 v2, page 8
 const SECTORS_SERVED = [
-  { sector: 'Corporates & NGOs', desc: 'Workplace first aid, fire safety, assessments, drills & team building.', icon: <Briefcase size={18} /> },
-  { sector: 'Schools & Youth', desc: 'Safety education, evacuation drills, adventure clubs, hikes & camps.', icon: <School size={18} /> },
-  { sector: 'Churches & Communities', desc: 'Team building, fellowship experiences, chamas & outreach programmes.', icon: <Heart size={18} /> },
-  { sector: 'Event Organisers', desc: 'Medical standby teams, ambulance coordination & crowd safety planning.', icon: <Zap size={18} /> }
+  { sector: 'Corporates and businesses', desc: 'Workplace first aid, fire safety, equipment, assessments, drills and team development.', icon: <Briefcase size={18} /> },
+  { sector: 'NGOs and development organisations', desc: 'Safety training, team development and outdoor programmes.', icon: <Target size={18} /> },
+  { sector: 'Families and households', desc: 'Fire safety, first aid and CPR, and fun games at home, at a flat family price.', icon: <Heart size={18} /> },
+  { sector: 'Schools and colleges', desc: 'Fire safety and first aid training for students and staff, evacuation drills and safety equipment.', icon: <School size={18} /> },
+  { sector: 'Churches and ministries', desc: 'Team building, youth development, outdoor activities, fellowship and safety equipment.', icon: <Users size={18} /> },
+  { sector: 'Chamas and community groups', desc: 'Practical safety education, teamwork and outdoor experiences.', icon: <Compass size={18} /> },
+  { sector: 'Event organisers', desc: 'MC and hosting, emergency planning and medical standby.', icon: <Zap size={18} /> }
 ];
 
 const QUALITY_COMMITMENTS = [
-  'Activities planned around identified risks and group needs.',
-  'Certified trainers, EMTs, proper equipment & emergency protocols.',
-  'Clear scope, pricing & deliverables agreed before every engagement.'
+  'We check the risks before every activity.',
+  'We use the right equipment and keep a first aider on hand.',
+  'We agree in writing what we will deliver before each job.',
+  'We give you feedback and recommendations afterwards.',
+  'We are honest about our qualifications, certificates and insurance.'
 ];
 
 const About: React.FC<AboutProps> = ({ setView }) => {
@@ -41,7 +47,7 @@ const About: React.FC<AboutProps> = ({ setView }) => {
         <div className="max-w-4xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 bg-brand-green/10 border border-brand-green/20 px-4 py-1.5 rounded-full mb-5">
             <Sparkles size={14} className="text-brand-gold" />
-            <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-brand-green">
+            <span className="text-xs font-bold uppercase tracking-[0.3em] text-brand-green">
               Cross Connect Africa • Nairobi, Kenya
             </span>
           </div>
@@ -52,7 +58,7 @@ const About: React.FC<AboutProps> = ({ setView }) => {
           </h1>
 
           <p className="text-base sm:text-lg text-gray-700 leading-relaxed font-serif italic max-w-2xl mx-auto mb-8">
-            Cross Connect Africa delivers workplace safety training, fire & emergency drills, event medical standby, safety equipment, and team-building programmes across Kenya.
+            Cross Connect Africa is a Kenyan company based in Nairobi. We run team-building days, teach first aid and fire safety, supply safety equipment, and provide MCs and medics for events. Book one service or combine several into one day, planned around your group, your goals and your budget.
           </p>
 
           <div className="pt-5 border-t border-brand-green/15 flex flex-wrap justify-center items-center gap-x-6 gap-y-2 text-xs text-gray-600 font-medium">
@@ -77,12 +83,12 @@ const About: React.FC<AboutProps> = ({ setView }) => {
                   <Target size={20} />
                 </div>
                 <div>
-                  <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-brand-gold block">Our Purpose</span>
+                  <span className="text-xs font-bold uppercase tracking-[0.25em] text-brand-gold block">Our Purpose</span>
                   <h2 className="text-2xl font-serif font-bold text-brand-green">Our Mission</h2>
                 </div>
               </div>
               <p className="text-gray-700 text-base leading-relaxed font-serif italic">
-                “To equip people and organisations with practical skills, resources and experiences that strengthen safety, preparedness, teamwork and community.”
+                “To give people the skills and equipment to stay safe, and time together that helps them work better as a team.”
               </p>
             </div>
           </div>
@@ -94,12 +100,15 @@ const About: React.FC<AboutProps> = ({ setView }) => {
                   <Compass size={20} />
                 </div>
                 <div>
-                  <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-brand-gold block">Our Vision</span>
-                  <h2 className="text-2xl font-serif font-bold text-white">Christ-Centred Service</h2>
+                  <span className="text-xs font-bold uppercase tracking-[0.25em] text-brand-gold block">Our Vision</span>
+                  <h2 className="text-2xl font-serif font-bold text-white">Safer, connected communities</h2>
                 </div>
               </div>
               <p className="text-brand-cream/90 text-base leading-relaxed font-serif italic mb-4">
-                “To build safer, more resilient and better-connected communities through Christ-centred service, practical preparedness and purposeful adventure.”
+                “Safer workplaces, schools, churches and homes across Kenya, where people know what to do in an emergency and work well together.”
+              </p>
+              <p className="text-sm text-brand-cream/80 leading-relaxed mb-4">
+                We are a Christian company, and we work with clients of every faith and background. Where a group wants it, we include prayer, fellowship and mentoring.
               </p>
             </div>
             <p className="text-xs text-brand-gold/90 font-serif italic pt-3 border-t border-white/10">
@@ -113,7 +122,7 @@ const About: React.FC<AboutProps> = ({ setView }) => {
       <section className="max-w-6xl mx-auto px-6 mb-16 space-y-12">
         <div>
           <div className="text-center mb-8">
-            <span className="text-brand-gold text-[10px] font-bold uppercase tracking-[0.35em] block mb-1">What Anchors Us</span>
+            <span className="text-brand-gold text-xs font-bold uppercase tracking-[0.35em] block mb-1">What Anchors Us</span>
             <h2 className="text-3xl font-serif font-bold text-brand-green">Core Values</h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -133,7 +142,7 @@ const About: React.FC<AboutProps> = ({ setView }) => {
 
         <div>
           <div className="text-center mb-8">
-            <span className="text-brand-gold text-[10px] font-bold uppercase tracking-[0.35em] block mb-1">Who We Work With</span>
+            <span className="text-brand-gold text-xs font-bold uppercase tracking-[0.35em] block mb-1">Who We Work With</span>
             <h2 className="text-3xl font-serif font-bold text-brand-green">Sectors We Serve</h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -164,14 +173,14 @@ const About: React.FC<AboutProps> = ({ setView }) => {
                 />
                 <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-brand-green via-brand-green/80 to-transparent p-6 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-3">
                   <div>
-                    <p className="text-brand-gold font-bold uppercase tracking-[0.2em] text-[10px] mb-0.5">Founder & Lead Facilitator</p>
+                    <p className="text-brand-gold font-bold uppercase tracking-[0.2em] text-xs mb-0.5">Founder & Lead Facilitator</p>
                     <h3 className="text-white text-2xl font-serif font-bold">Kevin Muhoro</h3>
                   </div>
                   <a
                     href="https://kevin-muhoro-portfolio.vercel.app/"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="bg-brand-gold text-brand-green px-3.5 py-2 rounded-xl shadow-md hover:scale-105 transition-all flex items-center gap-1.5 shrink-0 font-bold text-[10px] uppercase tracking-wider"
+                    className="bg-brand-gold text-brand-green px-3.5 py-2 rounded-xl shadow-md hover:scale-105 transition-all flex items-center gap-1.5 shrink-0 font-bold text-xs uppercase tracking-wider"
                   >
                     <span>Portfolio</span>
                     <ExternalLink size={12} />
@@ -189,17 +198,17 @@ const About: React.FC<AboutProps> = ({ setView }) => {
               </h2>
 
               <p className="text-gray-700 leading-relaxed text-sm md:text-base">
-                Kevin leads Cross Connect Africa with a focus on practical workplace preparedness, purposeful outdoor experiences, and character development. Grounded in Christian faith, he serves teams, schools, churches, and organisations across Kenya.
+                Kevin started Cross Connect Africa to help people be ready for emergencies and to help teams work better together. He plans and leads our sessions, and hosts weddings, galas, company, church and school events in English and Swahili.
               </p>
 
               <div className="pt-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="p-4 bg-brand-cream/60 rounded-xl border border-brand-green/10">
-                  <h4 className="font-bold text-xs text-brand-green uppercase tracking-wider">Education</h4>
-                  <p className="text-xs text-gray-600 mt-1">BSc Physics — Catholic University of Eastern Africa (CUEA)</p>
+                  <h4 className="font-bold text-sm text-brand-green">Education</h4>
+                  <p className="text-sm text-gray-600 mt-1">Physics degree, The Catholic University of Eastern Africa</p>
                 </div>
                 <div className="p-4 bg-brand-cream/60 rounded-xl border border-brand-green/10">
-                  <h4 className="font-bold text-xs text-brand-green uppercase tracking-wider">Leadership</h4>
-                  <p className="text-xs text-gray-600 mt-1">Founder & Lead Facilitator, Cross Connect Africa</p>
+                  <h4 className="font-bold text-sm text-brand-green">Ministry</h4>
+                  <p className="text-sm text-gray-600 mt-1">Head of Department for youth ministry, CITAM Parklands</p>
                 </div>
               </div>
             </div>
@@ -213,15 +222,15 @@ const About: React.FC<AboutProps> = ({ setView }) => {
         <div className="bg-brand-green text-white p-8 md:p-10 rounded-3xl border border-brand-gold/30 shadow-xl space-y-6">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-6">
             <div>
-              <span className="text-brand-gold text-[10px] font-bold uppercase tracking-[0.35em] block mb-1">Track Record & Standards</span>
-              <h2 className="text-2xl md:text-3xl font-serif font-bold">Trusted Execution Across Kenya</h2>
+              <span className="text-brand-gold text-xs font-bold uppercase tracking-[0.35em] block mb-1">Track Record & Standards</span>
+              <h2 className="text-2xl md:text-3xl font-serif font-bold">Our promise to you</h2>
             </div>
-            <p className="text-xs text-brand-cream/80 max-w-md">
-              Trusted by CITAM Kadolta, Kadolta Resort, Biblica, NGOs, schools, and corporate teams of up to 250+ participants.
+            <p className="text-sm text-brand-cream/80 max-w-md">
+              Recent work: a full staff team-building day for 250 people at CITAM Kadolta, Nairobi, on 5 September 2026. Organisations we work with include CITAM (Kadolta and Parklands), Kadolta Resort, Biblica, NGOs, schools and corporate teams.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
             {QUALITY_COMMITMENTS.map((comm, idx) => (
               <div key={idx} className="flex items-start gap-3 p-4 bg-white/5 rounded-xl border border-white/10">
                 <Check size={16} className="text-brand-gold shrink-0 mt-0.5" />

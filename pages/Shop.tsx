@@ -1030,7 +1030,7 @@ const Shop: React.FC = () => {
         <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#d4af37_1px,transparent_1px)] [background-size:24px_24px]"></div>
         
         <div className="max-w-6xl mx-auto text-center relative z-10 space-y-4">
-          <div className="inline-flex items-center gap-2 text-brand-gold text-[10px] md:text-xs font-bold uppercase tracking-[0.4em]">
+          <div className="inline-flex items-center gap-2 text-brand-gold text-xs md:text-xs font-bold uppercase tracking-[0.4em]">
             <Sparkles size={14} className="text-brand-gold" />
             Field-Grade Equipment & Mission Procurement
           </div>
@@ -1047,22 +1047,22 @@ const Shop: React.FC = () => {
           <div className="pt-4 flex flex-wrap items-center justify-center gap-6 sm:gap-10 text-xs text-brand-cream/80 font-medium">
             <div className="flex items-center gap-2">
               <span className="font-serif font-bold text-base text-brand-gold">38+</span>
-              <span className="text-[11px] uppercase tracking-wider text-gray-300">Cataloged SKUs</span>
+              <span className="text-[13px] uppercase tracking-wider text-gray-300">Cataloged SKUs</span>
             </div>
             <span className="text-white/20 hidden sm:inline">·</span>
             <div className="flex items-center gap-2">
               <span className="font-serif font-bold text-base text-brand-gold">DOSHS</span>
-              <span className="text-[11px] uppercase tracking-wider text-gray-300">Statutory Compliant</span>
+              <span className="text-[13px] uppercase tracking-wider text-gray-300">Statutory Compliant</span>
             </div>
             <span className="text-white/20 hidden sm:inline">·</span>
             <div className="flex items-center gap-2">
               <span className="font-serif font-bold text-base text-brand-gold">24h</span>
-              <span className="text-[11px] uppercase tracking-wider text-gray-300">Nairobi Dispatch</span>
+              <span className="text-[13px] uppercase tracking-wider text-gray-300">Nairobi Dispatch</span>
             </div>
             <span className="text-white/20 hidden sm:inline">·</span>
             <div className="flex items-center gap-2">
               <span className="font-serif font-bold text-base text-brand-gold">100%</span>
-              <span className="text-[11px] uppercase tracking-wider text-gray-300">CSR Margin Reinvestment</span>
+              <span className="text-[13px] uppercase tracking-wider text-gray-300">CSR Margin Reinvestment</span>
             </div>
           </div>
         </div>
@@ -1090,7 +1090,7 @@ const Shop: React.FC = () => {
                   <div className={`p-2.5 rounded-xl ${isSelected ? 'bg-brand-gold text-brand-green' : 'bg-brand-cream text-brand-green group-hover:bg-brand-gold/20'}`}>
                     <Icon size={20} />
                   </div>
-                  <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-md ${
+                  <span className={`text-xs font-mono font-bold px-2 py-0.5 rounded-md ${
                     isSelected ? 'bg-black/30 text-brand-gold' : 'bg-gray-100 text-gray-600'
                   }`}>
                     {sectionCounts[sec.id]} Items
@@ -1100,7 +1100,7 @@ const Shop: React.FC = () => {
                   <h3 className={`font-serif font-bold text-sm md:text-base leading-tight mb-1 ${isSelected ? 'text-brand-gold' : 'text-brand-green'}`}>
                     {sec.shortTitle}
                   </h3>
-                  <p className={`text-[11px] line-clamp-1 ${isSelected ? 'text-gray-300' : 'text-gray-500'}`}>
+                  <p className={`text-[13px] line-clamp-1 ${isSelected ? 'text-gray-300' : 'text-gray-500'}`}>
                     {sec.badge}
                   </p>
                 </div>
@@ -1183,7 +1183,7 @@ const Shop: React.FC = () => {
                     <span className="p-2 bg-brand-green text-brand-gold rounded-lg inline-flex">
                       <SectionIcon size={18} />
                     </span>
-                    <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-brand-gold">
+                    <span className="text-xs font-bold uppercase tracking-[0.3em] text-brand-gold">
                       Section {SECTIONS.findIndex(s => s.id === section.id) + 1} • {section.badge}
                     </span>
                   </div>
@@ -1193,7 +1193,7 @@ const Shop: React.FC = () => {
                   <p className="text-xs md:text-sm text-gray-600 font-serif italic">
                     {section.tagline}
                   </p>
-                  <div className="flex items-center gap-2 text-[11px] text-gray-500 pt-1">
+                  <div className="flex items-center gap-2 text-[13px] text-gray-500 pt-1">
                     <ShieldCheck size={14} className="text-emerald-600 shrink-0" />
                     <span>{section.complianceNote}</span>
                   </div>
@@ -1201,7 +1201,7 @@ const Shop: React.FC = () => {
 
                 {/* Section Action / Bulk RFQ Link */}
                 <div className="shrink-0 flex sm:flex-col items-center sm:items-end gap-2 w-full sm:w-auto">
-                  <span className="text-[11px] font-mono text-gray-400 hidden sm:inline">
+                  <span className="text-[13px] font-mono text-gray-400 hidden sm:inline">
                     {sectionItems.length} Products Available
                   </span>
                   <button
@@ -1236,7 +1236,7 @@ const Shop: React.FC = () => {
                       {/* Top Badges */}
                       <div className="absolute top-3 left-3 flex flex-col gap-1.5 z-10">
                         {product.certBadge && (
-                          <span className="bg-brand-green/95 backdrop-blur-sm text-brand-gold px-2.5 py-1 rounded-md text-[9px] font-bold uppercase tracking-wider shadow-sm border border-brand-gold/30">
+                          <span className="bg-brand-green/95 backdrop-blur-sm text-brand-gold px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-wider shadow-sm border border-brand-gold/30">
                             {product.certBadge}
                           </span>
                         )}
@@ -1249,7 +1249,7 @@ const Shop: React.FC = () => {
 
                       {/* Stock Status Badge */}
                       <div className="absolute bottom-3 left-3 z-10">
-                        <span className="bg-white/95 backdrop-blur-sm text-emerald-800 text-[9px] font-bold px-2 py-0.5 rounded-md border border-emerald-200 flex items-center gap-1">
+                        <span className="bg-white/95 backdrop-blur-sm text-emerald-800 text-xs font-bold px-2 py-0.5 rounded-md border border-emerald-200 flex items-center gap-1">
                           <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse"></span>
                           {product.stockStatus || 'In Stock'}
                         </span>
@@ -1261,7 +1261,7 @@ const Shop: React.FC = () => {
                       
                       <div className="space-y-2">
                         {/* SKU & Category */}
-                        <div className="flex items-center justify-between text-[10px] text-gray-400 font-mono">
+                        <div className="flex items-center justify-between text-xs text-gray-400 font-mono">
                           <span>{product.sku || 'CCA-EQUIP'}</span>
                           <span className="text-brand-gold font-sans font-bold uppercase tracking-wider">
                             {product.category}
@@ -1278,7 +1278,7 @@ const Shop: React.FC = () => {
 
                         {/* Brief Spec Highlights */}
                         {product.specs && product.specs.length > 0 && (
-                          <ul className="space-y-1 text-[11px] text-gray-500 font-sans pt-1">
+                          <ul className="space-y-1 text-[13px] text-gray-500 font-sans pt-1">
                             {product.specs.slice(0, 2).map((spec, i) => (
                               <li key={i} className="flex items-start gap-1.5 line-clamp-1">
                                 <span className="text-brand-gold font-bold">•</span>
@@ -1292,7 +1292,7 @@ const Shop: React.FC = () => {
                       {/* Price & Action Row */}
                       <div className="pt-3 border-t border-gray-100 flex items-center justify-between gap-2">
                         <div>
-                          <div className="text-[9px] text-gray-400 uppercase font-semibold">Standard Unit</div>
+                          <div className="text-xs text-gray-400 uppercase font-semibold">Standard Unit</div>
                           <div className="text-base font-serif font-bold text-brand-green">
                             {formatPrice(product.price)}
                           </div>
@@ -1309,7 +1309,7 @@ const Shop: React.FC = () => {
                           
                           <button 
                             onClick={() => addToCart(product)}
-                            className="px-3.5 py-2 bg-brand-green text-brand-gold hover:bg-brand-gold hover:text-brand-green font-bold text-[11px] uppercase tracking-wider rounded-xl transition-all shadow-sm flex items-center gap-1.5"
+                            className="px-3.5 py-2 bg-brand-green text-brand-gold hover:bg-brand-gold hover:text-brand-green font-bold text-[13px] uppercase tracking-wider rounded-xl transition-all shadow-sm flex items-center gap-1.5"
                           >
                             <Plus size={14} /> Add
                           </button>
@@ -1347,7 +1347,7 @@ const Shop: React.FC = () => {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 mt-20">
         <div className="bg-brand-green text-white rounded-3xl p-8 md:p-12 border border-brand-gold/30 shadow-2xl relative overflow-hidden flex flex-col lg:flex-row items-center justify-between gap-8">
           <div className="space-y-4 max-w-2xl text-center lg:text-left">
-            <div className="inline-flex items-center gap-2 text-brand-gold text-[10px] font-bold uppercase tracking-[0.4em]">
+            <div className="inline-flex items-center gap-2 text-brand-gold text-xs font-bold uppercase tracking-[0.4em]">
               <Package size={14} /> Corporate & School Procurement
             </div>
             <h2 className="text-2xl sm:text-4xl font-serif font-bold tracking-tight">
@@ -1356,7 +1356,7 @@ const Shop: React.FC = () => {
             <p className="text-gray-300 text-xs sm:text-sm font-serif italic leading-relaxed">
               We supply schools, corporate headquarters, safari camps, and NGOs across Kenya with certified DOSHS first aid replenishment, fire extinguisher supply/servicing, and customized corporate team merchandise.
             </p>
-            <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 text-[11px] text-gray-300 pt-2 font-mono">
+            <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 text-[13px] text-gray-300 pt-2 font-mono">
               <span className="flex items-center gap-1.5"><CheckCircle2 size={13} className="text-brand-gold" /> KRA PIN Registered</span>
               <span className="flex items-center gap-1.5"><CheckCircle2 size={13} className="text-brand-gold" /> Statutory DOSHS Approval</span>
               <span className="flex items-center gap-1.5"><CheckCircle2 size={13} className="text-brand-gold" /> Countrywide Courier Delivery</span>
@@ -1411,7 +1411,7 @@ const Shop: React.FC = () => {
                 onError={handleImageError} 
                 className="w-full h-full object-cover" 
               />
-              <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between text-[10px] font-mono bg-black/60 backdrop-blur-md text-white px-3 py-1.5 rounded-lg border border-white/10">
+              <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between text-xs font-mono bg-black/60 backdrop-blur-md text-white px-3 py-1.5 rounded-lg border border-white/10">
                 <span>SKU: {selectedProduct.sku || 'CCA-EQUIP'}</span>
                 <span className="text-brand-gold font-bold">{selectedProduct.stockStatus || 'In Stock'}</span>
               </div>
@@ -1423,11 +1423,11 @@ const Shop: React.FC = () => {
               <div className="space-y-4">
                 <div>
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="text-brand-gold text-[10px] font-bold uppercase tracking-[0.3em]">
+                    <span className="text-brand-gold text-xs font-bold uppercase tracking-[0.3em]">
                       {selectedProduct.category}
                     </span>
                     {selectedProduct.certBadge && (
-                      <span className="text-[9px] bg-brand-green/10 text-brand-green font-bold px-2 py-0.5 rounded-md">
+                      <span className="text-xs bg-brand-green/10 text-brand-green font-bold px-2 py-0.5 rounded-md">
                         {selectedProduct.certBadge}
                       </span>
                     )}
@@ -1447,7 +1447,7 @@ const Shop: React.FC = () => {
 
                 {/* Mission Relevance / Value Prop */}
                 <div className="p-3.5 bg-brand-cream/60 rounded-xl border border-brand-green/10 space-y-1">
-                  <span className="text-[9px] font-bold uppercase tracking-wider text-brand-gold block">
+                  <span className="text-xs font-bold uppercase tracking-wider text-brand-gold block">
                     Operational Relevance
                   </span>
                   <p className="text-xs font-serif italic text-brand-green">
@@ -1458,7 +1458,7 @@ const Shop: React.FC = () => {
                 {/* Full Technical Specifications List */}
                 {selectedProduct.specs && (
                   <div className="space-y-2 pt-2">
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400 block">
+                    <span className="text-xs font-bold uppercase tracking-widest text-gray-400 block">
                       Technical Specifications
                     </span>
                     <ul className="space-y-1.5 text-xs text-gray-700 font-sans">
@@ -1521,7 +1521,7 @@ const Shop: React.FC = () => {
               <h2 className="text-lg font-serif font-bold text-white leading-tight">
                 Mission Requisition Bag
               </h2>
-              <span className="text-[11px] text-gray-300 font-mono">
+              <span className="text-[13px] text-gray-300 font-mono">
                 {totalCartCount} {totalCartCount === 1 ? 'item' : 'items'} selected
               </span>
             </div>
@@ -1569,7 +1569,7 @@ const Shop: React.FC = () => {
                     </button>
                   </div>
 
-                  <div className="text-[10px] text-gray-400 font-mono">
+                  <div className="text-xs text-gray-400 font-mono">
                     {item.sku || 'CCA-EQUIP'} • {formatPrice(item.price)} each
                   </div>
 
@@ -1606,7 +1606,7 @@ const Shop: React.FC = () => {
           <div className="p-6 border-t border-gray-100 bg-brand-cream/50 space-y-4">
             
             {/* Delivery Note */}
-            <div className="flex items-start gap-2.5 p-3 bg-white rounded-xl border border-brand-green/10 text-[11px] text-gray-600">
+            <div className="flex items-start gap-2.5 p-3 bg-white rounded-xl border border-brand-green/10 text-[13px] text-gray-600">
               <Truck size={16} className="text-brand-gold shrink-0 mt-0.5" />
               <span>
                 <strong>Logistics:</strong> Same-day dispatch within Nairobi. Parcel courier delivery countrywide across Kenya via Fargo / G4S / Easy Coach.
@@ -1632,7 +1632,7 @@ const Shop: React.FC = () => {
 
               <button 
                 onClick={() => handleBulkRFQ('Items in Bag: ' + cart.map(i => i.name).join(', '))}
-                className="w-full py-2.5 bg-brand-green text-brand-gold hover:bg-brand-green/90 font-bold uppercase tracking-wider text-[10px] rounded-xl transition-all border border-brand-gold/30 flex items-center justify-center gap-2"
+                className="w-full py-2.5 bg-brand-green text-brand-gold hover:bg-brand-green/90 font-bold uppercase tracking-wider text-xs rounded-xl transition-all border border-brand-gold/30 flex items-center justify-center gap-2"
               >
                 <FileText size={14} /> Request Proforma Invoice (PDF)
               </button>

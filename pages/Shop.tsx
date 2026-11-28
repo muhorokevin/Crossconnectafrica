@@ -4,7 +4,9 @@ import {
   ShieldCheck, Tag, Ticket, ArrowRight, ShoppingCart, Award, Flame, 
   Compass, Shirt, Package, CheckCircle2, FileText, Phone, Truck, 
   ExternalLink, Sparkles, Filter, SlidersHorizontal, Info, ShieldAlert,
-  HelpCircle, Check
+  HelpCircle, Check, House, Car, Layers, Wind, Megaphone, BriefcaseMedical,
+  Droplet, HeartPulse, Bone, Bandage, BedSingle, Backpack, Flashlight,
+  GlassWater, Wrench, Tent, Footprints, Sun, FireExtinguisher, Cross
 } from 'lucide-react';
 import { Product, ShopSectionId } from '../types';
 
@@ -69,7 +71,7 @@ const PRODUCTS: Product[] = [
     price: '14000',
     description: 'Complete ready pack: 2 × 6kg ABC extinguishers with wall brackets, Small Office First Aid Kit, 4 glow-in-the-dark fire safety signs, and 1 A3 Fire Action Notice.',
     valueProp: '6% cheaper than buying individual items. Full statutory starter kit for clinics, startups, and branch offices.',
-    image: 'https://images.unsplash.com/photo-1582139329536-e7284fece509?q=80&w=1000&auto=format&fit=crop',
+    image: '',
     sku: 'CCA-PK-OFF15',
     certBadge: '6% Ready Pack Saving',
     stockStatus: 'In Stock',
@@ -89,7 +91,7 @@ const PRODUCTS: Product[] = [
     price: '41000',
     description: 'Institutional protection bundle: 4 × 9kg ABC extinguishers and 1 × 2kg CO2 extinguisher with brackets, 2 Medium First Aid Kits, Fire Blanket, 8 signs, and 2 A3 notices.',
     valueProp: '6% cheaper than individual item pricing. Ideal for churches, schools, halls, and community centres.',
-    image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?q=80&w=1000&auto=format&fit=crop',
+    image: '',
     sku: 'CCA-PK-SCH100',
     certBadge: '6% Ready Pack Saving',
     stockStatus: 'In Stock',
@@ -108,7 +110,7 @@ const PRODUCTS: Product[] = [
     price: '65500',
     description: 'Comprehensive commercial safety solution: 6 × 9kg ABC and 2 × 5kg CO2 extinguishers with brackets, Industrial & Medium First Aid Kits, Fire Blanket, 12 signs, and 2 notices.',
     valueProp: '6% Ready Pack discount for factories, large offices, lodges, and workshops.',
-    image: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?q=80&w=1000&auto=format&fit=crop',
+    image: '/images/equipment-safety-point.jpg',
     sku: 'CCA-PK-WRK50',
     certBadge: '6% Ready Pack Saving',
     stockStatus: 'In Stock',
@@ -127,7 +129,7 @@ const PRODUCTS: Product[] = [
     price: '7000',
     description: 'Complete household fire & medical protection: 2kg ABC dry powder extinguisher, 1.2×1.2m fire blanket, battery optical smoke alarm, and Home First Aid Kit.',
     valueProp: '6% bundle savings for residential apartments, family homes, and Airbnb hosts.',
-    image: 'https://images.unsplash.com/photo-1558002038-1055907df827?q=80&w=1000&auto=format&fit=crop',
+    image: '',
     sku: 'CCA-PK-HOME',
     certBadge: '6% Ready Pack Saving',
     stockStatus: 'In Stock',
@@ -146,7 +148,7 @@ const PRODUCTS: Product[] = [
     price: '5000',
     description: 'Road-ready safety pack pairing a 1kg dry powder extinguisher with mounting bracket and a stocked Vehicle First Aid Kit for private cars, matatus, and delivery vans.',
     valueProp: 'NTSA-aligned roadside preparedness with 6% ready pack savings.',
-    image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1000&auto=format&fit=crop',
+    image: '',
     sku: 'CCA-PK-VEH',
     certBadge: 'NTSA Road Ready',
     stockStatus: 'In Stock',
@@ -201,7 +203,7 @@ const PRODUCTS: Product[] = [
     price: '4900',
     description: 'Clean gas carbon dioxide extinguisher leaving zero residue. Built for server rooms and electrical panels.',
     valueProp: 'Protects critical IT infrastructure and switchboards without powder damage.',
-    image: 'https://images.unsplash.com/photo-1563245372-f21724e3856d?q=80&w=1000&auto=format&fit=crop',
+    image: '/images/equipment-extinguishers.jpg',
     sku: 'CCA-FS-CO2-2',
     certBadge: 'Class B & Electrical',
     stockStatus: 'In Stock',
@@ -219,7 +221,7 @@ const PRODUCTS: Product[] = [
     price: '7200',
     description: 'High-volume carbon dioxide extinguisher for electrical rooms, labs, and offices with heavy IT infrastructure. (9kg CO2 for plant/generator rooms: KES 12,500).',
     valueProp: 'Heavy-duty non-conductive clean suppression for major power hubs.',
-    image: 'https://images.unsplash.com/photo-1517524008697-84bbe3c3fd98?q=80&w=1000&auto=format&fit=crop',
+    image: '/images/equipment-extinguishers.jpg',
     sku: 'CCA-FS-CO2-5',
     certBadge: 'Heavy Commercial',
     stockStatus: 'In Stock',
@@ -237,7 +239,7 @@ const PRODUCTS: Product[] = [
     price: '1500',
     description: 'Quick-deploy woven fiberglass fire blanket for kitchens, canteens, and small pan fires.',
     valueProp: 'Rapid, zero-mess suppression for domestic and commercial kitchen flare-ups.',
-    image: 'https://images.unsplash.com/photo-1584036561566-baf8f5f1b144?q=80&w=1000&auto=format&fit=crop',
+    image: '',
     sku: 'CCA-FS-BLK12',
     certBadge: 'EN 1869 Certified',
     stockStatus: 'In Stock',
@@ -254,7 +256,7 @@ const PRODUCTS: Product[] = [
     price: '2200',
     description: 'Extra-large fire blanket for industrial kitchens, workshops, and outdoor camps.',
     valueProp: 'Maximum surface coverage for commercial kitchens and workshops.',
-    image: 'https://images.unsplash.com/photo-1504917599217-d4dc5ebe6122?q=80&w=1000&auto=format&fit=crop',
+    image: '',
     sku: 'CCA-FS-BLK18',
     certBadge: 'Industrial Workshop',
     stockStatus: 'In Stock',
@@ -307,7 +309,7 @@ const PRODUCTS: Product[] = [
     price: '6500',
     description: 'Protective emergency smoke escape hood providing 15 minutes of breathable air filtration to escape through thick smoke in hotels, offices, and hostels.',
     valueProp: 'Critical personal respiratory escape protection for high-rise buildings and hotels.',
-    image: 'https://i.imgur.com/MXik4LC.jpeg',
+    image: '',
     sku: 'CCA-FS-HOOD15',
     certBadge: '15-Min Smoke Escape',
     stockStatus: 'In Stock',
@@ -325,7 +327,7 @@ const PRODUCTS: Product[] = [
     price: '5500',
     description: '25W portable megaphone with alert siren for fire marshals managing evacuation assembly points and crowd control.',
     valueProp: 'Clear directional voice command across open evacuation zones.',
-    image: 'https://images.unsplash.com/photo-1508847154043-be5407fcaa5a?q=80&w=1000&auto=format&fit=crop',
+    image: '',
     sku: 'CCA-FS-MEG25',
     certBadge: '25W Marshal Command',
     stockStatus: 'In Stock',
@@ -498,7 +500,7 @@ const PRODUCTS: Product[] = [
     price: '8500',
     description: 'Statutory commercial workplace first aid kit stocked for warehouses, factories, construction sites, and large institutions. (Refill pack: KES 5,000).',
     valueProp: 'Full statutory compliance for 30+ staff offices, factories, and schools.',
-    image: 'https://images.unsplash.com/photo-1603398938378-e54eab446dde?q=80&w=1000&auto=format&fit=crop',
+    image: '/images/shop-first-aid-box.jpg',
     sku: 'CCA-FA-IND30',
     certBadge: '30+ Staff Workplace',
     stockStatus: 'In Stock',
@@ -533,7 +535,7 @@ const PRODUCTS: Product[] = [
     price: '14500',
     description: 'Complete field response trauma bag loaded for events, sports tournaments, and standby response teams.',
     valueProp: 'Event-ready medical trauma jump bag with multi-compartment access.',
-    image: 'https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?q=80&w=1000&auto=format&fit=crop',
+    image: '',
     sku: 'CCA-FA-TRB14',
     certBadge: 'Events & Sports Spec',
     stockStatus: 'In Stock',
@@ -550,7 +552,7 @@ const PRODUCTS: Product[] = [
     price: '2200',
     description: 'Tactical windlass tourniquet for severe limb bleeding emergencies. Crucial addition to event trauma bags and workshop kits.',
     valueProp: 'Immediate control of severe life-threatening extremity hemorrhage.',
-    image: 'https://images.unsplash.com/photo-1583947581924-860bda6a26df?q=80&w=1000&auto=format&fit=crop',
+    image: '',
     sku: 'CCA-FA-TRN01',
     certBadge: 'Severe Bleed Control',
     stockStatus: 'In Stock',
@@ -567,7 +569,7 @@ const PRODUCTS: Product[] = [
     price: '700',
     description: 'Protected resuscitation barrier mask with one-way filter valve for safe rescue breaths during CPR.',
     valueProp: 'Zero-hesitation barrier protection for first responders.',
-    image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?q=80&w=1000&auto=format&fit=crop',
+    image: '',
     sku: 'CCA-FA-CPR01',
     certBadge: 'One-Way Valve',
     stockStatus: 'In Stock',
@@ -585,7 +587,7 @@ const PRODUCTS: Product[] = [
     price: '900',
     description: 'Lightweight moldable fracture splint for supporting suspected limb fractures until medical help arrives. Assorted full splint set available at KES 5,500.',
     valueProp: 'Waterproof, reusable, and fits compact into any kit.',
-    image: 'https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?q=80&w=1000&auto=format&fit=crop',
+    image: '',
     sku: 'CCA-FA-SPL01',
     certBadge: 'Moldable Core',
     stockStatus: 'In Stock',
@@ -602,7 +604,7 @@ const PRODUCTS: Product[] = [
     price: '4500',
     description: 'Dedicated large burn kit for rapid cooling and sterile covering of major burns and scalds in kitchens, factories, and fire drills. Individual burn gel dressing: KES 400.',
     valueProp: 'Immediate thermal cooling and contamination shield for severe burns.',
-    image: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?q=80&w=1000&auto=format&fit=crop',
+    image: '',
     sku: 'CCA-FA-BRN45',
     certBadge: 'Medical Hydrogel',
     stockStatus: 'In Stock',
@@ -620,7 +622,7 @@ const PRODUCTS: Product[] = [
     price: '9500',
     description: 'Lightweight folding aluminium stretcher for safely moving injured casualties at events, schools, sports pitches, and factories. Spine board w/ straps: KES 16,500.',
     valueProp: 'Rapid casualty evacuation with compact vehicle/clinic storage.',
-    image: 'https://images.unsplash.com/photo-1516574187841-cb9cc2ca948b?q=80&w=1000&auto=format&fit=crop',
+    image: '',
     sku: 'CCA-FA-STR95',
     certBadge: 'Event & Factory Ready',
     stockStatus: 'In Stock',
@@ -638,7 +640,7 @@ const PRODUCTS: Product[] = [
     price: '145000',
     description: 'Life-saving automated external defibrillator for cardiac arrest response in workplaces, schools, gyms, and public venues (model confirmed at order).',
     valueProp: 'Essential cardiac arrest readiness paired with guided voice prompts.',
-    image: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?q=80&w=1000&auto=format&fit=crop',
+    image: '/images/shop-aed.jpg',
     sku: 'CCA-FA-AED01',
     certBadge: 'Cardiac Response',
     stockStatus: 'Pre-Order',
@@ -698,7 +700,7 @@ const PRODUCTS: Product[] = [
     price: '8800',
     description: 'Multi-day alpine rucksack featuring an internal lightweight aluminium stay frame, adjustable torso suspension, bottom sleeping bag compartment, and high-visibility rain cover.',
     valueProp: 'Ultimate multi-day load carriage for Mount Kenya Lenana summits and Aberdares traverses.',
-    image: 'https://images.unsplash.com/photo-1544717305-2782549b5136?q=80&w=1000&auto=format&fit=crop',
+    image: '',
     sku: 'CCA-TC-RUK65',
     certBadge: 'Alpine Expedition 65L',
     stockStatus: 'In Stock',
@@ -717,7 +719,7 @@ const PRODUCTS: Product[] = [
     price: '2900',
     description: '1200 Lumens tactical headlamp with Cree LED core and secondary red night-vision LED. USB-C fast charging with 18650 lithium battery. IPX6 waterproof rating handles heavy torrential rain.',
     valueProp: 'Essential for 2:00 AM summit pushes, night forest navigation, and camp setup.',
-    image: 'https://images.unsplash.com/photo-1508873696983-2df57046475a?q=80&w=1000&auto=format&fit=crop',
+    image: '',
     sku: 'CCA-TC-HL12',
     certBadge: '1200 Lumens • USB-C',
     stockStatus: 'In Stock',
@@ -736,7 +738,7 @@ const PRODUCTS: Product[] = [
     price: '2600',
     description: 'Heavy metal alloy casing with oil-filled thermo-elastic floating dial, sighting slit with magnifying lens, and built-in clinometer to measure mountain slopes and heights. Phosphorescent dial glows in dark.',
     valueProp: 'Dead reckoning orienteering instrument that never runs out of battery.',
-    image: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=1000&auto=format&fit=crop',
+    image: '',
     sku: 'CCA-TC-COMP1',
     certBadge: 'Sighting Clinometer',
     stockStatus: 'In Stock',
@@ -774,7 +776,7 @@ const PRODUCTS: Product[] = [
     price: '2800',
     description: 'Ultra-light personal hollow-fiber membrane water purifier straw. Filters out 99.9999% of waterborne bacteria (Salmonella, Cholera, E. coli) and 99.9% of protozoan cysts from streams, rivers, and wilderness dams.',
     valueProp: 'Drink safely straight from natural Kenyan rivers and high-altitude tarns.',
-    image: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?q=80&w=1000&auto=format&fit=crop',
+    image: '',
     sku: 'CCA-TC-WFL01',
     certBadge: '0.01 Micron Membrane',
     stockStatus: 'In Stock',
@@ -793,7 +795,7 @@ const PRODUCTS: Product[] = [
     price: '3400',
     description: 'Black-oxide coated 420HC stainless steel multi-tool with spring-action needlenose pliers, wire strippers, serrated rope saw blade, glass breaker, can opener, and 9-piece hex bit driver set with nylon sheath.',
     valueProp: 'Full field toolbox on your belt for emergency shelter repairs and equipment fixes.',
-    image: 'https://images.unsplash.com/photo-1589149098258-3e9102cd63d3?q=80&w=1000&auto=format&fit=crop',
+    image: '',
     sku: 'CCA-TC-TOOL18',
     certBadge: '420HC Stainless Steel',
     stockStatus: 'In Stock',
@@ -812,7 +814,7 @@ const PRODUCTS: Product[] = [
     price: '1600',
     description: 'Windproof, waterproof emergency sleeping bag constructed of aluminized PE material. Reflects 90% of radiant body heat back to the user, preventing fatal hypothermia during unexpected night stranding on high ridges.',
     valueProp: 'Mandatory safety protocol for any hiker entering Aberdares or Mount Kenya.',
-    image: 'https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?q=80&w=1000&auto=format&fit=crop',
+    image: '',
     sku: 'CCA-TC-BIV01',
     certBadge: '90% Heat Reflective',
     stockStatus: 'In Stock',
@@ -831,7 +833,7 @@ const PRODUCTS: Product[] = [
     price: '2400',
     description: 'Reinforced 600D ripstop waterproof leg gaiters designed to seal your hiking boots against mud, scree, sharp acacia thorns, ticks, and wet savannah brush. Heavy-duty under-boot TPU strap and front lace hook.',
     valueProp: 'Keeps socks dry and lower legs protected on muddy moorlands and thorny trails.',
-    image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1000&auto=format&fit=crop',
+    image: '',
     sku: 'CCA-TC-GTR01',
     certBadge: 'Thorn & Mud Shield',
     stockStatus: 'In Stock',
@@ -854,7 +856,7 @@ const PRODUCTS: Product[] = [
     price: '2500',
     description: 'Crafted from 240gsm combed ringspun African cotton. Features our iconic high-density screenprinted Cross Connect Africa chest emblem and bold "Faith in Action" back manifesto. Pre-shrunk and durable for CSR clean-ups and rugged trails.',
     valueProp: 'Wear the mission. 100% of proceeds support community outreach logistics.',
-    image: 'https://i.imgur.com/Kiw1wbc.jpeg',
+    image: '',
     sku: 'CCA-MC-TSH01',
     certBadge: '240gsm Combed Cotton',
     stockStatus: 'In Stock',
@@ -874,7 +876,7 @@ const PRODUCTS: Product[] = [
     price: '4800',
     description: 'Ultra-warm 340gsm brushed fleece hoodie built for early morning 5:00 AM mission departures, cold mountain trailheads, and evening fireside fellowship. Features double-lined hood, heavyweight ribbing, and kangaroo pouch pocket.',
     valueProp: 'Rugged warmth for high-altitude debriefs and team fellowship.',
-    image: 'https://i.imgur.com/4z6QSwY.jpeg',
+    image: '',
     sku: 'CCA-MC-HOD01',
     certBadge: '340gsm Brushed Fleece',
     stockStatus: 'In Stock',
@@ -894,7 +896,7 @@ const PRODUCTS: Product[] = [
     price: '3200',
     description: 'Professional moisture-wicking pique polo tailored for corporate team building facilitators, youth pastors, and event safety marshals. Features embroidered chest crest, ribbed collar, and side vents.',
     valueProp: 'Executive presentation meets all-day active field performance.',
-    image: 'https://images.unsplash.com/photo-1581655353564-df123a1eb820?q=80&w=1000&auto=format&fit=crop',
+    image: '',
     sku: 'CCA-MC-POL01',
     certBadge: 'Dry-Fit Pique',
     stockStatus: 'In Stock',
@@ -913,7 +915,7 @@ const PRODUCTS: Product[] = [
     price: '1800',
     description: 'Durable washed cotton twill wide-brim sun protection hat. Designed for full-day sun exposure on open savannahs and mountain tracks. Includes adjustable paracord chin strap and brass side ventilation eyelets.',
     valueProp: 'Identity and essential sun protection for the open ridge.',
-    image: 'https://i.imgur.com/YLr6AHT.jpeg',
+    image: '',
     sku: 'CCA-MC-HAT01',
     certBadge: 'Sun Shield Twill',
     stockStatus: 'In Stock',
@@ -1022,7 +1024,55 @@ const PRODUCTS: Product[] = [
   }
 ];
 
-const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1582139329536-e7284fece509?q=80&w=1000&auto=format&fit=crop';
+// Products without a real photo of the item get an icon tile instead of an unrelated stock picture
+const PRODUCT_ICONS: Record<string, React.ComponentType<{ size?: number; strokeWidth?: number; className?: string }>> = {
+  'pack-small-office': Package,
+  'pack-school-church': Package,
+  'pack-home-safety': House,
+  'pack-vehicle-safety': Car,
+  'fire-blanket-12': Layers,
+  'fire-blanket-18': Layers,
+  'fire-smoke-hood': Wind,
+  'fire-drill-megaphone': Megaphone,
+  'fa-trauma-bag-stocked': BriefcaseMedical,
+  'fa-cat-tourniquet': Droplet,
+  'fa-cpr-pocket-mask': HeartPulse,
+  'fa-splint-flexible': Bone,
+  'fa-burn-kit-large': Bandage,
+  'fa-folding-stretcher': BedSingle,
+  'tac-rucksack-65': Backpack,
+  'tac-headlamp-1200': Flashlight,
+  'tac-compass-prismatic': Compass,
+  'tac-water-filter': GlassWater,
+  'tac-multitool-18': Wrench,
+  'tac-bivy-sack': Tent,
+  'tac-trail-gaiters': Footprints,
+  'merch-tshirt-fia': Shirt,
+  'merch-hoodie-scg': Shirt,
+  'merch-polo-facilitator': Shirt,
+  'merch-bucket-hat': Sun
+};
+const SECTION_ICONS: Record<string, React.ComponentType<{ size?: number; strokeWidth?: number; className?: string }>> = {
+  fire_safety: FireExtinguisher,
+  first_aid: Cross,
+  tactical_hiking: Compass,
+  ministry_merch: Shirt
+};
+
+const ProductVisual: React.FC<{ product: Product; className?: string; iconSize?: number; lazy?: boolean }> = ({ product, className = '', iconSize = 56, lazy }) => {
+  const [failed, setFailed] = useState(false);
+  if (product.image && !failed) {
+    return <img src={product.image} alt={product.name} loading={lazy ? 'lazy' : undefined} onError={() => setFailed(true)} className={`w-full h-full object-cover ${className}`} />;
+  }
+  const Icon = PRODUCT_ICONS[product.id] || SECTION_ICONS[product.sectionId || ''] || Package;
+  return (
+    <div role="img" aria-label={product.name} className="w-full h-full flex items-center justify-center bg-gradient-to-br from-brand-sand to-brand-stone">
+      <span className="rounded-full bg-white/80 shadow-soft flex items-center justify-center text-brand-green" style={{ width: iconSize * 2, height: iconSize * 2 }}>
+        <Icon size={iconSize} strokeWidth={1.5} />
+      </span>
+    </div>
+  );
+};
 
 interface CartItem extends Product {
   quantity: number;
@@ -1036,9 +1086,6 @@ const Shop: React.FC = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [quickAddedToast, setQuickAddedToast] = useState<string | null>(null);
 
-  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-    e.currentTarget.src = FALLBACK_IMAGE;
-  };
 
   const formatPrice = (price: string) => `KES ${parseInt(price).toLocaleString()}`;
 
@@ -1359,13 +1406,7 @@ const Shop: React.FC = () => {
                       onClick={() => setSelectedProduct(product)}
                       className="aspect-[4/3] bg-brand-sand/40 overflow-hidden relative cursor-pointer"
                     >
-                      <img 
-                        src={product.image} 
-                        alt={product.name} 
-                        loading="lazy"
-                        onError={handleImageError}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
-                      />
+                      <ProductVisual product={product} lazy className="group-hover:scale-105 transition-transform duration-700" />
 
                       {/* Top Badges */}
                       <div className="absolute top-3 left-3 flex flex-col gap-1.5 z-10">
@@ -1539,12 +1580,7 @@ const Shop: React.FC = () => {
 
             {/* Left Image Showcase */}
             <div className="md:w-1/2 bg-brand-sand/50 relative min-h-[280px] md:min-h-full">
-              <img 
-                src={selectedProduct.image} 
-                alt={selectedProduct.name} 
-                onError={handleImageError} 
-                className="w-full h-full object-cover" 
-              />
+              <div className="absolute inset-0"><ProductVisual key={selectedProduct.id} product={selectedProduct} iconSize={72} /></div>
               <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between text-xs font-mono bg-black/60 backdrop-blur-md text-white px-3 py-1.5 rounded-lg border border-white/10">
                 <span>SKU: {selectedProduct.sku || 'CCA-EQUIP'}</span>
                 <span className="text-brand-gold font-bold">{selectedProduct.stockStatus || 'In Stock'}</span>
@@ -1686,7 +1722,7 @@ const Shop: React.FC = () => {
             cart.map(item => (
               <div key={item.id} className="flex gap-4 p-3.5 bg-brand-cream/30 rounded-2xl border border-gray-100 relative group">
                 <div className="w-16 h-16 rounded-xl overflow-hidden bg-brand-sand shrink-0">
-                  <img src={item.image} alt={item.name} onError={handleImageError} className="w-full h-full object-cover" />
+                  <ProductVisual product={item} iconSize={14} />
                 </div>
                 
                 <div className="flex-1 min-w-0 space-y-1">

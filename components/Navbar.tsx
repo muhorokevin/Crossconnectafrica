@@ -91,11 +91,11 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, setView }) => {
           </a>
           <button
             onClick={() => go(ViewState.CALCULATOR)}
-            className="group inline-flex items-center gap-2 h-11 pl-5 pr-1.5 rounded-full bg-brand-amber text-brand-ink text-[14px] font-semibold hover:bg-white transition-colors"
+            className="group inline-flex items-center gap-2 h-11 px-4 sm:pl-5 sm:pr-1.5 rounded-full bg-brand-amber text-brand-ink text-[14px] font-semibold hover:bg-white transition-colors"
           >
             <span className="hidden sm:inline">Get a quote</span>
             <span className="sm:hidden">Quote</span>
-            <span className="w-8 h-8 rounded-full bg-brand-ink text-brand-amber flex items-center justify-center transition-transform group-hover:rotate-45">
+            <span className="hidden sm:flex w-8 h-8 rounded-full bg-brand-ink text-brand-amber items-center justify-center transition-transform group-hover:rotate-45">
               <ArrowUpRight size={16} />
             </span>
           </button>

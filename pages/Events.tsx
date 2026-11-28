@@ -35,14 +35,14 @@ const CATEGORY_TABS: { id: 'all' | EventCategory; label: string }[] = [
   { id: 'all', label: 'All Events' },
   { id: 'fire_safety', label: 'Fire Safety Training' },
   { id: 'first_aid', label: 'First Aid Training' },
-  { id: 'hike', label: 'Uncommon Hikes' },
+  { id: 'hike', label: 'Guided Hikes' },
   { id: 'camping', label: 'Wilderness Camping' }
 ];
 
 const CATEGORY_LABEL: Record<EventCategory, string> = {
   fire_safety: 'Fire Safety Training',
   first_aid: 'First Aid Training',
-  hike: 'Uncommon Hike',
+  hike: 'Guided Hike',
   camping: 'Wilderness Camping'
 };
 
@@ -362,7 +362,7 @@ Hello! I would like to book a spot or inquire about a group booking for this eve
             <span>Training &amp; Expeditions</span>
           </div>
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-serif font-bold text-brand-green leading-[1.08] tracking-tight text-balance">
-            Hands-On Safety Trainings &amp; <span className="italic text-brand-gold font-normal">Uncommon Kenyan Expeditions.</span>
+            Hands-On Safety Trainings &amp; <span className="italic text-brand-gold font-normal">Guided Hikes Across Kenya.</span>
           </h1>
           <p className="text-base md:text-lg text-gray-600 leading-relaxed max-w-2xl">
             Certified fire safety and first aid courses paired with guided hikes and wilderness camps across Kenya’s hidden ridges, forests, and northern valleys.
@@ -458,7 +458,7 @@ Hello! I would like to book a spot or inquire about a group booking for this eve
                 Upcoming Calendar Across Kenya
               </h2>
               <p className="text-xs text-gray-600 mt-1">
-                Filter by Fire Safety, First Aid, Uncommon Hikes, or Wilderness Camps across 7 Kenyan counties.
+                Filter by Fire Safety, First Aid, Guided Hikes, or Wilderness Camps across 7 Kenyan counties.
               </p>
             </div>
 

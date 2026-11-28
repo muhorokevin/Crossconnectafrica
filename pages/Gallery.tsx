@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import {
-  Maximize2, X, ChevronLeft, ChevronRight, Share2, ArrowRight,
-  Play, Film, Check
+  Maximize2, X, ChevronLeft, ChevronRight, ChevronDown, Share2, ArrowRight, ArrowUpRight,
+  Play, Film, Check, Image as ImageIcon
 } from 'lucide-react';
 import { ViewState } from '../types';
 import { BookingContextData } from '../App';
@@ -27,6 +27,24 @@ const GALLERY_ITEMS: GalleryItem[] = [
     url: 'https://i.imgur.com/ta9deUd.mp4',
     posterUrl: 'https://i.imgur.com/ta9deUdm.jpg'
   },
+
+  // Lakeside staff team day: team-carry challenge videos and group photos
+  {
+    id: 'little-lions-carry-1',
+    type: 'video',
+    url: '/videos/little-lions-school-1.mp4',
+    posterUrl: '/videos/little-lions-school-1.jpg'
+  },
+  { id: 'lake-team-group', type: 'photo', url: '/images/lake-team-group.jpg' },
+  { id: 'lake-team-small-group', type: 'photo', url: '/images/lake-team-small-group.jpg' },
+  {
+    id: 'little-lions-carry-2',
+    type: 'video',
+    url: '/videos/little-lions-school-2.mp4',
+    posterUrl: '/videos/little-lions-school-2.jpg'
+  },
+  { id: 'lake-team-four', type: 'photo', url: '/images/lake-team-four.jpg' },
+  { id: 'lake-team-small-group-2', type: 'photo', url: '/images/lake-team-small-group-2.jpg' },
 
   // Latest photos: CITAM Kadolta team days, catering, marshals and hikes
   { id: 'kadolta-team-fun', type: 'photo', url: '/images/kadolta-team-fun.jpg' },
@@ -84,378 +102,239 @@ const GALLERY_ITEMS: GalleryItem[] = [
   { id: 'cca-36', type: 'photo', url: 'https://i.imgur.com/H7y7KfG.jpg' }
 ];
 
-type RowLayout = 'split-even' | 'full' | 'split-wide-left' | 'split-wide-right';
-
-interface GalleryRow {
-  layout: RowLayout;
-  entries: { item: GalleryItem; index: number }[];
-}
-
-const ROW_PATTERN: RowLayout[] = [
-  'split-even',
-  'full',
-  'split-wide-left',
-  'split-even',
-  'full',
-  'split-wide-right'
-];
+const PAGE_SIZE = 24;
 
 interface GalleryProps {
   setView?: (view: ViewState) => void;
   onNavigateToBooking?: (data: BookingContextData) => void;
 }
 
-const Gallery: React.FC<GalleryProps> = ({ setView, onNavigateToBooking }) => {
-  const [activeFilter, setActiveFilter] = useState<'all' | 'photo' | 'video'>('all');
+type Filter = 'all' | 'photo' | 'video';
+
+const Gallery: React.FC<GalleryProps> = ({ setView }) => {
+  const [activeFilter, setActiveFilter] = useState<Filter>('all');
+  const [visible, setVisible] = useState(PAGE_SIZE);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [copiedLink, setCopiedLink] = useState(false);
   const filmstripRef = useRef<HTMLDivElement>(null);
+  const touchX = useRef<number | null>(null);
 
   const filteredItems = useMemo(
     () => GALLERY_ITEMS.filter(item => activeFilter === 'all' || item.type === activeFilter),
     [activeFilter]
   );
+  const shown = filteredItems.slice(0, visible);
 
-  // Build balanced editorial rows matching the showcase collage rhythm
-  const rows = useMemo<GalleryRow[]>(() => {
-    const built: GalleryRow[] = [];
-    let cursor = 0;
-    let step = 0;
+  const counts = {
+    all: GALLERY_ITEMS.length,
+    photo: GALLERY_ITEMS.filter(i => i.type === 'photo').length,
+    video: GALLERY_ITEMS.filter(i => i.type === 'video').length
+  };
 
-    while (cursor < filteredItems.length) {
-      const remaining = filteredItems.length - cursor;
-      const desiredLayout = ROW_PATTERN[step % ROW_PATTERN.length];
+  const changeFilter = (f: Filter) => { setActiveFilter(f); setVisible(PAGE_SIZE); };
 
-      if (desiredLayout === 'full' || remaining === 1) {
-        built.push({
-          layout: 'full',
-          entries: [{ item: filteredItems[cursor], index: cursor }]
-        });
-        cursor += 1;
-      } else {
-        built.push({
-          layout: desiredLayout,
-          entries: [
-            { item: filteredItems[cursor], index: cursor },
-            { item: filteredItems[cursor + 1], index: cursor + 1 }
-          ]
-        });
-        cursor += 2;
-      }
-      step += 1;
-    }
-
-    return built;
-  }, [filteredItems]);
-
-  const openLightbox = (index: number) => setLightboxIndex(index);
   const closeLightbox = () => setLightboxIndex(null);
+  const step = (dir: 1 | -1) =>
+    setLightboxIndex(prev => (prev === null ? null : (prev + dir + filteredItems.length) % filteredItems.length));
 
-  const handlePrev = (e?: React.MouseEvent) => {
-    if (e) e.stopPropagation();
-    if (lightboxIndex !== null) {
-      setLightboxIndex((lightboxIndex - 1 + filteredItems.length) % filteredItems.length);
-    }
-  };
-
-  const handleNext = (e?: React.MouseEvent) => {
-    if (e) e.stopPropagation();
-    if (lightboxIndex !== null) {
-      setLightboxIndex((lightboxIndex + 1) % filteredItems.length);
-    }
-  };
-
-  useEffect(() => {
-    if (lightboxIndex !== null && filmstripRef.current) {
-      const activeThumb = filmstripRef.current.children[lightboxIndex] as HTMLElement;
-      if (activeThumb) {
-        activeThumb.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-      }
-    }
-  }, [lightboxIndex]);
-
+  // Keyboard controls and scroll lock while the viewer is open
   useEffect(() => {
     if (lightboxIndex === null) return;
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        closeLightbox();
-      } else if (e.key === 'ArrowLeft') {
-        setLightboxIndex(prev => (prev !== null ? (prev - 1 + filteredItems.length) % filteredItems.length : null));
-      } else if (e.key === 'ArrowRight') {
-        setLightboxIndex(prev => (prev !== null ? (prev + 1) % filteredItems.length : null));
-      }
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') closeLightbox();
+      else if (e.key === 'ArrowLeft') step(-1);
+      else if (e.key === 'ArrowRight') step(1);
     };
+    document.body.style.overflow = 'hidden';
+    window.addEventListener('keydown', onKey);
+    return () => { document.body.style.overflow = ''; window.removeEventListener('keydown', onKey); };
+  }, [lightboxIndex === null, filteredItems.length]);
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [lightboxIndex, filteredItems.length]);
+  // Keep the active thumbnail in view
+  useEffect(() => {
+    if (lightboxIndex === null || !filmstripRef.current) return;
+    const thumb = filmstripRef.current.children[lightboxIndex] as HTMLElement | undefined;
+    thumb?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+  }, [lightboxIndex]);
 
-  const handleQuoteClick = () => {
-    closeLightbox();
-    if (setView) {
-      if (onNavigateToBooking) {
-        onNavigateToBooking({ categoryTitle: 'Cross Connect Africa Services' });
-      } else {
-        setView(ViewState.CALCULATOR);
-      }
+  const share = (url: string) => {
+    const full = url.startsWith('/') ? window.location.origin + url : url;
+    if (navigator.share) {
+      navigator.share({ title: 'Cross Connect Africa', url: full }).catch(() => {});
+    } else {
+      navigator.clipboard.writeText(full);
+      setCopiedLink(true);
+      setTimeout(() => setCopiedLink(false), 2200);
     }
   };
 
-  const photoCount = GALLERY_ITEMS.filter(i => i.type === 'photo').length;
-  const videoCount = GALLERY_ITEMS.filter(i => i.type === 'video').length;
+  const goQuote = () => { closeLightbox(); setView?.(ViewState.CALCULATOR); };
+
+  const current = lightboxIndex !== null ? filteredItems[lightboxIndex] : null;
 
   return (
-    <div className="bg-white min-h-screen pt-32 md:pt-36 pb-24 text-neutral-900">
+    <div className="bg-brand-cream min-h-screen pt-28 md:pt-36 pb-10">
+      {/* Header */}
+      <header className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-10 flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8 md:mb-12">
+        <div className="max-w-2xl">
+          <p className="eyebrow text-brand-gold">Gallery</p>
+          <h1 className="font-display font-bold text-brand-green text-4xl sm:text-5xl md:text-6xl leading-[1.02] mt-4">Our work, in pictures.</h1>
+          <p className="text-lg text-brand-green/65 mt-4 leading-relaxed">
+            Team days, safety training, drills, hikes and events from across Kenya. Tap any photo to see it full size.
+          </p>
+        </div>
 
-      {/* Minimalist Editorial Header */}
-      <header className="max-w-2xl mx-auto px-6 text-center mb-10 md:mb-12">
-        <h1 className="text-3xl md:text-5xl font-serif font-medium tracking-tight text-neutral-900 mb-4">
-          Our Work
-        </h1>
-        <p className="text-sm md:text-base text-neutral-500 font-sans leading-relaxed max-w-md mx-auto">
-          Moments from corporate team building, fire safety drills, first aid training, and wilderness expeditions across Kenya.
-        </p>
-
-        {/* Quiet Editorial Text Filter */}
-        <nav
-          aria-label="Filter gallery media"
-          className="mt-8 flex items-center justify-center gap-6 text-xs font-medium tracking-wide"
-        >
-          <button
-            type="button"
-            onClick={() => setActiveFilter('all')}
-            className={`pb-1 transition-colors whitespace-nowrap shrink-0 border-b ${
-              activeFilter === 'all'
-                ? 'border-neutral-900 text-neutral-900 font-semibold'
-                : 'border-transparent text-neutral-400 hover:text-neutral-700'
-            }`}
-          >
-            All ({GALLERY_ITEMS.length})
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveFilter('photo')}
-            className={`pb-1 transition-colors whitespace-nowrap shrink-0 border-b ${
-              activeFilter === 'photo'
-                ? 'border-neutral-900 text-neutral-900 font-semibold'
-                : 'border-transparent text-neutral-400 hover:text-neutral-700'
-            }`}
-          >
-            Photos ({photoCount})
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveFilter('video')}
-            className={`pb-1 transition-colors whitespace-nowrap shrink-0 border-b ${
-              activeFilter === 'video'
-                ? 'border-neutral-900 text-neutral-900 font-semibold'
-                : 'border-transparent text-neutral-400 hover:text-neutral-700'
-            }`}
-          >
-            Videos ({videoCount})
-          </button>
-        </nav>
+        <div role="tablist" aria-label="Filter the gallery" className="inline-flex self-start md:self-auto rounded-full bg-white ring-1 ring-brand-green/10 p-1 shadow-soft">
+          {([
+            ['all', 'All'],
+            ['photo', 'Photos'],
+            ['video', 'Videos']
+          ] as [Filter, string][]).map(([f, label]) => (
+            <button
+              key={f}
+              type="button"
+              role="tab"
+              aria-selected={activeFilter === f}
+              onClick={() => changeFilter(f)}
+              className={`h-10 px-4 sm:px-5 rounded-full text-sm font-semibold transition-colors flex items-center gap-2 ${
+                activeFilter === f ? 'bg-brand-green text-white' : 'text-brand-green/70 hover:text-brand-green'
+              }`}
+            >
+              {f === 'video' && <Film size={15} />}
+              {f === 'photo' && <ImageIcon size={15} />}
+              {label}
+              <span className={`text-xs tabular-nums ${activeFilter === f ? 'text-brand-amber' : 'text-brand-green/40'}`}>{counts[f]}</span>
+            </button>
+          ))}
+        </div>
       </header>
 
-      {/* Edge-to-Edge Editorial Collage Grid (Tight White Hairline Seams, Pure Pictures) */}
-      <main className="max-w-5xl mx-auto px-4 md:px-6 space-y-1.5">
-        {rows.map((row, rowIdx) => {
-          if (row.layout === 'full') {
-            const { item, index } = row.entries[0];
-            return (
-              <div key={`row-${rowIdx}`} className="w-full">
-                <GalleryTile
-                  item={item}
-                  onOpen={() => openLightbox(index)}
-                  heightClass="h-[260px] sm:h-[400px] md:h-[520px]"
-                />
-              </div>
-            );
-          }
+      {/* Masonry grid: every photo keeps its own shape, nothing is cropped */}
+      <main className="max-w-7xl mx-auto px-3 sm:px-8 lg:px-10">
+        <div className="columns-2 md:columns-3 xl:columns-4 gap-2.5 sm:gap-4 [&>*]:mb-2.5 sm:[&>*]:mb-4">
+          {shown.map((item, idx) => (
+            <GalleryTile key={item.id} item={item} onOpen={() => setLightboxIndex(idx)} />
+          ))}
+        </div>
 
-          return (
-            <div
-              key={`row-${rowIdx}`}
-              className="grid grid-cols-1 md:grid-cols-12 gap-1.5"
+        {visible < filteredItems.length && (
+          <div className="mt-8 flex flex-col items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setVisible(v => v + PAGE_SIZE)}
+              className="inline-flex items-center gap-2 h-12 px-7 rounded-full bg-white ring-1 ring-brand-green/15 text-brand-green font-semibold hover:ring-brand-green/40 shadow-soft"
             >
-              {row.entries.map((entry, colIdx) => {
-                const colSpanClass =
-                  row.layout === 'split-even'
-                    ? 'md:col-span-6'
-                    : row.layout === 'split-wide-left'
-                    ? colIdx === 0
-                      ? 'md:col-span-8'
-                      : 'md:col-span-4'
-                    : colIdx === 0
-                    ? 'md:col-span-4'
-                    : 'md:col-span-8';
-
-                return (
-                  <div key={entry.item.id} className={colSpanClass}>
-                    <GalleryTile
-                      item={entry.item}
-                      onOpen={() => openLightbox(entry.index)}
-                      heightClass="h-[260px] sm:h-[340px] md:h-[390px]"
-                    />
-                  </div>
-                );
-              })}
-            </div>
-          );
-        })}
+              Show more <ChevronDown size={18} />
+            </button>
+            <p className="text-sm text-brand-green/50">Showing {shown.length} of {filteredItems.length}</p>
+          </div>
+        )}
       </main>
 
-      {/* Lightbox Modal */}
-      {lightboxIndex !== null && filteredItems[lightboxIndex] && (
+      {/* Closing call to action */}
+      <section className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-10 mt-16 md:mt-24">
+        <div className="rounded-[28px] bg-brand-ink text-white p-8 md:p-12 flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div>
+            <h2 className="font-display font-bold text-3xl md:text-4xl leading-tight">Want a day like this for your team?</h2>
+            <p className="text-white/65 mt-2 text-lg">See your price in a minute, then send it to us on WhatsApp.</p>
+          </div>
+          <button
+            type="button"
+            onClick={goQuote}
+            className="group shrink-0 inline-flex items-center gap-3 h-14 pl-7 pr-2 rounded-full bg-brand-amber text-brand-ink font-semibold hover:bg-white transition-colors"
+          >
+            Get your price
+            <span className="w-10 h-10 rounded-full bg-brand-ink text-brand-amber flex items-center justify-center transition-transform group-hover:rotate-45"><ArrowUpRight size={18} /></span>
+          </button>
+        </div>
+      </section>
+
+      {/* Full-screen viewer */}
+      {current && lightboxIndex !== null && (
         <div
-          onClick={closeLightbox}
           role="dialog"
           aria-modal="true"
-          aria-label="Media Lightbox"
-          className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex flex-col justify-between p-4 md:p-6"
+          aria-label="Photo viewer"
+          onClick={closeLightbox}
+          className="fixed inset-0 z-[70] bg-brand-ink/[0.97] backdrop-blur-sm flex flex-col animate-fade-in"
         >
-          {/* Top Control Bar */}
-          <div
-            onClick={e => e.stopPropagation()}
-            className="w-full flex items-center justify-between text-white pb-3 border-b border-white/10"
-          >
-            <div className="flex items-center gap-3">
-              <span className="text-white/75 text-xs font-mono uppercase tracking-widest tabular-nums">
-                {lightboxIndex + 1} / {filteredItems.length}
-              </span>
-            </div>
-
+          {/* Top bar */}
+          <div onClick={e => e.stopPropagation()} className="flex items-center justify-between gap-3 px-4 sm:px-6 py-3 text-white">
+            <span className="text-sm text-white/60 tabular-nums">{lightboxIndex + 1} / {filteredItems.length}</span>
             <div className="flex items-center gap-2">
-              <span className="hidden sm:inline text-white/50 text-[13px] font-mono mr-2">
-                ESC to close · ← → to browse
-              </span>
-
-              <button
-                type="button"
-                onClick={() => {
-                  const url = filteredItems[lightboxIndex].url;
-                  if (navigator.share) {
-                    navigator.share({
-                      title: 'Cross Connect Africa Media',
-                      url
-                    }).catch(() => {});
-                  } else {
-                    navigator.clipboard.writeText(url);
-                    setCopiedLink(true);
-                    setTimeout(() => setCopiedLink(false), 2200);
-                  }
-                }}
-                className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs font-medium flex items-center gap-1.5 transition-colors border border-white/10"
-                title="Share link"
-              >
-                {copiedLink ? (
-                  <>
-                    <Check size={14} className="text-emerald-400" /> Copied
-                  </>
-                ) : (
-                  <>
-                    <Share2 size={14} /> Share
-                  </>
-                )}
+              <button type="button" onClick={() => share(current.url)} className="h-10 px-4 rounded-full bg-white/10 hover:bg-white/20 text-sm font-semibold flex items-center gap-1.5">
+                {copiedLink ? <><Check size={15} className="text-emerald-400" /> Copied</> : <><Share2 size={15} /> Share</>}
               </button>
-
-              <button
-                type="button"
-                onClick={closeLightbox}
-                aria-label="Close Lightbox"
-                className="p-2.5 rounded-lg bg-white/10 text-white hover:bg-brand-gold hover:text-brand-green transition-colors border border-white/10"
-              >
-                <X size={18} />
+              <button type="button" onClick={closeLightbox} aria-label="Close" className="w-10 h-10 rounded-full bg-white/10 hover:bg-white hover:text-brand-ink flex items-center justify-center">
+                <X size={20} />
               </button>
             </div>
           </div>
 
-          {/* Central Media Stage */}
+          {/* Stage */}
           <div
-            onClick={e => e.stopPropagation()}
-            className="relative flex-1 flex items-center justify-center py-2 px-2 sm:px-12 w-full max-h-[75vh]"
+            className="relative flex-1 min-h-0 flex items-center justify-center px-2 sm:px-20"
+            onTouchStart={e => { touchX.current = e.touches[0].clientX; }}
+            onTouchEnd={e => {
+              if (touchX.current === null) return;
+              const dx = e.changedTouches[0].clientX - touchX.current;
+              if (Math.abs(dx) > 50) step(dx < 0 ? 1 : -1);
+              touchX.current = null;
+            }}
           >
-            <button
-              type="button"
-              onClick={handlePrev}
-              aria-label="Previous Media"
-              className="absolute left-2 sm:left-4 z-20 p-3 md:p-4 rounded-full bg-black/60 text-white hover:bg-brand-gold hover:text-brand-green transition-colors border border-white/10"
-            >
-              <ChevronLeft size={22} />
-            </button>
-
-            <button
-              type="button"
-              onClick={handleNext}
-              aria-label="Next Media"
-              className="absolute right-2 sm:right-4 z-20 p-3 md:p-4 rounded-full bg-black/60 text-white hover:bg-brand-gold hover:text-brand-green transition-colors border border-white/10"
-            >
-              <ChevronRight size={22} />
-            </button>
-
-            {filteredItems[lightboxIndex].type === 'video' ? (
-              <div className="w-full max-w-4xl max-h-full overflow-hidden bg-black shadow-2xl border border-white/10 flex items-center justify-center">
+            <div onClick={e => e.stopPropagation()} className="max-w-full max-h-full flex items-center justify-center">
+              {current.type === 'video' ? (
                 <video
-                  src={filteredItems[lightboxIndex].url}
+                  key={current.id}
+                  src={current.url}
+                  poster={current.posterUrl}
                   controls
                   autoPlay
                   playsInline
                   controlsList="nodownload"
-                  className="max-h-[72vh] w-auto max-w-full object-contain mx-auto"
+                  className="max-h-[calc(100svh-190px)] max-w-full rounded-2xl bg-black"
                 />
-              </div>
-            ) : (
-              <img
-                src={filteredItems[lightboxIndex].url}
-                alt="Cross Connect Africa Gallery"
-                referrerPolicy="no-referrer"
-                className="max-w-full max-h-[72vh] object-contain shadow-2xl select-none"
-              />
-            )}
+              ) : (
+                <img
+                  key={current.id}
+                  src={current.url}
+                  alt="Cross Connect Africa event photo"
+                  referrerPolicy="no-referrer"
+                  className="max-h-[calc(100svh-190px)] max-w-full object-contain rounded-2xl select-none animate-fade-in"
+                />
+              )}
+            </div>
+
+            <button type="button" onClick={e => { e.stopPropagation(); step(-1); }} aria-label="Previous" className="hidden sm:flex absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 hover:bg-brand-amber hover:text-brand-ink text-white items-center justify-center">
+              <ChevronLeft size={24} />
+            </button>
+            <button type="button" onClick={e => { e.stopPropagation(); step(1); }} aria-label="Next" className="hidden sm:flex absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 hover:bg-brand-amber hover:text-brand-ink text-white items-center justify-center">
+              <ChevronRight size={24} />
+            </button>
           </div>
 
-          {/* Bottom Actions & Thumbnail Filmstrip */}
-          <div
-            onClick={e => e.stopPropagation()}
-            className="w-full pt-3 border-t border-white/10 flex flex-col items-center gap-3"
-          >
-            <button
-              type="button"
-              onClick={handleQuoteClick}
-              className="px-6 py-2 bg-brand-gold text-brand-green rounded-lg font-bold text-xs uppercase tracking-wider hover:bg-white transition-colors flex items-center gap-2"
-            >
-              Book a Service <ArrowRight size={14} />
-            </button>
-
-            <div
-              ref={filmstripRef}
-              className="w-full max-w-3xl flex items-center gap-1.5 overflow-x-auto py-1 scrollbar-none"
-            >
+          {/* Bottom: thumbnails, phone arrows and quote button */}
+          <div onClick={e => e.stopPropagation()} className="px-3 sm:px-6 pt-3 pb-4 flex flex-col items-center gap-3">
+            <div ref={filmstripRef} className="w-full max-w-4xl flex gap-1.5 overflow-x-auto no-scrollbar py-1">
               {filteredItems.map((item, idx) => (
                 <button
                   type="button"
                   key={item.id}
                   onClick={() => setLightboxIndex(idx)}
-                  className={`relative shrink-0 w-12 h-10 overflow-hidden transition-opacity border ${
-                    idx === lightboxIndex
-                      ? 'border-brand-gold ring-2 ring-brand-gold/60 opacity-100'
-                      : 'border-white/20 opacity-50 hover:opacity-90'
-                  }`}
+                  aria-label={`Show item ${idx + 1}`}
+                  className={`relative shrink-0 w-14 h-11 rounded-lg overflow-hidden transition-all ${idx === lightboxIndex ? 'ring-2 ring-brand-amber opacity-100' : 'opacity-45 hover:opacity-90'}`}
                 >
-                  <img
-                    src={item.type === 'video' ? (item.posterUrl || item.url) : item.url}
-                    alt="Thumbnail"
-                    referrerPolicy="no-referrer"
-                    className="w-full h-full object-cover"
-                  />
-                  {item.type === 'video' && (
-                    <span className="absolute inset-0 bg-black/40 flex items-center justify-center text-white">
-                      <Play size={10} className="fill-current text-brand-gold" />
-                    </span>
-                  )}
+                  <img src={item.type === 'video' ? item.posterUrl || item.url : item.url} alt="" loading="lazy" referrerPolicy="no-referrer" className="w-full h-full object-cover" />
+                  {item.type === 'video' && <span className="absolute inset-0 flex items-center justify-center bg-black/30"><Play size={12} className="text-white fill-current" /></span>}
                 </button>
               ))}
+            </div>
+            <div className="flex items-center gap-2">
+              <button type="button" onClick={() => step(-1)} aria-label="Previous" className="sm:hidden w-11 h-11 rounded-full bg-white/10 text-white flex items-center justify-center"><ChevronLeft size={20} /></button>
+              <button type="button" onClick={goQuote} className="h-11 px-5 rounded-full bg-brand-amber text-brand-ink text-sm font-semibold flex items-center gap-2 hover:bg-white">
+                Get your price <ArrowRight size={15} />
+              </button>
+              <button type="button" onClick={() => step(1)} aria-label="Next" className="sm:hidden w-11 h-11 rounded-full bg-white/10 text-white flex items-center justify-center"><ChevronRight size={20} /></button>
             </div>
           </div>
         </div>
@@ -464,56 +343,42 @@ const Gallery: React.FC<GalleryProps> = ({ setView, onNavigateToBooking }) => {
   );
 };
 
-interface GalleryTileProps {
-  item: GalleryItem;
-  onOpen: () => void;
-  heightClass: string;
-}
-
-const GalleryTile: React.FC<GalleryTileProps> = ({ item, onOpen, heightClass }) => {
+const GalleryTile: React.FC<{ item: GalleryItem; onOpen: () => void }> = ({ item, onOpen }) => {
+  const [loaded, setLoaded] = useState(false);
+  const isVideo = item.type === 'video';
   return (
-    <div
+    <button
+      type="button"
       onClick={onOpen}
-      className={`group relative w-full ${heightClass} overflow-hidden bg-neutral-100 cursor-pointer`}
+      aria-label={isVideo ? 'Play video' : 'Open photo'}
+      className="group relative block w-full break-inside-avoid overflow-hidden rounded-2xl sm:rounded-[20px] bg-brand-sand text-left focus-visible:ring-2 focus-visible:ring-brand-gold"
     >
-      {item.type === 'video' ? (
-        <div className="w-full h-full relative bg-neutral-900">
-          <video
-            src={item.url}
-            poster={item.posterUrl}
-            muted
-            loop
-            playsInline
-            className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500"
-            onMouseOver={e => (e.target as HTMLVideoElement).play().catch(() => {})}
-            onMouseOut={e => (e.target as HTMLVideoElement).pause()}
-          />
-          <div className="absolute inset-0 bg-black/20 group-hover:bg-black/35 transition-colors flex items-center justify-center">
-            <span className="w-12 h-12 rounded-full bg-white/90 text-neutral-900 shadow-lg flex items-center justify-center group-hover:scale-105 transition-transform">
-              <Play size={20} className="fill-current ml-0.5" />
+      <img
+        src={isVideo ? item.posterUrl || item.url : item.url}
+        alt={isVideo ? '' : 'Cross Connect Africa event photo'}
+        loading="lazy"
+        referrerPolicy="no-referrer"
+        onLoad={() => setLoaded(true)}
+        className={`w-full h-auto block transition-all duration-700 group-hover:scale-[1.04] ${loaded ? 'opacity-100' : 'opacity-0 min-h-[180px]'}`}
+      />
+      <span className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+      {isVideo ? (
+        <>
+          <span className="absolute inset-0 flex items-center justify-center">
+            <span className="w-14 h-14 rounded-full bg-white/90 text-brand-ink shadow-lift flex items-center justify-center transition-transform group-hover:scale-110">
+              <Play size={22} className="fill-current ml-0.5" />
             </span>
-          </div>
-          <span className="absolute top-3 left-3 text-white/90 text-[13px] font-medium flex items-center gap-1 drop-shadow">
+          </span>
+          <span className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-black/55 backdrop-blur text-white text-xs font-semibold flex items-center gap-1">
             <Film size={12} /> Video
           </span>
-        </div>
+        </>
       ) : (
-        <div className="w-full h-full relative">
-          <img
-            src={item.url}
-            alt="Cross Connect Africa"
-            referrerPolicy="no-referrer"
-            loading="lazy"
-            className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500"
-          />
-          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
-            <span className="opacity-0 group-hover:opacity-100 transition-opacity p-3 rounded-full bg-white/85 text-neutral-900 shadow-md">
-              <Maximize2 size={18} />
-            </span>
-          </div>
-        </div>
+        <span className="absolute bottom-3 right-3 w-9 h-9 rounded-full bg-white/90 text-brand-ink flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+          <Maximize2 size={16} />
+        </span>
       )}
-    </div>
+    </button>
   );
 };
 
